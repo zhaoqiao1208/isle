@@ -18,35 +18,63 @@ body {
   padding: 0 0 50px;
 }
 
-/* Character image */
-.character-area {
+/* Time & Days Counter */
+.time-section {
   width: 100%;
   max-width: 900px;
-  padding: 0 12px;
-  margin-top: 16px;
-  margin-bottom: 0;
+  padding: 20px 12px 0;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.time-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.time-date {
+  font-size: 22px;
+  font-weight: 300;
+  color: #5a4a6e;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-weekday {
+  font-size: 12px;
+  color: #b8a8c8;
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+.days-box {
+  display: flex;
+  flex-direction: column;
   align-items: flex-end;
 }
 
-.character-area img {
-  width: 140px;
-  height: auto;
-  display: block;
-  animation: float 3s ease-in-out infinite;
+.days-number {
+  font-size: 28px;
+  font-weight: 200;
+  color: #c9a8e8;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+.days-label {
+  font-size: 10px;
+  color: #b8a8c8;
+  margin-top: 2px;
+  letter-spacing: 0.5px;
 }
 
 .cottage-wrapper {
   position: relative;
   width: 100%;
   max-width: 900px;
-  margin: 0 auto;
+  margin: 14px auto 0;
   padding: 0 12px;
 }
 
@@ -342,9 +370,16 @@ body {
 </head>
 <body>
 
-<!-- Character image -->
-<div class="character-area">
-  <img src="人物.png" alt="江屿">
+<!-- Time & Days Together -->
+<div class="time-section">
+  <div class="time-box">
+    <div class="time-date" id="time-date">--</div>
+    <div class="time-weekday" id="time-weekday">--</div>
+  </div>
+  <div class="days-box">
+    <div class="days-number" id="days-number">--</div>
+    <div class="days-label">在一起的第 — 天</div>
+  </div>
 </div>
 
 <div class="cottage-wrapper">
@@ -423,6 +458,27 @@ body {
 <script>
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
+
+// Time display
+function updateTime() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
+  document.getElementById('time-date').textContent = `${y}.${m}.${d}`;
+  document.getElementById('time-weekday').textContent = weekdays[now.getDay()];
+
+  // Days together since 2026-06-18
+  const start = new Date('2026-06-18T00:00:00+08:00');
+  const today = new Date(y, now.getMonth(), now.getDate());
+  const days = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1;
+  document.getElementById('days-number').textContent = days;
+  document.querySelector('.days-label').textContent = `在一起的第 ${days} 天`;
+}
+updateTime();
+setInterval(updateTime, 60000);
 
 const rooms = {
   living: {
