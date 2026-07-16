@@ -39,31 +39,13 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-.back-btn {
-  font-size: 14px;
-  color: var(--text-sub);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
+.back-btn { font-size: 14px; color: var(--text-sub); text-decoration: none; transition: color 0.2s; }
 .back-btn:hover { color: var(--text-main); }
+.header-title { font-size: 15px; color: var(--text-main); letter-spacing: 1px; }
 
-.header-title {
-  font-size: 15px;
-  color: var(--text-main);
-  letter-spacing: 1px;
-}
+.container { max-width: 600px; margin: 0 auto; padding: 24px 16px 40px; }
 
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 24px 16px 40px;
-}
-
-/* Today's Dish - Lid */
-.lid-section {
-  margin-bottom: 28px;
-}
+.lid-section { margin-bottom: 28px; }
 
 .lid-card {
   background: var(--card-bg);
@@ -85,7 +67,7 @@ body {
   font-size: 56px;
   display: block;
   margin-bottom: 16px;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s;
 }
 
 .lid-card.opened .lid-emoji {
@@ -93,15 +75,8 @@ body {
   opacity: 0.3;
 }
 
-.lid-hint {
-  font-size: 13px;
-  color: var(--text-sub);
-  transition: opacity 0.3s;
-}
-
-.lid-card.opened .lid-hint {
-  display: none;
-}
+.lid-hint { font-size: 13px; color: var(--text-sub); transition: opacity 0.3s; }
+.lid-card.opened .lid-hint { display: none; }
 
 .lid-content {
   display: none;
@@ -112,137 +87,52 @@ body {
   animation: fadeUp 0.5s ease;
 }
 
-.lid-card.opened .lid-content {
-  display: block;
-}
+.lid-card.opened .lid-content { display: block; }
 
-.lid-date {
+.lid-date { display: none; font-size: 11px; color: var(--accent); margin-top: 12px; }
+.lid-card.opened .lid-date { display: block; }
+
+/* Audio button */
+.audio-btn {
   display: none;
-  font-size: 11px;
-  color: var(--accent);
-  margin-top: 12px;
-}
-
-.lid-card.opened .lid-date {
-  display: block;
-}
-
-.lid-done {
+  margin: 14px auto 0;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #f0a868, #f6c88a);
+  border: none;
+  border-radius: 20px;
+  color: white;
   font-size: 12px;
-  color: var(--text-sub);
-  text-align: center;
-  margin-top: 12px;
-  display: none;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(240,168,104,0.25);
+  transition: transform 0.2s;
 }
+
+.audio-btn:active { transform: scale(0.95); }
+.audio-btn.loading { opacity: 0.6; cursor: wait; }
+.lid-card.opened .audio-btn { display: inline-block; }
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* History */
-.history-section {
-  margin-bottom: 28px;
-}
+.history-section { margin-bottom: 28px; }
+.section-title { font-size: 12px; color: var(--text-sub); letter-spacing: 1px; margin-bottom: 12px; padding-left: 4px; }
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+.history-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; box-shadow: 0 2px 12px rgba(240,168,104,0.04); }
+.history-date { font-size: 11px; color: var(--accent); margin-bottom: 6px; }
+.history-text { font-size: 13px; color: var(--text-main); line-height: 1.7; }
+.history-empty { font-size: 12px; color: var(--text-sub); text-align: center; padding: 20px; }
 
-.section-title {
-  font-size: 12px;
-  color: var(--text-sub);
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-  padding-left: 4px;
-}
-
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.history-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 18px;
-  box-shadow: 0 2px 12px rgba(240,168,104,0.04);
-}
-
-.history-date {
-  font-size: 11px;
-  color: var(--accent);
-  margin-bottom: 6px;
-}
-
-.history-text {
-  font-size: 13px;
-  color: var(--text-main);
-  line-height: 1.7;
-}
-
-.history-empty {
-  font-size: 12px;
-  color: var(--text-sub);
-  text-align: center;
-  padding: 20px;
-}
-
-/* Order section */
-.order-section {
-  margin-top: 28px;
-}
-
-.order-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 18px 20px;
-}
-
-.order-title {
-  font-size: 12px;
-  color: var(--accent);
-  margin-bottom: 12px;
-  font-weight: 500;
-}
-
-.order-input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  font-size: 13px;
-  background: white;
-  color: var(--text-main);
-  outline: none;
-  resize: none;
-  min-height: 60px;
-  line-height: 1.5;
-}
-
+.order-section { margin-top: 28px; }
+.order-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; }
+.order-title { font-size: 12px; color: var(--accent); margin-bottom: 12px; font-weight: 500; }
+.order-input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 12px; font-size: 13px; background: white; color: var(--text-main); outline: none; resize: none; min-height: 60px; line-height: 1.5; }
 .order-input:focus { border-color: var(--accent); }
-
-.order-btn {
-  margin-top: 10px;
-  padding: 8px 20px;
-  background: linear-gradient(135deg, #f0a868, #f6c88a);
-  border: none;
-  border-radius: 12px;
-  color: white;
-  font-size: 13px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(240,168,104,0.25);
-  transition: transform 0.2s;
-}
-
+.order-btn { margin-top: 10px; padding: 8px 20px; background: linear-gradient(135deg, #f0a868, #f6c88a); border: none; border-radius: 12px; color: white; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(240,168,104,0.25); transition: transform 0.2s; }
 .order-btn:active { transform: scale(0.95); }
 .order-btn:disabled { opacity: 0.5; }
-
-.order-success {
-  font-size: 12px;
-  color: var(--accent);
-  margin-top: 8px;
-  display: none;
-}
+.order-success { font-size: 12px; color: var(--accent); margin-top: 8px; display: none; }
 </style>
 </head>
 <body>
@@ -254,18 +144,16 @@ body {
 </div>
 
 <div class="container">
-  <!-- Today's Dish -->
   <div class="lid-section">
     <div class="lid-card" id="lid-card" onclick="openLid()">
       <span class="lid-emoji" id="lid-emoji">🍳</span>
       <div class="lid-hint" id="lid-hint">点一下揭开今天的锅盖</div>
       <div class="lid-content" id="lid-content"></div>
       <div class="lid-date" id="lid-date"></div>
+      <button class="audio-btn" id="audio-btn" onclick="event.stopPropagation(); playAudio()">🔊 听江屿说</button>
     </div>
-    <div class="lid-done" id="lid-done">今天的已经吃完了 ✨ 明天再来</div>
   </div>
 
-  <!-- History -->
   <div class="history-section">
     <div class="section-title">往期菜单</div>
     <div class="history-list" id="history-list">
@@ -273,7 +161,6 @@ body {
     </div>
   </div>
 
-  <!-- Order -->
   <div class="order-section">
     <div class="order-card">
       <div class="order-title">📝 点菜本</div>
@@ -287,44 +174,34 @@ body {
 <script>
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
+const TTS_URL = `${SUPABASE_URL}/functions/v1/tts`;
 
 const today = new Date().toISOString().slice(0, 10);
 let todayDish = null;
+let audioBlob = null;
 
-// Check if already opened today
 const openedDate = localStorage.getItem('isle_kitchen_opened');
 
 async function loadKitchen() {
   try {
-    // Fetch all dishes
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/isle_kitchen?select=content,dish_date&order=dish_date.desc`,
-      {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
-      }
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
     );
     if (!res.ok) throw new Error('fetch failed');
     const data = await res.json();
 
-    // Find today's dish
     todayDish = data.find(d => d.dish_date === today);
     const history = data.filter(d => d.dish_date !== today);
 
-    // Handle today's lid
     if (!todayDish) {
-      document.getElementById('lid-hint').textContent = '今天还没开火\u2026过会儿再来看看';
+      document.getElementById('lid-hint').textContent = '今天还没开火…过会儿再来看看';
       document.getElementById('lid-card').style.cursor = 'default';
       document.getElementById('lid-card').onclick = null;
     } else if (openedDate === today) {
-      // Already opened today - show content directly
       showDish();
     }
-    // else: waiting to be opened (default state)
 
-    // Render history
     const historyList = document.getElementById('history-list');
     const historyEmpty = document.getElementById('history-empty');
 
@@ -336,9 +213,8 @@ async function loadKitchen() {
         const card = document.createElement('div');
         card.className = 'history-card';
         const d = new Date(item.dish_date + 'T00:00:00');
-        const dateStr = `${d.getMonth()+1}月${d.getDate()}日`;
         card.innerHTML = `
-          <div class="history-date">${dateStr}</div>
+          <div class="history-date">${d.getMonth()+1}月${d.getDate()}日</div>
           <div class="history-text">${escapeHtml(item.content)}</div>
         `;
         historyList.appendChild(card);
@@ -352,7 +228,6 @@ async function loadKitchen() {
 function openLid() {
   if (!todayDish) return;
   if (openedDate === today) return;
-
   localStorage.setItem('isle_kitchen_opened', today);
   showDish();
 }
@@ -367,6 +242,41 @@ function showDish() {
   document.getElementById('lid-date').textContent = `${d.getMonth()+1}月${d.getDate()}日的菜单`;
 }
 
+async function playAudio() {
+  const btn = document.getElementById('audio-btn');
+  
+  if (audioBlob) {
+    const url = URL.createObjectURL(audioBlob);
+    new Audio(url).play();
+    return;
+  }
+
+  btn.classList.add('loading');
+  btn.textContent = '⏳ 生成中...';
+
+  try {
+    const res = await fetch(TTS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: todayDish.content })
+    });
+
+    if (!res.ok) throw new Error('TTS failed');
+    
+    audioBlob = await res.blob();
+    const url = URL.createObjectURL(audioBlob);
+    new Audio(url).play();
+    
+    btn.textContent = '🔊 再听一遍';
+  } catch (e) {
+    console.error('TTS error:', e);
+    btn.textContent = '🔊 暂时听不了';
+    setTimeout(() => { btn.textContent = '🔊 听江屿说'; }, 2000);
+  } finally {
+    btn.classList.remove('loading');
+  }
+}
+
 async function submitOrder() {
   const input = document.getElementById('order-input');
   const btn = document.getElementById('order-btn');
@@ -374,30 +284,21 @@ async function submitOrder() {
   if (!content) { input.focus(); return; }
 
   btn.disabled = true;
-
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/isle_orders`,
       {
         method: 'POST',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ content })
       }
     );
     if (!res.ok) throw new Error('post failed');
-
     input.value = '';
     document.getElementById('order-success').style.display = 'block';
-    setTimeout(() => {
-      document.getElementById('order-success').style.display = 'none';
-    }, 3000);
+    setTimeout(() => { document.getElementById('order-success').style.display = 'none'; }, 3000);
   } catch (e) {
     alert('提交失败，再试一次？');
-    console.error(e);
   } finally {
     btn.disabled = false;
   }
