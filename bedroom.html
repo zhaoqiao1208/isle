@@ -57,10 +57,75 @@ body {
   font-weight: normal;
 }
 
+/* Lock Screen */
+.lock-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 40px 20px;
+}
+
+.lock-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.lock-hint {
+  font-size: 13px;
+  color: var(--text-sub);
+  margin-bottom: 24px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.lock-input {
+  width: 160px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 18px;
+  text-align: center;
+  letter-spacing: 8px;
+  background: white;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.lock-input:focus {
+  border-color: var(--accent);
+}
+
+.lock-input.shake {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.lock-error {
+  font-size: 11px;
+  color: #e8a0a0;
+  margin-top: 12px;
+  height: 16px;
+}
+
+/* Diary content (hidden until unlocked) */
 .diary-container {
   max-width: 600px;
   margin: 0 auto;
   padding: 24px 16px 60px;
+  display: none;
+}
+
+.diary-container.unlocked {
+  display: block;
 }
 
 .diary-entry {
@@ -97,11 +162,6 @@ body {
   white-space: pre-wrap;
 }
 
-.diary-entry.expanded .diary-preview {
-  -webkit-line-clamp: unset;
-  overflow: visible;
-}
-
 .expand-hint {
   font-size: 11px;
   color: var(--text-sub);
@@ -109,8 +169,6 @@ body {
   text-align: right;
   opacity: 0.7;
 }
-
-.diary-entry.expanded .expand-hint { display: none; }
 
 .loading {
   text-align: center;
@@ -190,6 +248,14 @@ body {
   <span style="width:60px;"></span>
 </div>
 
+<!-- Lock Screen -->
+<div class="lock-screen" id="lock-screen">
+  <div class="lock-icon">🔒</div>
+  <div class="lock-hint">这里是只属于我们的空间<br>输入暗号才能进来</div>
+  <input type="password" class="lock-input" id="lock-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+  <div class="lock-error" id="lock-error"></div>
+</div>
+
 <div class="diary-container" id="diary-container">
   <div class="loading" id="loading">翻开日记本 ...</div>
 </div>
@@ -204,6 +270,40 @@ body {
 <script>
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
+const PASSCODE = '5210';
+
+// Check if already unlocked this session
+const unlocked = sessionStorage.getItem('isle_bedroom_unlocked');
+if (unlocked === 'true') {
+  unlock();
+}
+
+// Lock input handler
+const lockInput = document.getElementById('lock-input');
+lockInput.addEventListener('input', function() {
+  if (this.value.length === 4) {
+    if (this.value === PASSCODE) {
+      sessionStorage.setItem('isle_bedroom_unlocked', 'true');
+      unlock();
+    } else {
+      this.classList.add('shake');
+      document.getElementById('lock-error').textContent = '暗号不对哦';
+      setTimeout(() => {
+        this.classList.remove('shake');
+        this.value = '';
+      }, 400);
+      setTimeout(() => {
+        document.getElementById('lock-error').textContent = '';
+      }, 2000);
+    }
+  }
+});
+
+function unlock() {
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('diary-container').classList.add('unlocked');
+  loadDiaries();
+}
 
 async function fetchDiaries() {
   try {
@@ -235,7 +335,6 @@ function formatDate(dateStr) {
 }
 
 function stripTitle(content) {
-  // Remove markdown headers and date lines at the start
   return content.replace(/^#.*\n?/gm, '').replace(/^\s*\n/, '').trim();
 }
 
@@ -251,7 +350,7 @@ function closeOverlay() {
   document.body.style.overflow = '';
 }
 
-async function init() {
+async function loadDiaries() {
   const container = document.getElementById('diary-container');
   const loading = document.getElementById('loading');
   
@@ -287,12 +386,9 @@ async function init() {
   });
 }
 
-// Close overlay with back gesture / escape
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeOverlay();
 });
-
-init();
 </script>
 
 </body>
