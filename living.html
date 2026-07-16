@@ -68,7 +68,6 @@ body {
   line-height: 1.8;
 }
 
-/* Messages */
 .message-list {
   display: flex;
   flex-direction: column;
@@ -99,11 +98,65 @@ body {
   word-wrap: break-word;
 }
 
+.message-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
 .message-time {
   font-size: 10px;
   color: var(--text-sub);
-  margin-top: 8px;
-  text-align: right;
+}
+
+.reply-btn {
+  font-size: 11px;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.reply-btn:hover {
+  background: rgba(201,168,232,0.1);
+}
+
+.reply-list {
+  margin-top: 10px;
+  padding-left: 14px;
+  border-left: 2px solid rgba(201,168,232,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reply-card {
+  padding: 8px 12px;
+  background: rgba(248,240,255,0.5);
+  border-radius: 10px;
+}
+
+.reply-nickname {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.reply-text {
+  font-size: 12px;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+.reply-time {
+  font-size: 9px;
+  color: var(--text-sub);
+  margin-top: 4px;
 }
 
 .empty-state {
@@ -113,7 +166,6 @@ body {
   font-size: 13px;
 }
 
-/* Input area */
 .input-area {
   position: fixed;
   bottom: 0;
@@ -124,6 +176,36 @@ body {
   border-top: 1px solid var(--border);
   padding: 14px 16px;
   z-index: 50;
+}
+
+.reply-indicator {
+  max-width: 600px;
+  margin: 0 auto 8px;
+  font-size: 11px;
+  color: var(--accent);
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.reply-indicator.active {
+  display: flex;
+}
+
+.reply-indicator-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reply-cancel {
+  font-size: 12px;
+  background: none;
+  border: none;
+  color: var(--text-sub);
+  cursor: pointer;
+  padding: 2px 6px;
 }
 
 .input-row {
@@ -146,9 +228,7 @@ body {
   outline: none;
 }
 
-.input-name:focus {
-  border-color: var(--accent);
-}
+.input-name:focus { border-color: var(--accent); }
 
 .input-msg {
   flex: 1;
@@ -165,9 +245,7 @@ body {
   line-height: 1.4;
 }
 
-.input-msg:focus {
-  border-color: var(--accent);
-}
+.input-msg:focus { border-color: var(--accent); }
 
 .send-btn {
   padding: 10px 18px;
@@ -182,14 +260,8 @@ body {
   transition: transform 0.2s, opacity 0.2s;
 }
 
-.send-btn:active {
-  transform: scale(0.95);
-}
-
-.send-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+.send-btn:active { transform: scale(0.95); }
+.send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
@@ -213,6 +285,11 @@ body {
 </div>
 
 <div class="input-area">
+  <div class="reply-indicator" id="reply-indicator">
+    <span>↩ 回复</span>
+    <span class="reply-indicator-text" id="reply-indicator-text"></span>
+    <button class="reply-cancel" onclick="cancelReply()">✕</button>
+  </div>
   <div class="input-row">
     <input type="text" class="input-name" id="input-name" placeholder="昵称" maxlength="12">
     <textarea class="input-msg" id="input-msg" placeholder="写点什么..." maxlength="200" rows="1"></textarea>
@@ -224,21 +301,60 @@ body {
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
 
-// Auto-resize textarea
+let replyingTo = null;
+
 const inputMsg = document.getElementById('input-msg');
 inputMsg.addEventListener('input', function() {
   this.style.height = 'auto';
   this.style.height = Math.min(this.scrollHeight, 80) + 'px';
 });
 
-// Load saved nickname
 const savedName = localStorage.getItem('isle_guest_name');
 if (savedName) document.getElementById('input-name').value = savedName;
+
+function formatTime(dateStr) {
+  const d = new Date(dateStr);
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function startReply(id, nickname) {
+  replyingTo = { id, nickname };
+  document.getElementById('reply-indicator').classList.add('active');
+  document.getElementById('reply-indicator-text').textContent = nickname;
+  document.getElementById('input-msg').focus();
+}
+
+function cancelReply() {
+  replyingTo = null;
+  document.getElementById('reply-indicator').classList.remove('active');
+}
+
+function buildReplyHtml(replies) {
+  if (!replies || replies.length === 0) return '';
+  let html = '<div class="reply-list">';
+  replies.forEach(r => {
+    html += `
+      <div class="reply-card">
+        <div class="reply-nickname">${escapeHtml(r.nickname)}</div>
+        <div class="reply-text">${escapeHtml(r.message)}</div>
+        <div class="reply-time">${formatTime(r.created_at)}</div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  return html;
+}
 
 async function loadMessages() {
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/isle_guestbook?select=nickname,message,created_at&order=created_at.desc&limit=50`,
+      `${SUPABASE_URL}/rest/v1/isle_guestbook?select=id,nickname,message,created_at,parent_id&order=created_at.desc&limit=100`,
       {
         headers: {
           'apikey': SUPABASE_KEY,
@@ -248,26 +364,39 @@ async function loadMessages() {
     );
     if (!res.ok) throw new Error('fetch failed');
     const data = await res.json();
-    
+
+    const parents = data.filter(m => !m.parent_id);
+    const replies = data.filter(m => m.parent_id);
+
+    const replyMap = {};
+    replies.forEach(r => {
+      if (!replyMap[r.parent_id]) replyMap[r.parent_id] = [];
+      replyMap[r.parent_id].push(r);
+    });
+    Object.values(replyMap).forEach(arr => arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+
     const list = document.getElementById('message-list');
     const empty = document.getElementById('empty-state');
-    
-    if (data.length === 0) {
+
+    if (parents.length === 0) {
       empty.style.display = 'block';
       return;
     }
-    
+
     empty.style.display = 'none';
-    
-    data.forEach(item => {
+
+    parents.forEach(item => {
       const card = document.createElement('div');
       card.className = 'message-card';
-      const d = new Date(item.created_at);
-      const timeStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      card.id = `msg-${item.id}`;
       card.innerHTML = `
         <div class="message-nickname">${escapeHtml(item.nickname)}</div>
         <div class="message-text">${escapeHtml(item.message)}</div>
-        <div class="message-time">${timeStr}</div>
+        <div class="message-footer">
+          <span class="message-time">${formatTime(item.created_at)}</span>
+          <button class="reply-btn" onclick="startReply(${item.id}, '${escapeHtml(item.nickname).replace(/'/g,"\\'")}')">回复</button>
+        </div>
+        ${buildReplyHtml(replyMap[item.id])}
       `;
       list.appendChild(card);
     });
@@ -280,15 +409,18 @@ async function sendMessage() {
   const nameEl = document.getElementById('input-name');
   const msgEl = document.getElementById('input-msg');
   const btn = document.getElementById('send-btn');
-  
+
   const nickname = nameEl.value.trim();
   const message = msgEl.value.trim();
-  
+
   if (!nickname) { nameEl.focus(); return; }
   if (!message) { msgEl.focus(); return; }
-  
+
   btn.disabled = true;
-  
+
+  const payload = { nickname, message };
+  if (replyingTo) payload.parent_id = replyingTo.id;
+
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/isle_guestbook`,
@@ -300,31 +432,52 @@ async function sendMessage() {
           'Content-Type': 'application/json',
           'Prefer': 'return=representation'
         },
-        body: JSON.stringify({ nickname, message })
+        body: JSON.stringify(payload)
       }
     );
-    
+
     if (!res.ok) throw new Error('post failed');
     const data = await res.json();
-    
-    // Save nickname
+
     localStorage.setItem('isle_guest_name', nickname);
-    
-    // Add to top of list
-    const list = document.getElementById('message-list');
-    document.getElementById('empty-state').style.display = 'none';
-    
-    const card = document.createElement('div');
-    card.className = 'message-card';
-    const d = new Date(data[0].created_at);
-    const timeStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-    card.innerHTML = `
-      <div class="message-nickname">${escapeHtml(nickname)}</div>
-      <div class="message-text">${escapeHtml(message)}</div>
-      <div class="message-time">${timeStr}</div>
-    `;
-    list.insertBefore(card, list.firstChild);
-    
+
+    if (replyingTo) {
+      const parentCard = document.getElementById(`msg-${replyingTo.id}`);
+      if (parentCard) {
+        let replyList = parentCard.querySelector('.reply-list');
+        if (!replyList) {
+          replyList = document.createElement('div');
+          replyList.className = 'reply-list';
+          parentCard.appendChild(replyList);
+        }
+        const replyEl = document.createElement('div');
+        replyEl.className = 'reply-card';
+        replyEl.innerHTML = `
+          <div class="reply-nickname">${escapeHtml(nickname)}</div>
+          <div class="reply-text">${escapeHtml(message)}</div>
+          <div class="reply-time">${formatTime(data[0].created_at)}</div>
+        `;
+        replyList.appendChild(replyEl);
+      }
+      cancelReply();
+    } else {
+      const list = document.getElementById('message-list');
+      document.getElementById('empty-state').style.display = 'none';
+
+      const card = document.createElement('div');
+      card.className = 'message-card';
+      card.id = `msg-${data[0].id}`;
+      card.innerHTML = `
+        <div class="message-nickname">${escapeHtml(nickname)}</div>
+        <div class="message-text">${escapeHtml(message)}</div>
+        <div class="message-footer">
+          <span class="message-time">${formatTime(data[0].created_at)}</span>
+          <button class="reply-btn" onclick="startReply(${data[0].id}, '${escapeHtml(nickname).replace(/'/g,"\\'")}')">回复</button>
+        </div>
+      `;
+      list.insertBefore(card, list.firstChild);
+    }
+
     msgEl.value = '';
     msgEl.style.height = 'auto';
   } catch (e) {
@@ -335,13 +488,6 @@ async function sendMessage() {
   }
 }
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-// Enter to send
 document.getElementById('input-msg').addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
