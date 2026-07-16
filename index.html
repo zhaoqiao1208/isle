@@ -8,7 +8,8 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  background: linear-gradient(180deg, #FFF8F0 0%, #F0E6F6 50%, #E8DFF5 100%);
+  background: url('边框.png') center top/cover no-repeat fixed;
+  background-color: #F0E6F6;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -16,27 +17,17 @@ body {
   font-family: 'Segoe UI', sans-serif;
   overflow-x: hidden;
   padding: 0 0 50px;
-  position: relative;
-}
-
-/* Pixel border overlay */
-.pixel-border {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: url('边框.png') center/cover no-repeat;
-  pointer-events: none;
-  z-index: 10;
 }
 
 /* Character area — placeholder for future sprite */
 .character-area {
   width: 100%;
   max-width: 900px;
-  height: 90px;
+  height: 60px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .cottage-wrapper {
@@ -44,7 +35,7 @@ body {
   width: 100%;
   max-width: 900px;
   margin: 4px auto 0;
-  padding: 0 20px;
+  padding: 0 24px;
 }
 
 .cottage-wrapper img {
@@ -58,8 +49,8 @@ body {
 .room-overlay {
   position: absolute;
   top: 0;
-  left: 20px;
-  width: calc(100% - 40px);
+  left: 24px;
+  width: calc(100% - 48px);
   height: 100%;
 }
 
@@ -68,7 +59,6 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  z-index: 20;
 }
 
 .room-hotspot:hover {
@@ -107,16 +97,14 @@ body {
   width: 100%;
   max-width: 900px;
   margin: 14px auto 0;
-  padding: 0 16px;
+  padding: 0 20px;
 }
 
 .status-card {
   background: url('状态栏、小纸条.png') center/100% 100% no-repeat;
-  padding: 28px 30px 24px;
-  border: none;
-  border-radius: 0;
+  padding: 42px 50px 36px;
   position: relative;
-  min-height: 140px;
+  min-height: 160px;
 }
 
 .status-header {
@@ -209,16 +197,14 @@ body {
   width: 100%;
   max-width: 900px;
   margin: 14px auto 0;
-  padding: 0 16px;
+  padding: 0 20px;
 }
 
 .note-card {
   background: url('状态栏、小纸条.png') center/100% 100% no-repeat;
-  padding: 24px 28px;
-  border: none;
-  border-radius: 0;
+  padding: 38px 50px 32px;
   position: relative;
-  min-height: 100px;
+  min-height: 120px;
 }
 
 .note-header {
@@ -234,8 +220,6 @@ body {
   color: #4a3a2e;
   line-height: 1.9;
   font-style: italic;
-  padding-left: 12px;
-  border-left: 2px solid rgba(160, 130, 100, 0.3);
 }
 
 .note-time {
@@ -298,9 +282,6 @@ body {
 </style>
 </head>
 <body>
-
-<!-- Pixel border decoration -->
-<div class="pixel-border"></div>
 
 <!-- Character placeholder: future sprite goes here -->
 <div class="character-area" id="character-area"></div>
