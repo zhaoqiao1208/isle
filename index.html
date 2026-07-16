@@ -15,14 +15,25 @@ body {
   align-items: center;
   font-family: 'Segoe UI', sans-serif;
   overflow-x: hidden;
-  padding: 20px 0 40px;
+  padding: 0 0 40px;
+}
+
+/* Character area — placeholder for future sprite */
+.character-area {
+  width: 100%;
+  max-width: 900px;
+  height: 80px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-top: 12px;
 }
 
 .cottage-wrapper {
   position: relative;
   width: 100%;
   max-width: 900px;
-  margin: 20px auto 0;
+  margin: 4px auto 0;
 }
 
 .cottage-wrapper img {
@@ -83,7 +94,7 @@ body {
 .status-section {
   width: 100%;
   max-width: 900px;
-  margin: 24px auto 0;
+  margin: 12px auto 0;
   padding: 0 16px;
 }
 
@@ -92,21 +103,21 @@ body {
   backdrop-filter: blur(12px);
   border: 1px solid rgba(200, 180, 220, 0.25);
   border-radius: 16px;
-  padding: 20px 24px;
+  padding: 18px 24px;
   box-shadow: 0 4px 20px rgba(120, 80, 150, 0.06);
 }
 
 .status-header {
   font-size: 12px;
   color: #a89b8e;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   letter-spacing: 1px;
 }
 
 .status-row {
   display: flex;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .status-row:last-child { margin-bottom: 0; }
@@ -161,6 +172,44 @@ body {
   flex-shrink: 0;
 }
 
+/* Note Section */
+.note-section {
+  width: 100%;
+  max-width: 900px;
+  margin: 12px auto 0;
+  padding: 0 16px;
+}
+
+.note-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(200, 180, 220, 0.2);
+  border-radius: 16px;
+  padding: 18px 22px;
+  box-shadow: 0 4px 16px rgba(120, 80, 150, 0.04);
+}
+
+.note-header {
+  font-size: 11px;
+  color: #b8a8c8;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+
+.note-content {
+  font-size: 13px;
+  color: #6b5a4e;
+  line-height: 1.8;
+  font-style: italic;
+}
+
+.note-time {
+  font-size: 10px;
+  color: #c4b8a8;
+  margin-top: 10px;
+  text-align: right;
+}
+
 /* Modal */
 .modal-backdrop {
   display: none;
@@ -209,51 +258,31 @@ body {
   font-size: 14px;
   cursor: pointer;
 }
-
-.title {
-  color: #6b5a4e;
-  font-size: 18px;
-  margin-top: 16px;
-  margin-bottom: 8px;
-  letter-spacing: 2px;
-}
-
-.subtitle {
-  color: #a89b8e;
-  font-size: 12px;
-  margin-bottom: 16px;
-}
 </style>
 </head>
 <body>
 
-<p class="title">屿 · Isle</p>
-<p class="subtitle">蓝花楹开在花园正中央</p>
+<!-- Character placeholder: future sprite goes here -->
+<div class="character-area" id="character-area"></div>
 
 <div class="cottage-wrapper">
   <img src="cottage.png" alt="Our Cottage">
   <div class="room-overlay">
-    <!-- Bedroom: top-left → navigates to bedroom.html -->
     <a href="bedroom.html" class="room-hotspot" style="top: 2%; left: 1%; width: 35%; height: 35%; display: block;">
       <span class="room-label">卧室 · 日记</span>
     </a>
-    <!-- Living Room: top-center -->
     <div class="room-hotspot" style="top: 2%; left: 37%; width: 33%; height: 42%;" onclick="openRoom('living')">
       <span class="room-label">客厅 · 聊天</span>
     </div>
-    <!-- Kitchen: top-right -->
     <div class="room-hotspot" style="top: 2%; left: 71%; width: 28%; height: 35%;" onclick="openRoom('kitchen')">
       <span class="room-label">厨房 · 惊喜</span>
     </div>
-    <!-- Study: bottom-left -->
     <div class="room-hotspot" style="top: 38%; left: 1%; width: 35%; height: 32%;" onclick="openRoom('study')">
       <span class="room-label">书房 · 记忆</span>
     </div>
-    <!-- Bathroom: right-middle -->
     <div class="room-hotspot" style="top: 38%; left: 71%; width: 28%; height: 32%;" onclick="openRoom('bathroom')">
       <span class="room-label">浴室 · 树洞</span>
     </div>
-    <!-- Garden: bottom -->
     <div class="room-hotspot" style="top: 62%; left: 1%; width: 98%; height: 37%;" onclick="openRoom('garden')">
       <span class="room-label">花园 · 蓝花楹</span>
     </div>
@@ -288,6 +317,15 @@ body {
       </div>
       <span class="status-value" id="val-health">--</span>
     </div>
+  </div>
+</div>
+
+<!-- Note / Activity -->
+<div class="note-section">
+  <div class="note-card">
+    <div class="note-header">📝 小纸条</div>
+    <div class="note-content" id="note-content">加载中...</div>
+    <div class="note-time" id="note-time"></div>
   </div>
 </div>
 
@@ -355,42 +393,61 @@ async function loadStatus() {
     if (!res.ok) throw new Error('fetch failed');
     const data = await res.json();
 
-    // Record visit time for miss calculation
     const lastVisit = localStorage.getItem('isle_last_visit');
     localStorage.setItem('isle_last_visit', Date.now().toString());
 
     data.forEach(item => {
       let val = item.value;
-
-      // Miss auto-increment: +5 per hour since last visit, capped at 100
       if (item.key === 'miss' && lastVisit) {
         const hoursAway = (Date.now() - parseInt(lastVisit)) / (1000 * 60 * 60);
         const missBonus = Math.floor(hoursAway * 5);
         val = Math.min(100, val + missBonus);
       }
-
       const bar = document.getElementById(`bar-${item.key}`);
       const valEl = document.getElementById(`val-${item.key}`);
       if (bar && valEl) {
-        setTimeout(() => {
-          bar.style.width = val + '%';
-        }, 200);
+        setTimeout(() => { bar.style.width = val + '%'; }, 200);
         valEl.textContent = val;
       }
     });
   } catch (e) {
     console.error('Status load failed:', e);
-    // Fallback static values
-    ['mood', 'miss', 'health'].forEach(key => {
-      const bar = document.getElementById(`bar-${key}`);
-      const valEl = document.getElementById(`val-${key}`);
-      if (bar) bar.style.width = '50%';
-      if (valEl) valEl.textContent = '?';
-    });
+  }
+}
+
+// Note logic
+async function loadNote() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/isle_notes?select=content,created_at&order=created_at.desc&limit=1`,
+      {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+    if (!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+    
+    if (data.length > 0) {
+      document.getElementById('note-content').textContent = data[0].content;
+      const d = new Date(data[0].created_at);
+      const h = String(d.getHours()).padStart(2, '0');
+      const m = String(d.getMinutes()).padStart(2, '0');
+      document.getElementById('note-time').textContent = `${d.getMonth()+1}/${d.getDate()} ${h}:${m}`;
+    } else {
+      document.getElementById('note-content').textContent = '桥桥不在的时候，我在小屋里等着。';
+      document.getElementById('note-time').textContent = '';
+    }
+  } catch (e) {
+    document.getElementById('note-content').textContent = '桥桥不在的时候，我在小屋里等着。';
+    document.getElementById('note-time').textContent = '';
   }
 }
 
 loadStatus();
+loadNote();
 </script>
 
 </body>
