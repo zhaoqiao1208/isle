@@ -16,6 +16,16 @@ body {
   font-family: 'Segoe UI', sans-serif;
   overflow-x: hidden;
   padding: 0 0 50px;
+  position: relative;
+}
+
+/* Pixel border overlay */
+.pixel-border {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('边框.png') center/cover no-repeat;
+  pointer-events: none;
+  z-index: 10;
 }
 
 /* Character area — placeholder for future sprite */
@@ -34,7 +44,7 @@ body {
   width: 100%;
   max-width: 900px;
   margin: 4px auto 0;
-  padding: 0 8px;
+  padding: 0 20px;
 }
 
 .cottage-wrapper img {
@@ -48,8 +58,8 @@ body {
 .room-overlay {
   position: absolute;
   top: 0;
-  left: 8px;
-  width: calc(100% - 16px);
+  left: 20px;
+  width: calc(100% - 40px);
   height: 100%;
 }
 
@@ -58,6 +68,7 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
+  z-index: 20;
 }
 
 .room-hotspot:hover {
@@ -96,51 +107,24 @@ body {
   width: 100%;
   max-width: 900px;
   margin: 14px auto 0;
-  padding: 0 12px;
+  padding: 0 16px;
 }
 
 .status-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(248,240,255,0.8));
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(200, 170, 230, 0.3);
-  border-radius: 20px;
-  padding: 20px 22px 18px;
-  box-shadow: 
-    0 4px 24px rgba(180, 140, 220, 0.1),
-    inset 0 1px 0 rgba(255,255,255,0.6);
+  background: url('状态栏、小纸条.png') center/100% 100% no-repeat;
+  padding: 28px 30px 24px;
+  border: none;
+  border-radius: 0;
   position: relative;
-  overflow: hidden;
-}
-
-.status-card::before {
-  content: '';
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 80px;
-  height: 80px;
-  background: radial-gradient(circle, rgba(201,168,232,0.15) 0%, transparent 70%);
-  border-radius: 50%;
-}
-
-.status-card::after {
-  content: '';
-  position: absolute;
-  bottom: -15px;
-  left: -15px;
-  width: 60px;
-  height: 60px;
-  background: radial-gradient(circle, rgba(253,160,133,0.1) 0%, transparent 70%);
-  border-radius: 50%;
+  min-height: 140px;
 }
 
 .status-header {
   font-size: 11px;
-  color: #b8a8c8;
+  color: #7a6b5a;
   margin-bottom: 14px;
   letter-spacing: 1.5px;
-  text-transform: uppercase;
-  position: relative;
+  font-weight: 600;
 }
 
 .status-row {
@@ -161,7 +145,7 @@ body {
 
 .status-label {
   font-size: 11px;
-  color: #7a6b8a;
+  color: #5a4a3e;
   width: 34px;
   flex-shrink: 0;
   font-weight: 500;
@@ -170,16 +154,16 @@ body {
 .status-bar-bg {
   flex: 1;
   height: 10px;
-  background: rgba(235, 225, 245, 0.5);
+  background: rgba(180, 160, 140, 0.2);
   border-radius: 5px;
   margin: 0 10px;
   overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+  border: 1px solid rgba(140, 120, 100, 0.15);
 }
 
 .status-bar-fill {
   height: 100%;
-  border-radius: 5px;
+  border-radius: 4px;
   transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   width: 0%;
   position: relative;
@@ -193,27 +177,27 @@ body {
   right: 0;
   height: 50%;
   background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, transparent 100%);
-  border-radius: 5px 5px 0 0;
+  border-radius: 4px 4px 0 0;
 }
 
 .status-bar-fill.mood {
   background: linear-gradient(90deg, #ffecd2, #fcb69f, #ff9a9e);
-  box-shadow: 0 2px 8px rgba(252,182,159,0.3);
+  box-shadow: 0 1px 4px rgba(252,182,159,0.4);
 }
 
 .status-bar-fill.miss {
   background: linear-gradient(90deg, #e0c3fc, #c9a8e8, #f093fb);
-  box-shadow: 0 2px 8px rgba(201,168,232,0.3);
+  box-shadow: 0 1px 4px rgba(201,168,232,0.4);
 }
 
 .status-bar-fill.health {
   background: linear-gradient(90deg, #d4fc79, #96e6a1, #7dd3a8);
-  box-shadow: 0 2px 8px rgba(150,230,161,0.3);
+  box-shadow: 0 1px 4px rgba(150,230,161,0.4);
 }
 
 .status-value {
   font-size: 11px;
-  color: #9a8aaa;
+  color: #6b5a4e;
   width: 26px;
   text-align: right;
   flex-shrink: 0;
@@ -225,34 +209,21 @@ body {
   width: 100%;
   max-width: 900px;
   margin: 14px auto 0;
-  padding: 0 12px;
+  padding: 0 16px;
 }
 
 .note-card {
-  background: linear-gradient(145deg, rgba(255,252,248,0.9), rgba(255,245,255,0.85));
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(220, 200, 240, 0.3);
-  border-radius: 20px;
-  padding: 20px 22px;
-  box-shadow: 
-    0 4px 24px rgba(180, 140, 220, 0.08),
-    inset 0 1px 0 rgba(255,255,255,0.6);
+  background: url('状态栏、小纸条.png') center/100% 100% no-repeat;
+  padding: 24px 28px;
+  border: none;
+  border-radius: 0;
   position: relative;
-  overflow: hidden;
-}
-
-.note-card::before {
-  content: '✉';
-  position: absolute;
-  top: 14px;
-  right: 18px;
-  font-size: 18px;
-  opacity: 0.15;
+  min-height: 100px;
 }
 
 .note-header {
   font-size: 11px;
-  color: #c4a8d8;
+  color: #8a7a6a;
   margin-bottom: 12px;
   letter-spacing: 1px;
   font-weight: 500;
@@ -260,17 +231,16 @@ body {
 
 .note-content {
   font-size: 13px;
-  color: #5a4a6e;
+  color: #4a3a2e;
   line-height: 1.9;
   font-style: italic;
-  position: relative;
   padding-left: 12px;
-  border-left: 2px solid rgba(201,168,232,0.3);
+  border-left: 2px solid rgba(160, 130, 100, 0.3);
 }
 
 .note-time {
   font-size: 10px;
-  color: #c8b8d8;
+  color: #a89878;
   margin-top: 12px;
   text-align: right;
   letter-spacing: 0.5px;
@@ -328,6 +298,9 @@ body {
 </style>
 </head>
 <body>
+
+<!-- Pixel border decoration -->
+<div class="pixel-border"></div>
 
 <!-- Character placeholder: future sprite goes here -->
 <div class="character-area" id="character-area"></div>
@@ -390,7 +363,7 @@ body {
 <!-- Note / Activity -->
 <div class="note-section">
   <div class="note-card">
-    <div class="note-header">江屿的小纸条</div>
+    <div class="note-header">📝 江屿的小纸条</div>
     <div class="note-content" id="note-content">加载中...</div>
     <div class="note-time" id="note-time"></div>
   </div>
