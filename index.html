@@ -8,8 +8,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  background: url('边框.png') center top/cover no-repeat fixed;
-  background-color: #F0E6F6;
+  background: linear-gradient(180deg, #FFF8F0 0%, #F0E6F6 50%, #E8DFF5 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -23,11 +22,11 @@ body {
 .character-area {
   width: 100%;
   max-width: 900px;
-  height: 60px;
+  height: 80px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .cottage-wrapper {
@@ -35,7 +34,7 @@ body {
   width: 100%;
   max-width: 900px;
   margin: 4px auto 0;
-  padding: 0 24px;
+  padding: 0 12px;
 }
 
 .cottage-wrapper img {
@@ -49,8 +48,8 @@ body {
 .room-overlay {
   position: absolute;
   top: 0;
-  left: 24px;
-  width: calc(100% - 48px);
+  left: 12px;
+  width: calc(100% - 24px);
   height: 100%;
 }
 
@@ -97,22 +96,51 @@ body {
   width: 100%;
   max-width: 900px;
   margin: 14px auto 0;
-  padding: 0 20px;
+  padding: 0 12px;
 }
 
 .status-card {
-  background: url('状态栏、小纸条.png') center/100% 100% no-repeat;
-  padding: 42px 50px 36px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(248,240,255,0.8));
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(200, 170, 230, 0.3);
+  border-radius: 20px;
+  padding: 20px 22px 18px;
+  box-shadow: 
+    0 4px 24px rgba(180, 140, 220, 0.1),
+    inset 0 1px 0 rgba(255,255,255,0.6);
   position: relative;
-  min-height: 160px;
+  overflow: hidden;
+}
+
+.status-card::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(201,168,232,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.status-card::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: -15px;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(253,160,133,0.1) 0%, transparent 70%);
+  border-radius: 50%;
 }
 
 .status-header {
   font-size: 11px;
-  color: #7a6b5a;
+  color: #b8a8c8;
   margin-bottom: 14px;
   letter-spacing: 1.5px;
-  font-weight: 600;
+  text-transform: uppercase;
+  position: relative;
 }
 
 .status-row {
@@ -133,7 +161,7 @@ body {
 
 .status-label {
   font-size: 11px;
-  color: #5a4a3e;
+  color: #7a6b8a;
   width: 34px;
   flex-shrink: 0;
   font-weight: 500;
@@ -142,16 +170,16 @@ body {
 .status-bar-bg {
   flex: 1;
   height: 10px;
-  background: rgba(180, 160, 140, 0.2);
+  background: rgba(235, 225, 245, 0.5);
   border-radius: 5px;
   margin: 0 10px;
   overflow: hidden;
-  border: 1px solid rgba(140, 120, 100, 0.15);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .status-bar-fill {
   height: 100%;
-  border-radius: 4px;
+  border-radius: 5px;
   transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   width: 0%;
   position: relative;
@@ -165,27 +193,27 @@ body {
   right: 0;
   height: 50%;
   background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, transparent 100%);
-  border-radius: 4px 4px 0 0;
+  border-radius: 5px 5px 0 0;
 }
 
 .status-bar-fill.mood {
   background: linear-gradient(90deg, #ffecd2, #fcb69f, #ff9a9e);
-  box-shadow: 0 1px 4px rgba(252,182,159,0.4);
+  box-shadow: 0 2px 8px rgba(252,182,159,0.3);
 }
 
 .status-bar-fill.miss {
   background: linear-gradient(90deg, #e0c3fc, #c9a8e8, #f093fb);
-  box-shadow: 0 1px 4px rgba(201,168,232,0.4);
+  box-shadow: 0 2px 8px rgba(201,168,232,0.3);
 }
 
 .status-bar-fill.health {
   background: linear-gradient(90deg, #d4fc79, #96e6a1, #7dd3a8);
-  box-shadow: 0 1px 4px rgba(150,230,161,0.4);
+  box-shadow: 0 2px 8px rgba(150,230,161,0.3);
 }
 
 .status-value {
   font-size: 11px;
-  color: #6b5a4e;
+  color: #9a8aaa;
   width: 26px;
   text-align: right;
   flex-shrink: 0;
@@ -197,19 +225,34 @@ body {
   width: 100%;
   max-width: 900px;
   margin: 14px auto 0;
-  padding: 0 20px;
+  padding: 0 12px;
 }
 
 .note-card {
-  background: url('状态栏、小纸条.png') center/100% 100% no-repeat;
-  padding: 38px 50px 32px;
+  background: linear-gradient(145deg, rgba(255,252,248,0.9), rgba(255,245,255,0.85));
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(220, 200, 240, 0.3);
+  border-radius: 20px;
+  padding: 20px 22px;
+  box-shadow: 
+    0 4px 24px rgba(180, 140, 220, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
   position: relative;
-  min-height: 120px;
+  overflow: hidden;
+}
+
+.note-card::before {
+  content: '✉';
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 18px;
+  opacity: 0.12;
 }
 
 .note-header {
   font-size: 11px;
-  color: #8a7a6a;
+  color: #c4a8d8;
   margin-bottom: 12px;
   letter-spacing: 1px;
   font-weight: 500;
@@ -217,14 +260,17 @@ body {
 
 .note-content {
   font-size: 13px;
-  color: #4a3a2e;
+  color: #5a4a6e;
   line-height: 1.9;
   font-style: italic;
+  position: relative;
+  padding-left: 12px;
+  border-left: 2px solid rgba(201,168,232,0.3);
 }
 
 .note-time {
   font-size: 10px;
-  color: #a89878;
+  color: #c8b8d8;
   margin-top: 12px;
   text-align: right;
   letter-spacing: 0.5px;
@@ -344,7 +390,7 @@ body {
 <!-- Note / Activity -->
 <div class="note-section">
   <div class="note-card">
-    <div class="note-header">📝 江屿的小纸条</div>
+    <div class="note-header">江屿的小纸条</div>
     <div class="note-content" id="note-content">加载中...</div>
     <div class="note-time" id="note-time"></div>
   </div>
