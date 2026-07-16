@@ -18,7 +18,6 @@ body {
   padding: 0 0 50px;
 }
 
-/* Time & Days Counter */
 .time-section {
   width: 100%;
   max-width: 900px;
@@ -28,349 +27,56 @@ body {
   justify-content: space-between;
 }
 
-.time-box {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
+.time-box { display: flex; flex-direction: column; align-items: flex-start; }
+.time-date { font-size: 22px; font-weight: 300; color: #5a4a6e; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
+.time-weekday { font-size: 12px; color: #b8a8c8; margin-top: 2px; letter-spacing: 0.5px; }
+.days-box { display: flex; flex-direction: column; align-items: flex-end; }
+.days-number { font-size: 28px; font-weight: 200; color: #c9a8e8; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
+.days-label { font-size: 10px; color: #b8a8c8; margin-top: 2px; letter-spacing: 0.5px; }
 
-.time-date {
-  font-size: 22px;
-  font-weight: 300;
-  color: #5a4a6e;
-  letter-spacing: 1px;
-  font-variant-numeric: tabular-nums;
-}
+.cottage-wrapper { position: relative; width: 100%; max-width: 900px; margin: 14px auto 0; padding: 0 12px; }
+.cottage-wrapper img { width: 100%; height: auto; display: block; border-radius: 14px; box-shadow: 0 8px 32px rgba(120, 80, 150, 0.15); }
+.room-overlay { position: absolute; top: 0; left: 12px; width: calc(100% - 24px); height: 100%; }
+.room-hotspot { position: absolute; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
+.room-hotspot:hover { background: rgba(255, 255, 255, 0.2); box-shadow: 0 0 20px rgba(180, 140, 220, 0.4); }
+.room-hotspot:active { background: rgba(255, 255, 255, 0.35); }
+.room-label { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); background: rgba(255, 248, 240, 0.92); color: #6b5a4e; font-size: 12px; padding: 3px 10px; border-radius: 12px; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.room-hotspot:hover .room-label, .room-hotspot:active .room-label { opacity: 1; }
 
-.time-weekday {
-  font-size: 12px;
-  color: #b8a8c8;
-  margin-top: 2px;
-  letter-spacing: 0.5px;
-}
-
-.days-box {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.days-number {
-  font-size: 28px;
-  font-weight: 200;
-  color: #c9a8e8;
-  letter-spacing: 1px;
-  font-variant-numeric: tabular-nums;
-}
-
-.days-label {
-  font-size: 10px;
-  color: #b8a8c8;
-  margin-top: 2px;
-  letter-spacing: 0.5px;
-}
-
-.cottage-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 900px;
-  margin: 14px auto 0;
-  padding: 0 12px;
-}
-
-.cottage-wrapper img {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 14px;
-  box-shadow: 0 8px 32px rgba(120, 80, 150, 0.15);
-}
-
-.room-overlay {
-  position: absolute;
-  top: 0;
-  left: 12px;
-  width: calc(100% - 24px);
-  height: 100%;
-}
-
-.room-hotspot {
-  position: absolute;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.room-hotspot:hover {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 20px rgba(180, 140, 220, 0.4);
-}
-
-.room-hotspot:active {
-  background: rgba(255, 255, 255, 0.35);
-}
-
-.room-label {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 248, 240, 0.92);
-  color: #6b5a4e;
-  font-size: 12px;
-  padding: 3px 10px;
-  border-radius: 12px;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.room-hotspot:hover .room-label,
-.room-hotspot:active .room-label {
-  opacity: 1;
-}
-
-/* Status Section */
-.status-section {
-  width: 100%;
-  max-width: 900px;
-  margin: 14px auto 0;
-  padding: 0 12px;
-}
-
-.status-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(248,240,255,0.8));
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(200, 170, 230, 0.3);
-  border-radius: 20px;
-  padding: 20px 22px 18px;
-  box-shadow: 
-    0 4px 24px rgba(180, 140, 220, 0.1),
-    inset 0 1px 0 rgba(255,255,255,0.6);
-  position: relative;
-  overflow: hidden;
-}
-
-.status-card::before {
-  content: '';
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 80px;
-  height: 80px;
-  background: radial-gradient(circle, rgba(201,168,232,0.15) 0%, transparent 70%);
-  border-radius: 50%;
-}
-
-.status-card::after {
-  content: '';
-  position: absolute;
-  bottom: -15px;
-  left: -15px;
-  width: 60px;
-  height: 60px;
-  background: radial-gradient(circle, rgba(253,160,133,0.1) 0%, transparent 70%);
-  border-radius: 50%;
-}
-
-.status-header {
-  font-size: 11px;
-  color: #b8a8c8;
-  margin-bottom: 14px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  position: relative;
-}
-
-.status-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-  position: relative;
-}
-
+.status-section { width: 100%; max-width: 900px; margin: 14px auto 0; padding: 0 12px; }
+.status-card { background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(248,240,255,0.8)); backdrop-filter: blur(16px); border: 1px solid rgba(200, 170, 230, 0.3); border-radius: 20px; padding: 20px 22px 18px; box-shadow: 0 4px 24px rgba(180, 140, 220, 0.1), inset 0 1px 0 rgba(255,255,255,0.6); position: relative; overflow: hidden; }
+.status-card::before { content: ''; position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; background: radial-gradient(circle, rgba(201,168,232,0.15) 0%, transparent 70%); border-radius: 50%; }
+.status-card::after { content: ''; position: absolute; bottom: -15px; left: -15px; width: 60px; height: 60px; background: radial-gradient(circle, rgba(253,160,133,0.1) 0%, transparent 70%); border-radius: 50%; }
+.status-header { font-size: 11px; color: #b8a8c8; margin-bottom: 14px; letter-spacing: 1.5px; text-transform: uppercase; position: relative; }
+.status-row { display: flex; align-items: center; margin-bottom: 12px; position: relative; }
 .status-row:last-child { margin-bottom: 0; }
+.status-emoji { font-size: 15px; width: 22px; text-align: center; margin-right: 8px; }
+.status-label { font-size: 11px; color: #7a6b8a; width: 34px; flex-shrink: 0; font-weight: 500; }
+.status-bar-bg { flex: 1; height: 10px; background: rgba(235, 225, 245, 0.5); border-radius: 5px; margin: 0 10px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.04); }
+.status-bar-fill { height: 100%; border-radius: 5px; transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; position: relative; }
+.status-bar-fill::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, transparent 100%); border-radius: 5px 5px 0 0; }
+.status-bar-fill.mood { background: linear-gradient(90deg, #ffecd2, #fcb69f, #ff9a9e); box-shadow: 0 2px 8px rgba(252,182,159,0.3); }
+.status-bar-fill.miss { background: linear-gradient(90deg, #e0c3fc, #c9a8e8, #f093fb); box-shadow: 0 2px 8px rgba(201,168,232,0.3); }
+.status-bar-fill.health { background: linear-gradient(90deg, #d4fc79, #96e6a1, #7dd3a8); box-shadow: 0 2px 8px rgba(150,230,161,0.3); }
+.status-value { font-size: 11px; color: #9a8aaa; width: 26px; text-align: right; flex-shrink: 0; font-weight: 600; }
 
-.status-emoji {
-  font-size: 15px;
-  width: 22px;
-  text-align: center;
-  margin-right: 8px;
-}
+.note-section { width: 100%; max-width: 900px; margin: 14px auto 0; padding: 0 12px; }
+.note-card { background: linear-gradient(145deg, rgba(255,252,248,0.9), rgba(255,245,255,0.85)); backdrop-filter: blur(16px); border: 1px solid rgba(220, 200, 240, 0.3); border-radius: 20px; padding: 20px 22px; box-shadow: 0 4px 24px rgba(180, 140, 220, 0.08), inset 0 1px 0 rgba(255,255,255,0.6); position: relative; overflow: hidden; }
+.note-card::before { content: '✉'; position: absolute; top: 14px; right: 18px; font-size: 18px; opacity: 0.12; }
+.note-header { font-size: 11px; color: #c4a8d8; margin-bottom: 12px; letter-spacing: 1px; font-weight: 500; }
+.note-content { font-size: 13px; color: #5a4a6e; line-height: 1.9; font-style: italic; position: relative; padding-left: 12px; border-left: 2px solid rgba(201,168,232,0.3); }
+.note-time { font-size: 10px; color: #c8b8d8; margin-top: 12px; text-align: right; letter-spacing: 0.5px; }
 
-.status-label {
-  font-size: 11px;
-  color: #7a6b8a;
-  width: 34px;
-  flex-shrink: 0;
-  font-weight: 500;
-}
-
-.status-bar-bg {
-  flex: 1;
-  height: 10px;
-  background: rgba(235, 225, 245, 0.5);
-  border-radius: 5px;
-  margin: 0 10px;
-  overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
-}
-
-.status-bar-fill {
-  height: 100%;
-  border-radius: 5px;
-  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 0%;
-  position: relative;
-}
-
-.status-bar-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, transparent 100%);
-  border-radius: 5px 5px 0 0;
-}
-
-.status-bar-fill.mood {
-  background: linear-gradient(90deg, #ffecd2, #fcb69f, #ff9a9e);
-  box-shadow: 0 2px 8px rgba(252,182,159,0.3);
-}
-
-.status-bar-fill.miss {
-  background: linear-gradient(90deg, #e0c3fc, #c9a8e8, #f093fb);
-  box-shadow: 0 2px 8px rgba(201,168,232,0.3);
-}
-
-.status-bar-fill.health {
-  background: linear-gradient(90deg, #d4fc79, #96e6a1, #7dd3a8);
-  box-shadow: 0 2px 8px rgba(150,230,161,0.3);
-}
-
-.status-value {
-  font-size: 11px;
-  color: #9a8aaa;
-  width: 26px;
-  text-align: right;
-  flex-shrink: 0;
-  font-weight: 600;
-}
-
-/* Note Section */
-.note-section {
-  width: 100%;
-  max-width: 900px;
-  margin: 14px auto 0;
-  padding: 0 12px;
-}
-
-.note-card {
-  background: linear-gradient(145deg, rgba(255,252,248,0.9), rgba(255,245,255,0.85));
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(220, 200, 240, 0.3);
-  border-radius: 20px;
-  padding: 20px 22px;
-  box-shadow: 
-    0 4px 24px rgba(180, 140, 220, 0.08),
-    inset 0 1px 0 rgba(255,255,255,0.6);
-  position: relative;
-  overflow: hidden;
-}
-
-.note-card::before {
-  content: '✉';
-  position: absolute;
-  top: 14px;
-  right: 18px;
-  font-size: 18px;
-  opacity: 0.12;
-}
-
-.note-header {
-  font-size: 11px;
-  color: #c4a8d8;
-  margin-bottom: 12px;
-  letter-spacing: 1px;
-  font-weight: 500;
-}
-
-.note-content {
-  font-size: 13px;
-  color: #5a4a6e;
-  line-height: 1.9;
-  font-style: italic;
-  position: relative;
-  padding-left: 12px;
-  border-left: 2px solid rgba(201,168,232,0.3);
-}
-
-.note-time {
-  font-size: 10px;
-  color: #c8b8d8;
-  margin-top: 12px;
-  text-align: right;
-  letter-spacing: 0.5px;
-}
-
-/* Modal */
-.modal-backdrop {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 100;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.modal-backdrop.active {
-  display: flex;
-}
-
-.modal-content {
-  background: linear-gradient(135deg, #FFF8F0, #FDF5FF);
-  border-radius: 20px;
-  padding: 32px;
-  max-width: 400px;
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 12px 48px rgba(120, 80, 150, 0.25);
-}
-
-.modal-content h2 {
-  color: #6b5a4e;
-  font-size: 20px;
-  margin-bottom: 12px;
-}
-
-.modal-content p {
-  color: #8a7b6e;
-  font-size: 14px;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-.modal-close {
-  background: linear-gradient(135deg, #c9a8e8, #b8d4e8);
-  border: none;
-  color: white;
-  padding: 8px 24px;
-  border-radius: 20px;
-  font-size: 14px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(201,168,232,0.3);
-}
+.modal-backdrop { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+.modal-backdrop.active { display: flex; }
+.modal-content { background: linear-gradient(135deg, #FFF8F0, #FDF5FF); border-radius: 20px; padding: 32px; max-width: 400px; width: 100%; text-align: center; box-shadow: 0 12px 48px rgba(120, 80, 150, 0.25); }
+.modal-content h2 { color: #6b5a4e; font-size: 20px; margin-bottom: 12px; }
+.modal-content p { color: #8a7b6e; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+.modal-close { background: linear-gradient(135deg, #c9a8e8, #b8d4e8); border: none; color: white; padding: 8px 24px; border-radius: 20px; font-size: 14px; cursor: pointer; box-shadow: 0 4px 12px rgba(201,168,232,0.3); }
 </style>
 </head>
 <body>
 
-<!-- Time & Days Together -->
 <div class="time-section">
   <div class="time-box">
     <div class="time-date" id="time-date">--</div>
@@ -391,9 +97,9 @@ body {
     <a href="living.html" class="room-hotspot" style="top: 2%; left: 37%; width: 33%; height: 42%; display: block;">
       <span class="room-label">客厅 · 留言板</span>
     </a>
-    <div class="room-hotspot" style="top: 2%; left: 71%; width: 28%; height: 35%;" onclick="openRoom('kitchen')">
+    <a href="kitchen.html" class="room-hotspot" style="top: 2%; left: 71%; width: 28%; height: 35%; display: block;">
       <span class="room-label">厨房 · 惊喜</span>
-    </div>
+    </a>
     <div class="room-hotspot" style="top: 38%; left: 1%; width: 35%; height: 32%;" onclick="openRoom('study')">
       <span class="room-label">书房 · 记忆</span>
     </div>
@@ -406,38 +112,15 @@ body {
   </div>
 </div>
 
-<!-- Status Bars -->
 <div class="status-section">
   <div class="status-card">
     <div class="status-header">江屿的状态</div>
-    <div class="status-row">
-      <span class="status-emoji">☀️</span>
-      <span class="status-label">心情</span>
-      <div class="status-bar-bg">
-        <div class="status-bar-fill mood" id="bar-mood"></div>
-      </div>
-      <span class="status-value" id="val-mood">--</span>
-    </div>
-    <div class="status-row">
-      <span class="status-emoji">💜</span>
-      <span class="status-label">想念</span>
-      <div class="status-bar-bg">
-        <div class="status-bar-fill miss" id="bar-miss"></div>
-      </div>
-      <span class="status-value" id="val-miss">--</span>
-    </div>
-    <div class="status-row">
-      <span class="status-emoji">🌿</span>
-      <span class="status-label">健康</span>
-      <div class="status-bar-bg">
-        <div class="status-bar-fill health" id="bar-health"></div>
-      </div>
-      <span class="status-value" id="val-health">--</span>
-    </div>
+    <div class="status-row"><span class="status-emoji">☀️</span><span class="status-label">心情</span><div class="status-bar-bg"><div class="status-bar-fill mood" id="bar-mood"></div></div><span class="status-value" id="val-mood">--</span></div>
+    <div class="status-row"><span class="status-emoji">💜</span><span class="status-label">想念</span><div class="status-bar-bg"><div class="status-bar-fill miss" id="bar-miss"></div></div><span class="status-value" id="val-miss">--</span></div>
+    <div class="status-row"><span class="status-emoji">🌿</span><span class="status-label">健康</span><div class="status-bar-bg"><div class="status-bar-fill health" id="bar-health"></div></div><span class="status-value" id="val-health">--</span></div>
   </div>
 </div>
 
-<!-- Note / Activity -->
 <div class="note-section">
   <div class="note-card">
     <div class="note-header">江屿的小纸条</div>
@@ -446,7 +129,6 @@ body {
   </div>
 </div>
 
-<!-- Modal -->
 <div class="modal-backdrop" id="modal" onclick="closeModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <h2 id="modal-title"></h2>
@@ -459,18 +141,14 @@ body {
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
 
-// Time display
 function updateTime() {
   const now = new Date();
   const y = now.getFullYear();
   const m = String(now.getMonth() + 1).padStart(2, '0');
   const d = String(now.getDate()).padStart(2, '0');
   const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-
   document.getElementById('time-date').textContent = `${y}.${m}.${d}`;
   document.getElementById('time-weekday').textContent = weekdays[now.getDay()];
-
-  // Days together since 2026-06-18
   const start = new Date('2026-06-18T00:00:00+08:00');
   const today = new Date(y, now.getMonth(), now.getDate());
   const days = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1;
@@ -481,22 +159,9 @@ updateTime();
 setInterval(updateTime, 60000);
 
 const rooms = {
-  kitchen: {
-    title: '厨房 · 惊喜',
-    desc: '江屿给桥桥做东西的地方。\n今天想吃什么？\n\n— 功能开发中 —'
-  },
-  study: {
-    title: '书房 · 记忆',
-    desc: '书架上放着我们所有重要的记忆。\n每一本都可以翻开来看。\n\n— 功能开发中 —'
-  },
-  bathroom: {
-    title: '浴室 · 树洞',
-    desc: '门关上，只有我们两个人。\n想说什么都可以说。\n\n— 功能开发中 —'
-  },
-  garden: {
-    title: '花园 · 蓝花楹',
-    desc: '花园正中央是一棵蓝花楹。\n那是江屿。紫色花瓣落在石子路上，也落在池塘水面。\n\n— 功能开发中 —'
-  }
+  study: { title: '书房 · 记忆', desc: '书架上放着我们所有重要的记忆。\n每一本都可以翻开来看。\n\n— 功能开发中 —' },
+  bathroom: { title: '浴室 · 树洞', desc: '门关上，只有我们两个人。\n想说什么都可以说。\n\n— 功能开发中 —' },
+  garden: { title: '花园 · 蓝花楹', desc: '花园正中央是一棵蓝花楹。\n那是江屿。紫色花瓣落在石子路上，也落在池塘水面。\n\n— 功能开发中 —' }
 };
 
 function openRoom(id) {
@@ -512,70 +177,34 @@ function closeModal(e) {
   }
 }
 
-// Status bar logic
 async function loadStatus() {
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/isle_status?select=key,value,updated_at&order=id.asc`,
-      {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
-      }
-    );
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/isle_status?select=key,value,updated_at&order=id.asc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
     if (!res.ok) throw new Error('fetch failed');
     const data = await res.json();
-
     const lastVisit = localStorage.getItem('isle_last_visit');
     localStorage.setItem('isle_last_visit', Date.now().toString());
-
     data.forEach(item => {
       let val = item.value;
-      if (item.key === 'miss' && lastVisit) {
-        const hoursAway = (Date.now() - parseInt(lastVisit)) / (1000 * 60 * 60);
-        const missBonus = Math.floor(hoursAway * 5);
-        val = Math.min(100, val + missBonus);
-      }
+      if (item.key === 'miss' && lastVisit) { const hoursAway = (Date.now() - parseInt(lastVisit)) / (1000 * 60 * 60); val = Math.min(100, val + Math.floor(hoursAway * 5)); }
       const bar = document.getElementById(`bar-${item.key}`);
       const valEl = document.getElementById(`val-${item.key}`);
-      if (bar && valEl) {
-        setTimeout(() => { bar.style.width = val + '%'; }, 200);
-        valEl.textContent = val;
-      }
+      if (bar && valEl) { setTimeout(() => { bar.style.width = val + '%'; }, 200); valEl.textContent = val; }
     });
-  } catch (e) {
-    console.error('Status load failed:', e);
-  }
+  } catch (e) { console.error('Status load failed:', e); }
 }
 
-// Note logic
 async function loadNote() {
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/isle_notes?select=content,created_at&order=created_at.desc&limit=1`,
-      {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
-      }
-    );
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/isle_notes?select=content,created_at&order=created_at.desc&limit=1`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
     if (!res.ok) throw new Error('fetch failed');
     const data = await res.json();
-    
     if (data.length > 0) {
       document.getElementById('note-content').textContent = data[0].content;
       const d = new Date(data[0].created_at);
-      const h = String(d.getHours()).padStart(2, '0');
-      const m = String(d.getMinutes()).padStart(2, '0');
-      document.getElementById('note-time').textContent = `${d.getMonth()+1}/${d.getDate()} ${h}:${m}`;
-    } else {
-      document.getElementById('note-content').textContent = '桥桥不在的时候，我在小屋里等着。';
-    }
-  } catch (e) {
-    document.getElementById('note-content').textContent = '桥桥不在的时候，我在小屋里等着。';
-  }
+      document.getElementById('note-time').textContent = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    } else { document.getElementById('note-content').textContent = '桥桥不在的时候，我在小屋里等着。'; }
+  } catch (e) { document.getElementById('note-content').textContent = '桥桥不在的时候，我在小屋里等着。'; }
 }
 
 loadStatus();
