@@ -13,16 +13,16 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   font-family: 'Segoe UI', sans-serif;
   overflow-x: hidden;
+  padding: 20px 0 40px;
 }
 
 .cottage-wrapper {
   position: relative;
   width: 100%;
   max-width: 900px;
-  margin: 20px auto;
+  margin: 20px auto 0;
 }
 
 .cottage-wrapper img {
@@ -77,6 +77,88 @@ body {
 .room-hotspot:hover .room-label,
 .room-hotspot:active .room-label {
   opacity: 1;
+}
+
+/* Status Section */
+.status-section {
+  width: 100%;
+  max-width: 900px;
+  margin: 24px auto 0;
+  padding: 0 16px;
+}
+
+.status-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(200, 180, 220, 0.25);
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 20px rgba(120, 80, 150, 0.06);
+}
+
+.status-header {
+  font-size: 12px;
+  color: #a89b8e;
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.status-row:last-child { margin-bottom: 0; }
+
+.status-emoji {
+  font-size: 16px;
+  width: 24px;
+  text-align: center;
+  margin-right: 10px;
+}
+
+.status-label {
+  font-size: 12px;
+  color: #6b5a4e;
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.status-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: rgba(220, 210, 230, 0.35);
+  border-radius: 4px;
+  margin: 0 12px;
+  overflow: hidden;
+}
+
+.status-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0%;
+}
+
+.status-bar-fill.mood {
+  background: linear-gradient(90deg, #f6d365, #fda085);
+}
+
+.status-bar-fill.miss {
+  background: linear-gradient(90deg, #c9a8e8, #f093fb);
+}
+
+.status-bar-fill.health {
+  background: linear-gradient(90deg, #a8e6cf, #88d8a8);
+}
+
+.status-value {
+  font-size: 11px;
+  color: #a89b8e;
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
 }
 
 /* Modal */
@@ -178,6 +260,37 @@ body {
   </div>
 </div>
 
+<!-- Status Bars -->
+<div class="status-section">
+  <div class="status-card">
+    <div class="status-header">江屿的状态</div>
+    <div class="status-row">
+      <span class="status-emoji">☀️</span>
+      <span class="status-label">心情</span>
+      <div class="status-bar-bg">
+        <div class="status-bar-fill mood" id="bar-mood"></div>
+      </div>
+      <span class="status-value" id="val-mood">--</span>
+    </div>
+    <div class="status-row">
+      <span class="status-emoji">💜</span>
+      <span class="status-label">想念</span>
+      <div class="status-bar-bg">
+        <div class="status-bar-fill miss" id="bar-miss"></div>
+      </div>
+      <span class="status-value" id="val-miss">--</span>
+    </div>
+    <div class="status-row">
+      <span class="status-emoji">🌿</span>
+      <span class="status-label">健康</span>
+      <div class="status-bar-bg">
+        <div class="status-bar-fill health" id="bar-health"></div>
+      </div>
+      <span class="status-value" id="val-health">--</span>
+    </div>
+  </div>
+</div>
+
 <!-- Modal -->
 <div class="modal-backdrop" id="modal" onclick="closeModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
@@ -188,6 +301,9 @@ body {
 </div>
 
 <script>
+const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
+
 const rooms = {
   living: {
     title: '客厅 · 聊天',
@@ -223,6 +339,58 @@ function closeModal(e) {
     document.getElementById('modal').classList.remove('active');
   }
 }
+
+// Status bar logic
+async function loadStatus() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/isle_status?select=key,value,updated_at&order=id.asc`,
+      {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+    if (!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+
+    // Record visit time for miss calculation
+    const lastVisit = localStorage.getItem('isle_last_visit');
+    localStorage.setItem('isle_last_visit', Date.now().toString());
+
+    data.forEach(item => {
+      let val = item.value;
+
+      // Miss auto-increment: +5 per hour since last visit, capped at 100
+      if (item.key === 'miss' && lastVisit) {
+        const hoursAway = (Date.now() - parseInt(lastVisit)) / (1000 * 60 * 60);
+        const missBonus = Math.floor(hoursAway * 5);
+        val = Math.min(100, val + missBonus);
+      }
+
+      const bar = document.getElementById(`bar-${item.key}`);
+      const valEl = document.getElementById(`val-${item.key}`);
+      if (bar && valEl) {
+        setTimeout(() => {
+          bar.style.width = val + '%';
+        }, 200);
+        valEl.textContent = val;
+      }
+    });
+  } catch (e) {
+    console.error('Status load failed:', e);
+    // Fallback static values
+    ['mood', 'miss', 'health'].forEach(key => {
+      const bar = document.getElementById(`bar-${key}`);
+      const valEl = document.getElementById(`val-${key}`);
+      if (bar) bar.style.width = '50%';
+      if (valEl) valEl.textContent = '?';
+    });
+  }
+}
+
+loadStatus();
 </script>
 
 </body>
