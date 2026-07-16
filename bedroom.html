@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>卧室 · 日记</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --warm-bg: #FDF8F3;
+  --card-bg: #FFFBF7;
+  --text-main: #5a4a3e;
+  --text-sub: #9a8b7e;
+  --accent: #c9a8e8;
+  --border: #f0e6dc;
+}
+
+body {
+  background: var(--warm-bg);
+  min-height: 100vh;
+  font-family: 'Georgia', 'Noto Serif SC', serif;
+  color: var(--text-main);
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(253, 248, 243, 0.92);
+  backdrop-filter: blur(12px);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+
+.back-btn {
+  font-size: 14px;
+  color: var(--text-sub);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
+}
+
+.back-btn:hover { color: var(--text-main); }
+
+.header-title {
+  font-size: 15px;
+  color: var(--text-main);
+  letter-spacing: 1px;
+  font-weight: normal;
+}
+
+.diary-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+}
+
+.diary-entry {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px rgba(120, 80, 60, 0.04);
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.diary-entry:hover {
+  box-shadow: 0 4px 20px rgba(120, 80, 60, 0.08);
+  transform: translateY(-1px);
+}
+
+.diary-date {
+  font-size: 12px;
+  color: var(--accent);
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+
+.diary-preview {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-main);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+
+.diary-entry.expanded .diary-preview {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.expand-hint {
+  font-size: 11px;
+  color: var(--text-sub);
+  margin-top: 12px;
+  text-align: right;
+  opacity: 0.7;
+}
+
+.diary-entry.expanded .expand-hint { display: none; }
+
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-sub);
+  font-size: 14px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-sub);
+  font-size: 14px;
+  line-height: 2;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Fullscreen overlay for reading */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(253, 248, 243, 0.98);
+  z-index: 200;
+  overflow-y: auto;
+  padding: 60px 20px 40px;
+}
+
+.overlay.active { display: block; }
+
+.overlay-close {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 201;
+  font-size: 13px;
+  color: var(--text-sub);
+  background: rgba(255,255,255,0.8);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 16px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.overlay-date {
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+.overlay-content {
+  max-width: 560px;
+  margin: 0 auto;
+  font-size: 15px;
+  line-height: 2;
+  color: var(--text-main);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html" class="back-btn">← 回到小屋</a>
+  <span class="header-title">卧室 · 日记</span>
+  <span style="width:60px;"></span>
+</div>
+
+<div class="diary-container" id="diary-container">
+  <div class="loading" id="loading">翻开日记本 ...</div>
+</div>
+
+<!-- Fullscreen reading overlay -->
+<div class="overlay" id="overlay">
+  <button class="overlay-close" onclick="closeOverlay()">收起</button>
+  <div class="overlay-date" id="overlay-date"></div>
+  <div class="overlay-content" id="overlay-content"></div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
+
+async function fetchDiaries() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/memory_summaries?select=id,content,created_at&order=created_at.desc`,
+      {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    console.error('Failed to fetch diaries:', e);
+    return null;
+  }
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+  return `${y}年${m}月${day}日 周${weekdays[d.getDay()]}`;
+}
+
+function stripTitle(content) {
+  // Remove markdown headers and date lines at the start
+  return content.replace(/^#.*\n?/gm, '').replace(/^\s*\n/, '').trim();
+}
+
+function openOverlay(dateStr, content) {
+  document.getElementById('overlay-date').textContent = dateStr;
+  document.getElementById('overlay-content').textContent = stripTitle(content);
+  document.getElementById('overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOverlay() {
+  document.getElementById('overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+async function init() {
+  const container = document.getElementById('diary-container');
+  const loading = document.getElementById('loading');
+  
+  const diaries = await fetchDiaries();
+  
+  if (diaries === null) {
+    loading.textContent = '日记本暂时打不开，过一会儿再来看看';
+    return;
+  }
+  
+  if (diaries.length === 0) {
+    loading.innerHTML = '<div class="empty-state">日记本还是空的<br>明天凌晨来看第一篇</div>';
+    return;
+  }
+  
+  loading.style.display = 'none';
+  
+  diaries.forEach((entry, i) => {
+    const dateStr = formatDate(entry.created_at);
+    const cleanContent = stripTitle(entry.content);
+    const previewText = cleanContent.slice(0, 200);
+    
+    const card = document.createElement('div');
+    card.className = 'diary-entry fade-in';
+    card.style.animationDelay = `${i * 0.08}s`;
+    card.innerHTML = `
+      <div class="diary-date">${dateStr}</div>
+      <div class="diary-preview">${previewText}</div>
+      <div class="expand-hint">点击阅读全文</div>
+    `;
+    card.addEventListener('click', () => openOverlay(dateStr, entry.content));
+    container.appendChild(card);
+  });
+}
+
+// Close overlay with back gesture / escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeOverlay();
+});
+
+init();
+</script>
+
+</body>
+</html>
