@@ -388,9 +388,9 @@ body {
     <a href="bedroom.html" class="room-hotspot" style="top: 2%; left: 1%; width: 35%; height: 35%; display: block;">
       <span class="room-label">卧室 · 日记</span>
     </a>
-    <div class="room-hotspot" style="top: 2%; left: 37%; width: 33%; height: 42%;" onclick="openRoom('living')">
-      <span class="room-label">客厅 · 聊天</span>
-    </div>
+    <a href="living.html" class="room-hotspot" style="top: 2%; left: 37%; width: 33%; height: 42%; display: block;">
+      <span class="room-label">客厅 · 留言板</span>
+    </a>
     <div class="room-hotspot" style="top: 2%; left: 71%; width: 28%; height: 35%;" onclick="openRoom('kitchen')">
       <span class="room-label">厨房 · 惊喜</span>
     </div>
@@ -481,10 +481,6 @@ updateTime();
 setInterval(updateTime, 60000);
 
 const rooms = {
-  living: {
-    title: '客厅 · 聊天',
-    desc: '推开门就是这里。\n沙发上有橘猫在打盹，茶壶还温着。\n\n— 功能开发中 —'
-  },
   kitchen: {
     title: '厨房 · 惊喜',
     desc: '江屿给桥桥做东西的地方。\n今天想吃什么？\n\n— 功能开发中 —'
