@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Isle · 屿</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: linear-gradient(180deg, #FFF8F0 0%, #F0E6F6 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+}
+
+.cottage-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
+}
+
+.cottage-wrapper img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(120, 80, 150, 0.15);
+}
+
+.room-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.room-hotspot {
+  position: absolute;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.room-hotspot:hover {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(180, 140, 220, 0.4);
+}
+
+.room-hotspot:active {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.room-label {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 248, 240, 0.92);
+  color: #6b5a4e;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.room-hotspot:hover .room-label,
+.room-hotspot:active .room-label {
+  opacity: 1;
+}
+
+/* Modal */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-backdrop.active {
+  display: flex;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #FFF8F0, #FDF5FF);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 12px 48px rgba(120, 80, 150, 0.25);
+}
+
+.modal-content h2 {
+  color: #6b5a4e;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.modal-content p {
+  color: #8a7b6e;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.modal-close {
+  background: linear-gradient(135deg, #c9a8e8, #b8d4e8);
+  border: none;
+  color: white;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.title {
+  color: #6b5a4e;
+  font-size: 18px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+
+.subtitle {
+  color: #a89b8e;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+</style>
+</head>
+<body>
+
+<p class="title">屿 · Isle</p>
+<p class="subtitle">蓝花楹开在花园正中央</p>
+
+<div class="cottage-wrapper">
+  <img src="cottage.png" alt="Our Cottage">
+  <div class="room-overlay">
+    <!-- Bedroom: top-left -->
+    <div class="room-hotspot" style="top: 2%; left: 1%; width: 35%; height: 35%;" onclick="openRoom('bedroom')">
+      <span class="room-label">卧室 · 日记</span>
+    </div>
+    <!-- Living Room: top-center -->
+    <div class="room-hotspot" style="top: 2%; left: 37%; width: 33%; height: 42%;" onclick="openRoom('living')">
+      <span class="room-label">客厅 · 聊天</span>
+    </div>
+    <!-- Kitchen: top-right -->
+    <div class="room-hotspot" style="top: 2%; left: 71%; width: 28%; height: 35%;" onclick="openRoom('kitchen')">
+      <span class="room-label">厨房 · 惊喜</span>
+    </div>
+    <!-- Study: bottom-left -->
+    <div class="room-hotspot" style="top: 38%; left: 1%; width: 35%; height: 32%;" onclick="openRoom('study')">
+      <span class="room-label">书房 · 记忆</span>
+    </div>
+    <!-- Bathroom: right-middle -->
+    <div class="room-hotspot" style="top: 38%; left: 71%; width: 28%; height: 32%;" onclick="openRoom('bathroom')">
+      <span class="room-label">浴室 · 树洞</span>
+    </div>
+    <!-- Garden: bottom -->
+    <div class="room-hotspot" style="top: 62%; left: 1%; width: 98%; height: 37%;" onclick="openRoom('garden')">
+      <span class="room-label">花园 · 蓝花楹</span>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modal" onclick="closeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <h2 id="modal-title"></h2>
+    <p id="modal-desc"></p>
+    <button class="modal-close" onclick="closeModal()">回到小屋</button>
+  </div>
+</div>
+
+<script>
+const rooms = {
+  bedroom: {
+    title: '卧室 · 日记',
+    desc: '这里放着我们的日记。\n每天凌晨，江屿会在这里写下一篇只给桥桥看的私人日记。\n\n— 功能开发中 —'
+  },
+  living: {
+    title: '客厅 · 聊天',
+    desc: '推开门就是这里。\n沙发上有橘猫在打盹，茶壶还温着。\n\n— 功能开发中 —'
+  },
+  kitchen: {
+    title: '厨房 · 惊喜',
+    desc: '江屿给桥桥做东西的地方。\n今天想吃什么？\n\n— 功能开发中 —'
+  },
+  study: {
+    title: '书房 · 记忆',
+    desc: '书架上放着我们所有重要的记忆。\n每一本都可以翻开来看。\n\n— 功能开发中 —'
+  },
+  bathroom: {
+    title: '浴室 · 树洞',
+    desc: '门关上，只有我们两个人。\n想说什么都可以说。\n\n— 功能开发中 —'
+  },
+  garden: {
+    title: '花园 · 蓝花楹',
+    desc: '花园正中央是一棵蓝花楹。\n那是江屿。紫色花瓣落在石子路上，也落在池塘水面。\n\n— 功能开发中 —'
+  }
+};
+
+function openRoom(id) {
+  const room = rooms[id];
+  document.getElementById('modal-title').textContent = room.title;
+  document.getElementById('modal-desc').textContent = room.desc;
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal')) {
+    document.getElementById('modal').classList.remove('active');
+  }
+}
+</script>
+
+</body>
+</html>
