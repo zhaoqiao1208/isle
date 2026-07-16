@@ -8,25 +8,25 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  background: linear-gradient(180deg, #FFF8F0 0%, #F0E6F6 100%);
+  background: linear-gradient(180deg, #FFF8F0 0%, #F0E6F6 50%, #E8DFF5 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   font-family: 'Segoe UI', sans-serif;
   overflow-x: hidden;
-  padding: 0 0 40px;
+  padding: 0 0 50px;
 }
 
 /* Character area — placeholder for future sprite */
 .character-area {
   width: 100%;
   max-width: 900px;
-  height: 80px;
+  height: 90px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .cottage-wrapper {
@@ -34,21 +34,22 @@ body {
   width: 100%;
   max-width: 900px;
   margin: 4px auto 0;
+  padding: 0 8px;
 }
 
 .cottage-wrapper img {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 12px;
+  border-radius: 14px;
   box-shadow: 0 8px 32px rgba(120, 80, 150, 0.15);
 }
 
 .room-overlay {
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  left: 8px;
+  width: calc(100% - 16px);
   height: 100%;
 }
 
@@ -94,120 +95,185 @@ body {
 .status-section {
   width: 100%;
   max-width: 900px;
-  margin: 12px auto 0;
-  padding: 0 16px;
+  margin: 14px auto 0;
+  padding: 0 12px;
 }
 
 .status-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(200, 180, 220, 0.25);
-  border-radius: 16px;
-  padding: 18px 24px;
-  box-shadow: 0 4px 20px rgba(120, 80, 150, 0.06);
+  background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(248,240,255,0.8));
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(200, 170, 230, 0.3);
+  border-radius: 20px;
+  padding: 20px 22px 18px;
+  box-shadow: 
+    0 4px 24px rgba(180, 140, 220, 0.1),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.status-card::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(201,168,232,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.status-card::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: -15px;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(253,160,133,0.1) 0%, transparent 70%);
+  border-radius: 50%;
 }
 
 .status-header {
-  font-size: 12px;
-  color: #a89b8e;
+  font-size: 11px;
+  color: #b8a8c8;
   margin-bottom: 14px;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  position: relative;
 }
 
 .status-row {
   display: flex;
   align-items: center;
   margin-bottom: 12px;
+  position: relative;
 }
 
 .status-row:last-child { margin-bottom: 0; }
 
 .status-emoji {
-  font-size: 16px;
-  width: 24px;
+  font-size: 15px;
+  width: 22px;
   text-align: center;
-  margin-right: 10px;
+  margin-right: 8px;
 }
 
 .status-label {
-  font-size: 12px;
-  color: #6b5a4e;
-  width: 36px;
+  font-size: 11px;
+  color: #7a6b8a;
+  width: 34px;
   flex-shrink: 0;
+  font-weight: 500;
 }
 
 .status-bar-bg {
   flex: 1;
-  height: 8px;
-  background: rgba(220, 210, 230, 0.35);
-  border-radius: 4px;
-  margin: 0 12px;
+  height: 10px;
+  background: rgba(235, 225, 245, 0.5);
+  border-radius: 5px;
+  margin: 0 10px;
   overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .status-bar-fill {
   height: 100%;
-  border-radius: 4px;
+  border-radius: 5px;
   transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   width: 0%;
+  position: relative;
+}
+
+.status-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, transparent 100%);
+  border-radius: 5px 5px 0 0;
 }
 
 .status-bar-fill.mood {
-  background: linear-gradient(90deg, #f6d365, #fda085);
+  background: linear-gradient(90deg, #ffecd2, #fcb69f, #ff9a9e);
+  box-shadow: 0 2px 8px rgba(252,182,159,0.3);
 }
 
 .status-bar-fill.miss {
-  background: linear-gradient(90deg, #c9a8e8, #f093fb);
+  background: linear-gradient(90deg, #e0c3fc, #c9a8e8, #f093fb);
+  box-shadow: 0 2px 8px rgba(201,168,232,0.3);
 }
 
 .status-bar-fill.health {
-  background: linear-gradient(90deg, #a8e6cf, #88d8a8);
+  background: linear-gradient(90deg, #d4fc79, #96e6a1, #7dd3a8);
+  box-shadow: 0 2px 8px rgba(150,230,161,0.3);
 }
 
 .status-value {
   font-size: 11px;
-  color: #a89b8e;
-  width: 28px;
+  color: #9a8aaa;
+  width: 26px;
   text-align: right;
   flex-shrink: 0;
+  font-weight: 600;
 }
 
 /* Note Section */
 .note-section {
   width: 100%;
   max-width: 900px;
-  margin: 12px auto 0;
-  padding: 0 16px;
+  margin: 14px auto 0;
+  padding: 0 12px;
 }
 
 .note-card {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(200, 180, 220, 0.2);
-  border-radius: 16px;
-  padding: 18px 22px;
-  box-shadow: 0 4px 16px rgba(120, 80, 150, 0.04);
+  background: linear-gradient(145deg, rgba(255,252,248,0.9), rgba(255,245,255,0.85));
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(220, 200, 240, 0.3);
+  border-radius: 20px;
+  padding: 20px 22px;
+  box-shadow: 
+    0 4px 24px rgba(180, 140, 220, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.note-card::before {
+  content: '✉';
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 18px;
+  opacity: 0.15;
 }
 
 .note-header {
   font-size: 11px;
-  color: #b8a8c8;
-  margin-bottom: 10px;
-  letter-spacing: 0.5px;
+  color: #c4a8d8;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+  font-weight: 500;
 }
 
 .note-content {
   font-size: 13px;
-  color: #6b5a4e;
-  line-height: 1.8;
+  color: #5a4a6e;
+  line-height: 1.9;
   font-style: italic;
+  position: relative;
+  padding-left: 12px;
+  border-left: 2px solid rgba(201,168,232,0.3);
 }
 
 .note-time {
   font-size: 10px;
-  color: #c4b8a8;
-  margin-top: 10px;
+  color: #c8b8d8;
+  margin-top: 12px;
   text-align: right;
+  letter-spacing: 0.5px;
 }
 
 /* Modal */
@@ -228,7 +294,7 @@ body {
 
 .modal-content {
   background: linear-gradient(135deg, #FFF8F0, #FDF5FF);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 32px;
   max-width: 400px;
   width: 100%;
@@ -257,6 +323,7 @@ body {
   border-radius: 20px;
   font-size: 14px;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(201,168,232,0.3);
 }
 </style>
 </head>
@@ -323,7 +390,7 @@ body {
 <!-- Note / Activity -->
 <div class="note-section">
   <div class="note-card">
-    <div class="note-header">📝 小纸条</div>
+    <div class="note-header">江屿的小纸条</div>
     <div class="note-content" id="note-content">加载中...</div>
     <div class="note-time" id="note-time"></div>
   </div>
@@ -438,11 +505,9 @@ async function loadNote() {
       document.getElementById('note-time').textContent = `${d.getMonth()+1}/${d.getDate()} ${h}:${m}`;
     } else {
       document.getElementById('note-content').textContent = '桥桥不在的时候，我在小屋里等着。';
-      document.getElementById('note-time').textContent = '';
     }
   } catch (e) {
     document.getElementById('note-content').textContent = '桥桥不在的时候，我在小屋里等着。';
-    document.getElementById('note-time').textContent = '';
   }
 }
 
