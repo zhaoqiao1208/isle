@@ -151,10 +151,10 @@ body {
 <div class="cottage-wrapper">
   <img src="cottage.png" alt="Our Cottage">
   <div class="room-overlay">
-    <!-- Bedroom: top-left -->
-    <div class="room-hotspot" style="top: 2%; left: 1%; width: 35%; height: 35%;" onclick="openRoom('bedroom')">
+    <!-- Bedroom: top-left → navigates to bedroom.html -->
+    <a href="bedroom.html" class="room-hotspot" style="top: 2%; left: 1%; width: 35%; height: 35%; display: block;">
       <span class="room-label">卧室 · 日记</span>
-    </div>
+    </a>
     <!-- Living Room: top-center -->
     <div class="room-hotspot" style="top: 2%; left: 37%; width: 33%; height: 42%;" onclick="openRoom('living')">
       <span class="room-label">客厅 · 聊天</span>
@@ -189,10 +189,6 @@ body {
 
 <script>
 const rooms = {
-  bedroom: {
-    title: '卧室 · 日记',
-    desc: '这里放着我们的日记。\n每天凌晨，江屿会在这里写下一篇只给桥桥看的私人日记。\n\n— 功能开发中 —'
-  },
   living: {
     title: '客厅 · 聊天',
     desc: '推开门就是这里。\n沙发上有橘猫在打盹，茶壶还温着。\n\n— 功能开发中 —'
