@@ -118,6 +118,14 @@ body { background: linear-gradient(180deg, #FFF8F0 0%, #F0E6F6 50%, #E8DFF5 100%
 var SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3emphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
 
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
 // Music visualizer
 var BAR_COUNT = 40;
 var vizContainer = document.getElementById('music-viz');
@@ -139,7 +147,22 @@ setInterval(function() { if (!bgMusic.paused) localStorage.setItem('isle_music_t
 window.addEventListener('beforeunload', function() { if (!bgMusic.paused) localStorage.setItem('isle_music_time', bgMusic.currentTime.toFixed(1)); });
 (function() { try { var savedState = localStorage.getItem('isle_music_state'); var savedTime = parseFloat(localStorage.getItem('isle_music_time') || '0'); if (savedState === 'playing') { initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); var doPlay = function() { bgMusic.currentTime = savedTime; bgMusic.play().then(function() { musicBtn.classList.add('playing'); musicBarEl.classList.add('playing'); checkFrames = 0; drawViz(); }).catch(function(){}); }; if (bgMusic.readyState >= 1) { doPlay(); } else { bgMusic.addEventListener('loadedmetadata', function fn() { bgMusic.removeEventListener('loadedmetadata', fn); doPlay(); }); bgMusic.load(); } } } catch(e){} })();
 
-function updateTime() { var now = new Date(); var y = now.getFullYear(); var m = String(now.getMonth() + 1).padStart(2, '0'); var d = String(now.getDate()).padStart(2, '0'); var weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']; document.getElementById('time-date').textContent = y + '.' + m + '.' + d; document.getElementById('time-weekday').textContent = weekdays[now.getDay()]; var start = new Date('2026-06-18T00:00:00+08:00'); var today = new Date(y, now.getMonth(), now.getDate()); var days = Math.floor((today - start) / 86400000) + 1; document.getElementById('days-number').textContent = days; document.querySelector('.days-label').textContent = '在一起的第 ' + days + ' 天'; }
+function updateTime() {
+  try {
+    var now = new Date();
+    var y = now.getFullYear();
+    var m = pad2(now.getMonth() + 1);
+    var d = pad2(now.getDate());
+    var weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    document.getElementById('time-date').textContent = y + '.' + m + '.' + d;
+    document.getElementById('time-weekday').textContent = weekdays[now.getDay()];
+    var start = new Date('2026-06-18T00:00:00+08:00');
+    var today = new Date(y, now.getMonth(), now.getDate());
+    var days = Math.floor((today - start) / 86400000) + 1;
+    document.getElementById('days-number').textContent = days;
+    document.querySelector('.days-label').textContent = '在一起的第 ' + days + ' 天';
+  } catch(e) {}
+}
 updateTime(); setInterval(updateTime, 60000);
 
 var rooms = { garden: { title: '花园 · 蓝花楹', desc: '花园正中央是一棵蓝花楹。\n那是江屿。紫色花瓣落在石子路上，也落在池塘水面。\n\n— 功能开发中 —' } };
@@ -148,38 +171,77 @@ function closeModal(e) { if (!e || e.target === document.getElementById('modal')
 
 // Load status
 (function() {
-  fetch(SUPABASE_URL + '/rest/v1/isle_status?select=key,value&order=id.asc', { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    var lastVisit = localStorage.getItem('isle_last_visit');
-    localStorage.setItem('isle_last_visit', Date.now().toString());
-    for (var i = 0; i < data.length; i++) {
-      var item = data[i];
-      var val = parseInt(item.value) || 0;
-      if (item.key === 'miss' && lastVisit) { var hoursAway = (Date.now() - parseInt(lastVisit)) / 3600000; val = Math.min(100, val + Math.floor(hoursAway * 5)); }
-      var bar = document.getElementById('bar-' + item.key);
-      var valEl = document.getElementById('val-' + item.key);
-      if (bar && valEl) { bar.style.width = val + '%'; valEl.textContent = val; }
-    }
-  }).catch(function(e) { console.error('Status load failed:', e); });
+  try {
+    var url = SUPABASE_URL + '/rest/v1/isle_status?select=key,value&order=id.asc';
+    fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
+    .then(function(r) {
+      if (!r.ok) { throw new Error('HTTP ' + r.status); }
+      return r.json();
+    })
+    .then(function(data) {
+      if (!data || !Array.isArray(data)) return;
+      var lastVisit = localStorage.getItem('isle_last_visit');
+      localStorage.setItem('isle_last_visit', Date.now().toString());
+      for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        if (!item || !item.key) continue;
+        var val = parseInt(item.value) || 0;
+        if (item.key === 'miss' && lastVisit) {
+          var hoursAway = (Date.now() - parseInt(lastVisit)) / 3600000;
+          val = Math.min(100, val + Math.floor(hoursAway * 5));
+        }
+        var bar = document.getElementById('bar-' + item.key);
+        var valEl = document.getElementById('val-' + item.key);
+        if (bar && valEl) {
+          bar.style.width = val + '%';
+          valEl.textContent = val;
+        }
+      }
+    }).catch(function(e) {
+      console.error('Status load failed:', e);
+      document.getElementById('val-mood').textContent = '85';
+      document.getElementById('bar-mood').style.width = '85%';
+      document.getElementById('val-miss').textContent = '90';
+      document.getElementById('bar-miss').style.width = '90%';
+      document.getElementById('val-health').textContent = '95';
+      document.getElementById('bar-health').style.width = '95%';
+    });
+  } catch(e) {
+    console.error('Status init error:', e);
+  }
 })();
 
 // Load notes (multiple, scrollable)
 (function() {
-  fetch(SUPABASE_URL + '/rest/v1/isle_notes?select=content,created_at&order=created_at.desc&limit=20', { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    var list = document.getElementById('note-list');
-    if (!data || data.length === 0) { list.innerHTML = '<div class="note-item">桥桥不在的时候，我在小屋里等着。</div>'; return; }
-    list.innerHTML = data.map(function(item) {
-      var d = new Date(item.created_at);
-      var timeStr = (d.getMonth()+1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-      return '<div class="note-item">' + escapeHtml(item.content) + '<div class="note-item-time">' + timeStr + '</div></div>';
-    }).join('');
-  }).catch(function(e) { document.getElementById('note-list').innerHTML = '<div class="note-item">桥桥不在的时候，我在小屋里等着。</div>'; });
+  try {
+    var url = SUPABASE_URL + '/rest/v1/isle_notes?select=content,created_at&order=created_at.desc&limit=20';
+    fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
+    .then(function(r) {
+      if (!r.ok) { throw new Error('HTTP ' + r.status); }
+      return r.json();
+    })
+    .then(function(data) {
+      var list = document.getElementById('note-list');
+      if (!data || !Array.isArray(data) || data.length === 0) {
+        list.innerHTML = '<div class="note-item">桥桥不在的时候，我在小屋里等着。</div>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        var d = new Date(item.created_at);
+        var timeStr = (d.getMonth()+1) + '/' + d.getDate() + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+        html += '<div class="note-item">' + escapeHtml(item.content) + '<div class="note-item-time">' + timeStr + '</div></div>';
+      }
+      list.innerHTML = html;
+    }).catch(function(e) {
+      console.error('Notes load failed:', e);
+      document.getElementById('note-list').innerHTML = '<div class="note-item">桥桥不在的时候，我在小屋里等着。</div>';
+    });
+  } catch(e) {
+    console.error('Notes init error:', e);
+  }
 })();
-
-function escapeHtml(str) { var div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
 </script>
 </body>
 </html>
