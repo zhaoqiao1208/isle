@@ -103,19 +103,8 @@ body {
   max-width: 3px;
   min-width: 2px;
   background: #c9a8e8;
-  border-radius: 0;
   height: 2px;
-  image-rendering: pixelated;
-}
-
-.music-bar.playing .viz-bar {
-  animation: vizBounce var(--dur) steps(8) infinite alternate;
-}
-
-@keyframes vizBounce {
-  0% { height: 2px; opacity: 0.4; }
-  50% { opacity: 0.8; }
-  100% { height: var(--max-h); opacity: 1; }
+  transition: height 0.06s steps(6);
 }
 
 .music-info {
@@ -200,24 +189,12 @@ body {
 <div class="cottage-wrapper">
   <img src="cottage.png" alt="Our Cottage">
   <div class="room-overlay">
-    <a href="bedroom.html" class="room-hotspot" style="top: 2%; left: 1%; width: 35%; height: 35%; display: block;">
-      <span class="room-label">卧室 · 日记</span>
-    </a>
-    <a href="living.html" class="room-hotspot" style="top: 2%; left: 37%; width: 33%; height: 42%; display: block;">
-      <span class="room-label">客厅 · 留言板</span>
-    </a>
-    <a href="kitchen.html" class="room-hotspot" style="top: 2%; left: 71%; width: 28%; height: 35%; display: block;">
-      <span class="room-label">厨房 · 惊喜</span>
-    </a>
-    <a href="study.html" class="room-hotspot" style="top: 38%; left: 1%; width: 35%; height: 32%; display: block;">
-      <span class="room-label">书房 · 记录</span>
-    </a>
-    <div class="room-hotspot" style="top: 38%; left: 71%; width: 28%; height: 32%;" onclick="openRoom('bathroom')">
-      <span class="room-label">浴室 · 树洞</span>
-    </div>
-    <div class="room-hotspot" style="top: 62%; left: 1%; width: 98%; height: 37%;" onclick="openRoom('garden')">
-      <span class="room-label">花园 · 蓝花楹</span>
-    </div>
+    <a href="bedroom.html" class="room-hotspot" style="top: 2%; left: 1%; width: 35%; height: 35%; display: block;"><span class="room-label">卧室 · 日记</span></a>
+    <a href="living.html" class="room-hotspot" style="top: 2%; left: 37%; width: 33%; height: 42%; display: block;"><span class="room-label">客厅 · 留言板</span></a>
+    <a href="kitchen.html" class="room-hotspot" style="top: 2%; left: 71%; width: 28%; height: 35%; display: block;"><span class="room-label">厨房 · 惊喜</span></a>
+    <a href="study.html" class="room-hotspot" style="top: 38%; left: 1%; width: 35%; height: 32%; display: block;"><span class="room-label">书房 · 记录</span></a>
+    <div class="room-hotspot" style="top: 38%; left: 71%; width: 28%; height: 32%;" onclick="openRoom('bathroom')"><span class="room-label">浴室 · 树洞</span></div>
+    <div class="room-hotspot" style="top: 62%; left: 1%; width: 98%; height: 37%;" onclick="openRoom('garden')"><span class="room-label">花园 · 蓝花楹</span></div>
   </div>
 </div>
 
@@ -246,7 +223,7 @@ body {
   </div>
 </div>
 
-<audio id="bg-music" loop preload="none">
+<audio id="bg-music" loop preload="none" crossorigin="anonymous">
   <source src="https://yraoaeeayaervwjjalvn.supabase.co/storage/v1/object/public/music/a-thousand-years.mp3" type="audio/mpeg">
 </audio>
 
@@ -254,54 +231,93 @@ body {
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
 
-// Generate pixel visualizer bars with varied parameters
-(function initViz() {
-  const viz = document.getElementById('music-viz');
-  const barCount = 40;
-  for (let i = 0; i < barCount; i++) {
-    const bar = document.createElement('div');
-    bar.className = 'viz-bar';
-    // Create wave-like max height pattern: higher in middle, lower at edges
-    const center = barCount / 2;
-    const distFromCenter = Math.abs(i - center) / center;
-    const baseMax = 22 - distFromCenter * 14;
-    const randomOffset = (Math.random() - 0.5) * 6;
-    const maxH = Math.max(4, Math.min(24, baseMax + randomOffset));
-    // Varied duration for each bar
-    const dur = (0.4 + Math.random() * 0.8).toFixed(2);
-    // Random delay
-    const delay = (Math.random() * 1.2).toFixed(2);
-    bar.style.setProperty('--max-h', maxH + 'px');
-    bar.style.setProperty('--dur', dur + 's');
-    bar.style.animationDelay = delay + 's';
-    viz.appendChild(bar);
-  }
-})();
+// Build visualizer bars
+const BAR_COUNT = 40;
+const vizContainer = document.getElementById('music-viz');
+const bars = [];
+for (let i = 0; i < BAR_COUNT; i++) {
+  const bar = document.createElement('div');
+  bar.className = 'viz-bar';
+  vizContainer.appendChild(bar);
+  bars.push(bar);
+}
 
-// Music player
+// Web Audio API setup
 const bgMusic = document.getElementById('bg-music');
 const musicBtn = document.getElementById('music-btn');
 const musicBar = document.getElementById('music-bar');
 bgMusic.volume = 0.35;
 
+let audioCtx = null;
+let analyser = null;
+let source = null;
+let animId = null;
+let dataArray = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 128;
+  analyser.smoothingTimeConstant = 0.75;
+  source = audioCtx.createMediaElementSource(bgMusic);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
+}
+
+function drawViz() {
+  if (!analyser) return;
+  analyser.getByteFrequencyData(dataArray);
+  const binCount = dataArray.length; // 64
+  const step = binCount / BAR_COUNT;
+  for (let i = 0; i < BAR_COUNT; i++) {
+    const idx = Math.floor(i * step);
+    const value = dataArray[idx];
+    // Map 0-255 to 2-24px, quantize to 2px steps for pixel feel
+    const raw = 2 + (value / 255) * 22;
+    const quantized = Math.round(raw / 2) * 2;
+    bars[i].style.height = quantized + 'px';
+    bars[i].style.opacity = 0.4 + (value / 255) * 0.6;
+  }
+  animId = requestAnimationFrame(drawViz);
+}
+
+function stopViz() {
+  if (animId) {
+    cancelAnimationFrame(animId);
+    animId = null;
+  }
+  bars.forEach(b => { b.style.height = '2px'; b.style.opacity = '0.4'; });
+}
+
 function toggleMusic() {
   if (bgMusic.paused) {
+    initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
     bgMusic.play().then(() => {
       musicBtn.classList.add('playing');
       musicBar.classList.add('playing');
-    }).catch(e => {
-      console.log('Play blocked:', e);
-    });
+      drawViz();
+    }).catch(e => console.log('Play blocked:', e));
   } else {
     bgMusic.pause();
     musicBtn.classList.remove('playing');
     musicBar.classList.remove('playing');
+    stopViz();
   }
 }
 
 bgMusic.addEventListener('pause', () => {
   musicBtn.classList.remove('playing');
   musicBar.classList.remove('playing');
+  stopViz();
+});
+
+bgMusic.addEventListener('play', () => {
+  musicBtn.classList.add('playing');
+  musicBar.classList.add('playing');
+  if (analyser && !animId) drawViz();
 });
 
 function updateTime() {
