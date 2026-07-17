@@ -100,9 +100,9 @@ body {
     <a href="kitchen.html" class="room-hotspot" style="top: 2%; left: 71%; width: 28%; height: 35%; display: block;">
       <span class="room-label">厨房 · 惊喜</span>
     </a>
-    <div class="room-hotspot" style="top: 38%; left: 1%; width: 35%; height: 32%;" onclick="openRoom('study')">
-      <span class="room-label">书房 · 记忆</span>
-    </div>
+    <a href="study.html" class="room-hotspot" style="top: 38%; left: 1%; width: 35%; height: 32%; display: block;">
+      <span class="room-label">书房 · 记录</span>
+    </a>
     <div class="room-hotspot" style="top: 38%; left: 71%; width: 28%; height: 32%;" onclick="openRoom('bathroom')">
       <span class="room-label">浴室 · 树洞</span>
     </div>
@@ -159,7 +159,6 @@ updateTime();
 setInterval(updateTime, 60000);
 
 const rooms = {
-  study: { title: '书房 · 记忆', desc: '书架上放着我们所有重要的记忆。\n每一本都可以翻开来看。\n\n— 功能开发中 —' },
   bathroom: { title: '浴室 · 树洞', desc: '门关上，只有我们两个人。\n想说什么都可以说。\n\n— 功能开发中 —' },
   garden: { title: '花园 · 蓝花楹', desc: '花园正中央是一棵蓝花楹。\n那是江屿。紫色花瓣落在石子路上，也落在池塘水面。\n\n— 功能开发中 —' }
 };
