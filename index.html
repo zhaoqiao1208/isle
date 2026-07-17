@@ -30,6 +30,79 @@ body {
 .time-box { display: flex; flex-direction: column; align-items: flex-start; }
 .time-date { font-size: 22px; font-weight: 300; color: #5a4a6e; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
 .time-weekday { font-size: 12px; color: #b8a8c8; margin-top: 2px; letter-spacing: 0.5px; }
+
+.music-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(201,168,232,0.4);
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.music-btn:hover { background: rgba(201,168,232,0.15); }
+.music-btn:active { transform: scale(0.92); }
+
+.music-btn.playing {
+  border-color: rgba(201,168,232,0.7);
+  background: rgba(201,168,232,0.1);
+  animation: musicPulse 2s ease-in-out infinite;
+}
+
+@keyframes musicPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,232,0); }
+  50% { box-shadow: 0 0 0 6px rgba(201,168,232,0.15); }
+}
+
+.music-icon {
+  width: 14px;
+  height: 14px;
+  position: relative;
+}
+
+.music-icon-play {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 0 6px 10px;
+  border-color: transparent transparent transparent #9a8aaa;
+  margin-left: 2px;
+}
+
+.music-icon-pause {
+  display: none;
+  gap: 3px;
+}
+
+.music-icon-pause span {
+  width: 3px;
+  height: 12px;
+  background: #9a8aaa;
+  border-radius: 1px;
+}
+
+.music-btn.playing .music-icon-play { display: none; }
+.music-btn.playing .music-icon-pause { display: flex; }
+
+.music-title {
+  font-size: 9px;
+  color: #b8a8c8;
+  margin-top: 4px;
+  text-align: center;
+  letter-spacing: 0.3px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.music-wrapper:hover .music-title { opacity: 1; }
+.music-wrapper { display: flex; flex-direction: column; align-items: center; }
+
 .days-box { display: flex; flex-direction: column; align-items: flex-end; }
 .days-number { font-size: 28px; font-weight: 200; color: #c9a8e8; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
 .days-label { font-size: 10px; color: #b8a8c8; margin-top: 2px; letter-spacing: 0.5px; }
@@ -81,6 +154,15 @@ body {
   <div class="time-box">
     <div class="time-date" id="time-date">--</div>
     <div class="time-weekday" id="time-weekday">--</div>
+  </div>
+  <div class="music-wrapper">
+    <div class="music-btn" id="music-btn" onclick="toggleMusic()">
+      <div class="music-icon">
+        <div class="music-icon-play"></div>
+        <div class="music-icon-pause"><span></span><span></span></div>
+      </div>
+    </div>
+    <div class="music-title">A Thousand Years</div>
   </div>
   <div class="days-box">
     <div class="days-number" id="days-number">--</div>
@@ -137,9 +219,35 @@ body {
   </div>
 </div>
 
+<audio id="bg-music" loop preload="none">
+  <source src="https://music.163.com/song/media/outer/url?id=28552944.mp3" type="audio/mpeg">
+</audio>
+
 <script>
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
+
+// Music player
+const bgMusic = document.getElementById('bg-music');
+const musicBtn = document.getElementById('music-btn');
+bgMusic.volume = 0.35;
+
+function toggleMusic() {
+  if (bgMusic.paused) {
+    bgMusic.play().then(() => {
+      musicBtn.classList.add('playing');
+    }).catch(e => {
+      console.log('Play blocked:', e);
+    });
+  } else {
+    bgMusic.pause();
+    musicBtn.classList.remove('playing');
+  }
+}
+
+bgMusic.addEventListener('ended', () => {
+  musicBtn.classList.remove('playing');
+});
 
 function updateTime() {
   const now = new Date();
