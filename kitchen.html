@@ -264,6 +264,9 @@ body {
 .history-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; box-shadow: 0 2px 12px rgba(240,168,104,0.04); }
 .history-date { font-size: 11px; color: var(--accent); margin-bottom: 6px; }
 .history-text { font-size: 13px; color: var(--text-main); line-height: 1.7; }
+.history-audio-btn { margin-top: 8px; padding: 5px 14px; background: none; border: 1px solid rgba(240,168,104,0.35); border-radius: 14px; color: var(--accent); font-size: 11px; cursor: pointer; transition: all 0.2s; }
+.history-audio-btn:hover { border-color: var(--accent); background: rgba(240,168,104,0.06); }
+.history-audio-btn:active { transform: scale(0.95); }
 .history-empty { font-size: 12px; color: var(--text-sub); text-align: center; padding: 20px; }
 
 .order-section { margin-top: 28px; }
@@ -294,7 +297,7 @@ body {
       <div class="lid-hint" id="lid-hint">点一下揭开今天的锅盖</div>
       <div class="lid-content" id="lid-content"></div>
       <div class="lid-date" id="lid-date"></div>
-      <button class="audio-btn" id="audio-btn" onclick="event.stopPropagation(); playAudio()">🔊 听江屿说</button>
+      <button class="audio-btn" id="audio-btn" onclick="event.stopPropagation(); playDishAudio(todayDish)">🔊 听江屿说</button>
     </div>
   </div>
 
@@ -334,7 +337,7 @@ body {
 
 <script>
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
+const SUPABASE_KEY = 'sb_publishable_RoXOyXj6HCsOI8f01LpC2Q_XVRXSNuF';
 const TTS_URL = `${SUPABASE_URL}/functions/v1/tts`;
 
 const today = new Date().toISOString().slice(0, 10);
@@ -342,8 +345,9 @@ const currentHour = new Date().getHours();
 const currentMeal = currentHour < 12 ? 'morning' : 'evening';
 
 let todayDish = null;
-let audioBlob = null;
 let currentAudio = null;
+// Cache audio blobs by dish id to avoid re-fetching
+const audioBlobCache = {};
 
 const openedKey = `isle_kitchen_opened_${currentMeal}`;
 const openedDate = localStorage.getItem(openedKey);
@@ -383,17 +387,26 @@ async function loadKitchen() {
         card.className = 'history-card';
         const d = new Date(item.dish_date + 'T00:00:00');
         const mealLabel = item.meal === 'morning' ? '早' : (item.meal === 'evening' ? '晚' : '');
-        card.innerHTML = `
+        let html = `
           <div class="history-date">${d.getMonth()+1}月${d.getDate()}日${mealLabel ? ' · ' + mealLabel : ''}</div>
           <div class="history-text">${escapeHtml(item.content)}</div>
         `;
+        if (item.tts_text || item.audio_url) {
+          html += `<button class="history-audio-btn" onclick="playDishAudio(historyDishes[${item.id}])">🔊 听江屿说</button>`;
+        }
+        card.innerHTML = html;
         historyList.appendChild(card);
       });
+      // Store history dishes by id for onclick access
+      history.forEach(item => { historyDishes[item.id] = item; });
     }
   } catch (e) {
     console.error('Kitchen load failed:', e);
   }
 }
+
+// Global map for history dish references
+const historyDishes = {};
 
 function openLid() {
   if (!todayDish) return;
@@ -411,14 +424,14 @@ function showDish() {
   const d = new Date(todayDish.dish_date + 'T00:00:00');
   const mealLabel = currentMeal === 'morning' ? '早安' : '晚安';
   document.getElementById('lid-date').textContent = `${d.getMonth()+1}月${d.getDate()}日 · ${mealLabel}`;
-  if (todayDish.tts_text) {
+  if (todayDish.tts_text || todayDish.audio_url) {
     document.getElementById('audio-btn').style.display = 'inline-block';
   }
 }
 
-function openVoicePlayer() {
+function openVoicePlayer(dish) {
   const overlay = document.getElementById('voice-overlay');
-  document.getElementById('voice-text').textContent = todayDish.content;
+  document.getElementById('voice-text').textContent = dish.content;
   overlay.classList.add('active');
   document.body.style.overflow = 'hidden';
 }
@@ -434,15 +447,17 @@ function closeVoicePlayer() {
   }
 }
 
-async function playAudio() {
-  openVoicePlayer();
+async function playDishAudio(dish) {
+  if (!dish) return;
+  openVoicePlayer(dish);
   const overlay = document.getElementById('voice-overlay');
   const status = document.getElementById('voice-status');
 
-  if (audioBlob) {
+  // Check cache first
+  if (audioBlobCache[dish.id]) {
     overlay.classList.add('playing');
     status.textContent = '正在播放';
-    const url = URL.createObjectURL(audioBlob);
+    const url = URL.createObjectURL(audioBlobCache[dish.id]);
     currentAudio = new Audio(url);
     currentAudio.onended = () => {
       overlay.classList.remove('playing');
@@ -452,56 +467,59 @@ async function playAudio() {
     return;
   }
 
-  if (todayDish.audio_url) {
+  // Try existing audio_url
+  if (dish.audio_url) {
     overlay.classList.add('loading');
     status.textContent = '加载中';
     try {
-      const res = await fetch(todayDish.audio_url);
+      const res = await fetch(dish.audio_url);
       if (res.ok) {
-        audioBlob = await res.blob();
+        const blob = await res.blob();
+        audioBlobCache[dish.id] = blob;
         overlay.classList.remove('loading');
         overlay.classList.add('playing');
         status.textContent = '正在播放';
-        const url = URL.createObjectURL(audioBlob);
+        const url = URL.createObjectURL(blob);
         currentAudio = new Audio(url);
         currentAudio.onended = () => {
           overlay.classList.remove('playing');
           status.textContent = '播放结束';
         };
         currentAudio.play();
-        document.getElementById('audio-btn').textContent = '🔊 再听一遍';
         return;
       }
-    } catch (e) { /* fall through */ }
+    } catch (e) {
+      console.error('audio_url fetch failed:', e);
+    }
   }
 
+  // Generate via TTS
   overlay.classList.add('loading');
   status.textContent = '生成中';
 
   try {
-    const ttsContent = todayDish.tts_text || todayDish.content;
+    const ttsContent = dish.tts_text || dish.content;
     const res = await fetch(TTS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: ttsContent, dish_id: todayDish.id })
+      body: JSON.stringify({ text: ttsContent, dish_id: dish.id })
     });
 
     if (!res.ok) throw new Error('TTS failed');
 
-    audioBlob = await res.blob();
+    const blob = await res.blob();
+    audioBlobCache[dish.id] = blob;
     overlay.classList.remove('loading');
     overlay.classList.add('playing');
     status.textContent = '正在播放';
 
-    const url = URL.createObjectURL(audioBlob);
+    const url = URL.createObjectURL(blob);
     currentAudio = new Audio(url);
     currentAudio.onended = () => {
       overlay.classList.remove('playing');
       status.textContent = '播放结束';
     };
     currentAudio.play();
-
-    document.getElementById('audio-btn').textContent = '🔊 再听一遍';
   } catch (e) {
     console.error('TTS error:', e);
     overlay.classList.remove('loading');
