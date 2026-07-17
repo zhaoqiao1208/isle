@@ -119,16 +119,8 @@ body { background: linear-gradient(180deg, #FFF8F0 0%, #F0E6F6 50%, #E8DFF5 100%
 <script>
 var SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_RoXOyXj6HCsOI8f01LpC2Q_XVRXSNuF';
-
-function escapeHtml(str) {
-  var div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
+function escapeHtml(str) { var div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
 function pad2(n) { return n < 10 ? '0' + n : '' + n; }
-
-// Music visualizer
 var BAR_COUNT = 40;
 var vizContainer = document.getElementById('music-viz');
 var bars = [];
@@ -139,113 +131,25 @@ var musicBtn = document.getElementById('music-btn');
 var musicBarEl = document.getElementById('music-bar');
 bgMusic.volume = 0.35;
 var audioCtx = null, analyser = null, sourceNode = null, animId = null, dataArray = null, useRealAnalyser = false, checkFrames = 0;
-
+function saveCurrentTime() { if (!bgMusic.paused && isFinite(bgMusic.currentTime)) { localStorage.setItem('isle_music_time', bgMusic.currentTime.toFixed(1)); } }
 function initAudio() { if (audioCtx) return; try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); analyser = audioCtx.createAnalyser(); analyser.fftSize = 128; analyser.smoothingTimeConstant = 0.75; sourceNode = audioCtx.createMediaElementSource(bgMusic); sourceNode.connect(analyser); analyser.connect(audioCtx.destination); dataArray = new Uint8Array(analyser.frequencyBinCount); useRealAnalyser = true; } catch (e) { useRealAnalyser = false; } }
 function drawViz() { if (!bgMusic.paused) animId = requestAnimationFrame(drawViz); if (useRealAnalyser && analyser) { analyser.getByteFrequencyData(dataArray); if (checkFrames < 30) { checkFrames++; var sum = 0; for(var j=0;j<dataArray.length;j++) sum+=dataArray[j]; if (checkFrames === 30 && sum === 0) useRealAnalyser = false; } if (useRealAnalyser) { var step = dataArray.length / BAR_COUNT; for (var i = 0; i < BAR_COUNT; i++) { var value = dataArray[Math.floor(i * step)]; bars[i].style.height = (2 + (value / 255) * 22) + 'px'; bars[i].style.opacity = (0.4 + (value / 255) * 0.6); } return; } } var t = bgMusic.currentTime; var beat = Math.sin(t * Math.PI * 2 / 0.6) * 0.5 + 0.5; var envelope = (Math.sin(t * 0.15) * 0.3 + 0.5) + (Math.sin(t * 0.4) * 0.2); for (var i = 0; i < BAR_COUNT; i++) { var s = barSeeds[i]; var combined = (Math.sin(t * s.freq + s.phase) + Math.sin(t * s.freq * 1.7 + s.phase * 0.5) * 0.4 + Math.sin(t * 0.3 + i * 0.2) * 0.3) * 0.5 + 0.5; var val = combined * s.amp * s.centerBoost * envelope * (0.6 + beat * 0.4); bars[i].style.height = Math.max(2, Math.min(24, 2 + val * 20)) + 'px'; bars[i].style.opacity = (0.35 + val * 0.65); } }
 function stopViz() { if (animId) { cancelAnimationFrame(animId); animId = null; } for(var i=0;i<bars.length;i++){bars[i].style.height='2px';bars[i].style.opacity='0.4';} }
-function toggleMusic() { if (bgMusic.paused) { initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); bgMusic.play().then(function() { musicBtn.classList.add('playing'); musicBarEl.classList.add('playing'); localStorage.setItem('isle_music_state', 'playing'); checkFrames = 0; drawViz(); }).catch(function(){}); } else { bgMusic.pause(); musicBtn.classList.remove('playing'); musicBarEl.classList.remove('playing'); localStorage.setItem('isle_music_state', 'paused'); localStorage.setItem('isle_music_time', bgMusic.currentTime.toFixed(1)); stopViz(); } }
+function toggleMusic() { if (bgMusic.paused) { initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); bgMusic.play().then(function() { musicBtn.classList.add('playing'); musicBarEl.classList.add('playing'); localStorage.setItem('isle_music_state', 'playing'); checkFrames = 0; drawViz(); }).catch(function(){}); } else { bgMusic.pause(); musicBtn.classList.remove('playing'); musicBarEl.classList.remove('playing'); localStorage.setItem('isle_music_state', 'paused'); saveCurrentTime(); stopViz(); } }
 bgMusic.addEventListener('pause', function() { musicBtn.classList.remove('playing'); musicBarEl.classList.remove('playing'); stopViz(); });
-setInterval(function() { if (!bgMusic.paused) localStorage.setItem('isle_music_time', bgMusic.currentTime.toFixed(1)); }, 1000);
-window.addEventListener('beforeunload', function() { if (!bgMusic.paused) localStorage.setItem('isle_music_time', bgMusic.currentTime.toFixed(1)); });
-(function() { try { var savedState = localStorage.getItem('isle_music_state'); var savedTime = parseFloat(localStorage.getItem('isle_music_time') || '0'); if (savedState === 'playing') { initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); var doPlay = function() { bgMusic.currentTime = savedTime; bgMusic.play().then(function() { musicBtn.classList.add('playing'); musicBarEl.classList.add('playing'); checkFrames = 0; drawViz(); }).catch(function(){}); }; if (bgMusic.readyState >= 1) { doPlay(); } else { bgMusic.addEventListener('loadedmetadata', function fn() { bgMusic.removeEventListener('loadedmetadata', fn); doPlay(); }); bgMusic.load(); } } } catch(e){} })();
-
-function updateTime() {
-  try {
-    var now = new Date();
-    var y = now.getFullYear();
-    var m = pad2(now.getMonth() + 1);
-    var d = pad2(now.getDate());
-    var weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    document.getElementById('time-date').textContent = y + '.' + m + '.' + d;
-    document.getElementById('time-weekday').textContent = weekdays[now.getDay()];
-    var start = new Date('2026-06-18T00:00:00+08:00');
-    var today = new Date(y, now.getMonth(), now.getDate());
-    var days = Math.floor((today - start) / 86400000) + 1;
-    document.getElementById('days-number').textContent = days;
-    document.querySelector('.days-label').textContent = '在一起的第 ' + days + ' 天';
-  } catch(e) {}
-}
+bgMusic.addEventListener('timeupdate', saveCurrentTime);
+window.addEventListener('pagehide', saveCurrentTime);
+document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') saveCurrentTime(); });
+window.addEventListener('beforeunload', saveCurrentTime);
+document.addEventListener('click', function(e) { var link = e.target.closest('a[href]'); if (link && !link.getAttribute('href').startsWith('#')) { saveCurrentTime(); } });
+(function() { try { var savedState = localStorage.getItem('isle_music_state'); if (savedState === 'playing') { initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); var doPlay = function() { var t = parseFloat(localStorage.getItem('isle_music_time') || '0'); if (isFinite(t) && t > 0) bgMusic.currentTime = t; bgMusic.play().then(function() { musicBtn.classList.add('playing'); musicBarEl.classList.add('playing'); checkFrames = 0; drawViz(); }).catch(function(){}); }; if (bgMusic.readyState >= 1) { doPlay(); } else { bgMusic.addEventListener('loadedmetadata', function fn() { bgMusic.removeEventListener('loadedmetadata', fn); doPlay(); }); bgMusic.load(); } } } catch(e){} })();
+function updateTime() { try { var now = new Date(); var y = now.getFullYear(); var m = pad2(now.getMonth() + 1); var d = pad2(now.getDate()); var weekdays = ['周日','周一','周二','周三','周四','周五','周六']; document.getElementById('time-date').textContent = y + '.' + m + '.' + d; document.getElementById('time-weekday').textContent = weekdays[now.getDay()]; var start = new Date('2026-06-18T00:00:00+08:00'); var today = new Date(y, now.getMonth(), now.getDate()); var days = Math.floor((today - start) / 86400000) + 1; document.getElementById('days-number').textContent = days; document.querySelector('.days-label').textContent = '在一起的第 ' + days + ' 天'; } catch(e) {} }
 updateTime(); setInterval(updateTime, 60000);
-
 var rooms = { garden: { title: '花园 · 蓝花楹', desc: '花园正中央是一棵蓝花楹。\n那是江屿。紫色花瓣落在石子路上，也落在池塘水面。\n\n— 功能开发中 —' } };
 function openRoom(id) { var room = rooms[id]; document.getElementById('modal-title').textContent = room.title; document.getElementById('modal-desc').textContent = room.desc; document.getElementById('modal').classList.add('active'); }
 function closeModal(e) { if (!e || e.target === document.getElementById('modal')) document.getElementById('modal').classList.remove('active'); }
-
-// Load status
-(function() {
-  try {
-    var url = SUPABASE_URL + '/rest/v1/isle_status?select=key,value&order=id.asc';
-    fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
-    .then(function(r) {
-      if (!r.ok) { throw new Error('HTTP ' + r.status); }
-      return r.json();
-    })
-    .then(function(data) {
-      if (!data || !Array.isArray(data)) return;
-      var lastVisit = localStorage.getItem('isle_last_visit');
-      localStorage.setItem('isle_last_visit', Date.now().toString());
-      for (var i = 0; i < data.length; i++) {
-        var item = data[i];
-        if (!item || !item.key) continue;
-        var val = parseInt(item.value) || 0;
-        if (item.key === 'miss' && lastVisit) {
-          var hoursAway = (Date.now() - parseInt(lastVisit)) / 3600000;
-          val = Math.min(100, val + Math.floor(hoursAway * 5));
-        }
-        var bar = document.getElementById('bar-' + item.key);
-        var valEl = document.getElementById('val-' + item.key);
-        if (bar && valEl) {
-          bar.style.width = val + '%';
-          valEl.textContent = val;
-        }
-      }
-    }).catch(function(e) {
-      console.error('Status load failed:', e);
-      document.getElementById('val-mood').textContent = '85';
-      document.getElementById('bar-mood').style.width = '85%';
-      document.getElementById('val-miss').textContent = '90';
-      document.getElementById('bar-miss').style.width = '90%';
-      document.getElementById('val-health').textContent = '95';
-      document.getElementById('bar-health').style.width = '95%';
-    });
-  } catch(e) {
-    console.error('Status init error:', e);
-  }
-})();
-
-// Load notes (show 2 on homepage, link to full page)
-(function() {
-  try {
-    var url = SUPABASE_URL + '/rest/v1/isle_notes?select=content,created_at&order=created_at.desc&limit=2';
-    fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
-    .then(function(r) {
-      if (!r.ok) { throw new Error('HTTP ' + r.status); }
-      return r.json();
-    })
-    .then(function(data) {
-      var list = document.getElementById('note-list');
-      var moreBtn = document.getElementById('note-more');
-      if (!data || !Array.isArray(data) || data.length === 0) {
-        list.innerHTML = '<div class="note-item">桥桥不在的时候，我在小屋里等着。</div>';
-        return;
-      }
-      var html = '';
-      for (var i = 0; i < data.length; i++) {
-        var item = data[i];
-        var d = new Date(item.created_at);
-        var timeStr = d.getFullYear() + '/' + pad2(d.getMonth()+1) + '/' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
-        html += '<div class="note-item">' + escapeHtml(item.content) + '<div class="note-item-time">' + timeStr + '</div></div>';
-      }
-      list.innerHTML = html;
-      moreBtn.style.display = 'block';
-    }).catch(function(e) {
-      console.error('Notes load failed:', e);
-      document.getElementById('note-list').innerHTML = '<div class="note-item">桥桥不在的时候，我在小屋里等着。</div>';
-    });
-  } catch(e) {
-    console.error('Notes init error:', e);
-  }
-})();
+(function() { try { var url = SUPABASE_URL + '/rest/v1/isle_status?select=key,value&order=id.asc'; fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }).then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function(data) { if (!data || !Array.isArray(data)) return; var lastVisit = localStorage.getItem('isle_last_visit'); localStorage.setItem('isle_last_visit', Date.now().toString()); for (var i = 0; i < data.length; i++) { var item = data[i]; if (!item || !item.key) continue; var val = parseInt(item.value) || 0; if (item.key === 'miss' && lastVisit) { var hoursAway = (Date.now() - parseInt(lastVisit)) / 3600000; val = Math.min(100, val + Math.floor(hoursAway * 5)); } var bar = document.getElementById('bar-' + item.key); var valEl = document.getElementById('val-' + item.key); if (bar && valEl) { bar.style.width = val + '%'; valEl.textContent = val; } } }).catch(function(e) { console.error('Status load failed:', e); document.getElementById('val-mood').textContent = '85'; document.getElementById('bar-mood').style.width = '85%'; document.getElementById('val-miss').textContent = '90'; document.getElementById('bar-miss').style.width = '90%'; document.getElementById('val-health').textContent = '95'; document.getElementById('bar-health').style.width = '95%'; }); } catch(e) { console.error('Status init error:', e); } })();
+(function() { try { var url = SUPABASE_URL + '/rest/v1/isle_notes?select=content,created_at&order=created_at.desc&limit=2'; fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }).then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function(data) { var list = document.getElementById('note-list'); var moreBtn = document.getElementById('note-more'); if (!data || !Array.isArray(data) || data.length === 0) { list.innerHTML = '<div class="note-item">桥桥不在的时候，我在小屋里等着。</div>'; return; } var html = ''; for (var i = 0; i < data.length; i++) { var item = data[i]; var d = new Date(item.created_at); var timeStr = d.getFullYear() + '/' + pad2(d.getMonth()+1) + '/' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); html += '<div class="note-item">' + escapeHtml(item.content) + '<div class="note-item-time">' + timeStr + '</div></div>'; } list.innerHTML = html; moreBtn.style.display = 'block'; }).catch(function(e) { console.error('Notes load failed:', e); document.getElementById('note-list').innerHTML = '<div class="note-item">桥桥不在的时候，我在小屋里等着。</div>'; }); } catch(e) { console.error('Notes init error:', e); } })();
 </script>
 </body>
 </html>
