@@ -116,6 +116,147 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ===== Voice Player Overlay ===== */
+.voice-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: linear-gradient(180deg, #FFF8F0 0%, #FDEBD0 50%, #FFF0E0 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.voice-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.voice-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(90,74,62,0.08);
+  border-radius: 50%;
+  font-size: 16px;
+  color: var(--text-sub);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.voice-close:hover { background: rgba(90,74,62,0.15); }
+
+.voice-pulse-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.voice-pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240,168,104,0.25) 0%, rgba(240,168,104,0) 70%);
+  animation: none;
+}
+
+.voice-pulse-ring:nth-child(1) { width: 60px; height: 60px; }
+.voice-pulse-ring:nth-child(2) { width: 100px; height: 100px; }
+.voice-pulse-ring:nth-child(3) { width: 150px; height: 150px; }
+.voice-pulse-ring:nth-child(4) { width: 200px; height: 200px; }
+
+.voice-overlay.playing .voice-pulse-ring:nth-child(1) {
+  animation: pulse1 1.8s ease-in-out infinite;
+}
+.voice-overlay.playing .voice-pulse-ring:nth-child(2) {
+  animation: pulse2 2.2s ease-in-out infinite 0.3s;
+}
+.voice-overlay.playing .voice-pulse-ring:nth-child(3) {
+  animation: pulse3 2.6s ease-in-out infinite 0.6s;
+}
+.voice-overlay.playing .voice-pulse-ring:nth-child(4) {
+  animation: pulse4 3s ease-in-out infinite 0.9s;
+}
+
+@keyframes pulse1 {
+  0%, 100% { transform: scale(0.8); opacity: 0.9; }
+  50% { transform: scale(1.1); opacity: 0.5; }
+}
+@keyframes pulse2 {
+  0%, 100% { transform: scale(0.85); opacity: 0.7; }
+  50% { transform: scale(1.15); opacity: 0.3; }
+}
+@keyframes pulse3 {
+  0%, 100% { transform: scale(0.9); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.2; }
+}
+@keyframes pulse4 {
+  0%, 100% { transform: scale(0.9); opacity: 0.35; }
+  50% { transform: scale(1.08); opacity: 0.1; }
+}
+
+.voice-core {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f0a868 0%, #e8945a 60%, rgba(240,168,104,0.4) 100%);
+  box-shadow: 0 0 30px rgba(240,168,104,0.4), 0 0 60px rgba(240,168,104,0.15);
+  z-index: 2;
+  transition: transform 0.3s;
+}
+
+.voice-overlay.playing .voice-core {
+  animation: coreBreath 2s ease-in-out infinite;
+}
+
+@keyframes coreBreath {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(240,168,104,0.4), 0 0 60px rgba(240,168,104,0.15); }
+  50% { transform: scale(1.08); box-shadow: 0 0 40px rgba(240,168,104,0.5), 0 0 80px rgba(240,168,104,0.2); }
+}
+
+.voice-text {
+  max-width: 300px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-main);
+  line-height: 1.8;
+  opacity: 0.85;
+  padding: 0 20px;
+}
+
+.voice-status {
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--text-sub);
+  letter-spacing: 1px;
+}
+
+.voice-overlay.loading .voice-status::after {
+  content: '';
+  animation: dots 1.5s steps(3) infinite;
+}
+
+@keyframes dots {
+  0% { content: ''; }
+  33% { content: '.'; }
+  66% { content: '..'; }
+  100% { content: '...'; }
+}
+
+/* ===== History & Order ===== */
 .history-section { margin-bottom: 28px; }
 .section-title { font-size: 12px; color: var(--text-sub); letter-spacing: 1px; margin-bottom: 12px; padding-left: 4px; }
 .history-list { display: flex; flex-direction: column; gap: 10px; }
@@ -171,6 +312,20 @@ body {
   </div>
 </div>
 
+<!-- Voice Player Overlay -->
+<div class="voice-overlay" id="voice-overlay">
+  <button class="voice-close" id="voice-close" onclick="closeVoicePlayer()">✕</button>
+  <div class="voice-pulse-container">
+    <div class="voice-pulse-ring"></div>
+    <div class="voice-pulse-ring"></div>
+    <div class="voice-pulse-ring"></div>
+    <div class="voice-pulse-ring"></div>
+    <div class="voice-core"></div>
+  </div>
+  <div class="voice-text" id="voice-text"></div>
+  <div class="voice-status" id="voice-status"></div>
+</div>
+
 <script>
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
@@ -179,6 +334,7 @@ const TTS_URL = `${SUPABASE_URL}/functions/v1/tts`;
 const today = new Date().toISOString().slice(0, 10);
 let todayDish = null;
 let audioBlob = null;
+let currentAudio = null;
 
 const openedDate = localStorage.getItem('isle_kitchen_opened');
 
@@ -242,17 +398,44 @@ function showDish() {
   document.getElementById('lid-date').textContent = `${d.getMonth()+1}月${d.getDate()}日的菜单`;
 }
 
+function openVoicePlayer() {
+  const overlay = document.getElementById('voice-overlay');
+  document.getElementById('voice-text').textContent = todayDish.content;
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeVoicePlayer() {
+  const overlay = document.getElementById('voice-overlay');
+  overlay.classList.remove('active', 'playing', 'loading');
+  document.body.style.overflow = '';
+  document.getElementById('voice-status').textContent = '';
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+  }
+}
+
 async function playAudio() {
-  const btn = document.getElementById('audio-btn');
-  
+  openVoicePlayer();
+  const overlay = document.getElementById('voice-overlay');
+  const status = document.getElementById('voice-status');
+
   if (audioBlob) {
+    overlay.classList.add('playing');
+    status.textContent = '正在播放';
     const url = URL.createObjectURL(audioBlob);
-    new Audio(url).play();
+    currentAudio = new Audio(url);
+    currentAudio.onended = () => {
+      overlay.classList.remove('playing');
+      status.textContent = '播放结束';
+    };
+    currentAudio.play();
     return;
   }
 
-  btn.classList.add('loading');
-  btn.textContent = '⏳ 生成中...';
+  overlay.classList.add('loading');
+  status.textContent = '生成中';
 
   try {
     const res = await fetch(TTS_URL, {
@@ -262,18 +445,27 @@ async function playAudio() {
     });
 
     if (!res.ok) throw new Error('TTS failed');
-    
+
     audioBlob = await res.blob();
+    overlay.classList.remove('loading');
+    overlay.classList.add('playing');
+    status.textContent = '正在播放';
+
     const url = URL.createObjectURL(audioBlob);
-    new Audio(url).play();
-    
-    btn.textContent = '🔊 再听一遍';
+    currentAudio = new Audio(url);
+    currentAudio.onended = () => {
+      overlay.classList.remove('playing');
+      status.textContent = '播放结束';
+    };
+    currentAudio.play();
+
+    // Update the button text for replay
+    document.getElementById('audio-btn').textContent = '🔊 再听一遍';
   } catch (e) {
     console.error('TTS error:', e);
-    btn.textContent = '🔊 暂时听不了';
-    setTimeout(() => { btn.textContent = '🔊 听江屿说'; }, 2000);
-  } finally {
-    btn.classList.remove('loading');
+    overlay.classList.remove('loading');
+    status.textContent = '暂时听不了…';
+    setTimeout(() => { closeVoicePlayer(); }, 2000);
   }
 }
 
