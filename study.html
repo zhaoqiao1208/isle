@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>书房 · 记录</title>
+<link rel="stylesheet" href="music-float.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -42,6 +43,7 @@ body {
 .back-btn { font-size: 14px; color: var(--text-sub); text-decoration: none; transition: color 0.2s; }
 .back-btn:hover { color: var(--text-main); }
 .header-title { font-size: 15px; color: var(--text-main); letter-spacing: 1px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
 
 .container { max-width: 600px; margin: 0 auto; padding: 24px 16px 40px; }
 
@@ -301,7 +303,9 @@ body {
 <div class="header">
   <a href="index.html" class="back-btn">← 回到小屋</a>
   <span class="header-title">书房 · 记录</span>
-  <span style="width:60px;"></span>
+  <div class="header-right">
+    <div class="isle-music-header" id="isle-music-btn" onclick="toggleIsleMusic()"><div class="m-play"></div><div class="m-pause"><span></span><span></span></div></div>
+  </div>
 </div>
 
 <div class="container">
@@ -354,6 +358,9 @@ body {
     <button class="book-detail-close" onclick="closeBook()">关上</button>
   </div>
 </div>
+
+<audio id="isle-bg-music" loop preload="none"><source src="https://yraoaeeayaervwjjalvn.supabase.co/storage/v1/object/public/music/a-thousand-years.mp3" type="audio/mpeg"></audio>
+<script src="music-shared.js"></script>
 
 <script>
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
