@@ -53,12 +53,14 @@ body { background: linear-gradient(180deg, #FFF8F0 0%, #F0E6F6 50%, #E8DFF5 100%
 .status-value { font-size: 11px; color: #9a8aaa; width: 26px; text-align: right; flex-shrink: 0; font-weight: 600; }
 .note-section { width: 100%; max-width: 900px; margin: 14px auto 0; padding: 0 12px; }
 .note-card { background: linear-gradient(145deg, rgba(255,252,248,0.9), rgba(255,245,255,0.85)); backdrop-filter: blur(16px); border: 1px solid rgba(220, 200, 240, 0.3); border-radius: 20px; padding: 20px 22px; box-shadow: 0 4px 24px rgba(180, 140, 220, 0.08), inset 0 1px 0 rgba(255,255,255,0.6); position: relative; overflow: hidden; }
-.note-card::before { content: '✉'; position: absolute; top: 14px; right: 18px; font-size: 18px; opacity: 0.12; }
+.note-card::before { content: '\2709'; position: absolute; top: 14px; right: 18px; font-size: 18px; opacity: 0.12; }
 .note-header { font-size: 11px; color: #c4a8d8; margin-bottom: 12px; letter-spacing: 1px; font-weight: 500; }
-.note-list { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scrollbar-width: thin; scrollbar-color: rgba(201,168,232,0.3) transparent; }
-.note-list::-webkit-scrollbar { width: 4px; }
-.note-list::-webkit-scrollbar-thumb { background: rgba(201,168,232,0.3); border-radius: 2px; }
-.note-item { font-size: 13px; color: #5a4a6e; line-height: 1.9; font-style: italic; padding-left: 12px; border-left: 2px solid rgba(201,168,232,0.3); }
+.note-list { max-height: 150px; overflow-y: scroll; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 12px; padding-right: 6px; scrollbar-width: thin; scrollbar-color: rgba(201,168,232,0.5) rgba(240,230,250,0.3); }
+.note-list::-webkit-scrollbar { width: 6px; }
+.note-list::-webkit-scrollbar-track { background: rgba(240,230,250,0.3); border-radius: 3px; }
+.note-list::-webkit-scrollbar-thumb { background: rgba(201,168,232,0.5); border-radius: 3px; min-height: 30px; }
+.note-list::-webkit-scrollbar-thumb:active { background: rgba(201,168,232,0.7); }
+.note-item { font-size: 13px; color: #5a4a6e; line-height: 1.9; font-style: italic; padding-left: 12px; border-left: 2px solid rgba(201,168,232,0.3); flex-shrink: 0; }
 .note-item-time { font-size: 10px; color: #c8b8d8; margin-top: 4px; }
 .modal-backdrop { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
 .modal-backdrop.active { display: flex; }
