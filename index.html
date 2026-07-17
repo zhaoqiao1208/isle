@@ -93,49 +93,29 @@ body {
   flex: 1;
   display: flex;
   align-items: flex-end;
-  gap: 2px;
-  height: 20px;
+  gap: 1.5px;
+  height: 24px;
   overflow: hidden;
 }
 
 .viz-bar {
   flex: 1;
-  max-width: 4px;
+  max-width: 3px;
   min-width: 2px;
-  background: linear-gradient(180deg, #c9a8e8, #e0c3fc);
-  border-radius: 2px;
-  height: 3px;
-  transition: height 0.15s ease;
+  background: #c9a8e8;
+  border-radius: 0;
+  height: 2px;
+  image-rendering: pixelated;
 }
 
 .music-bar.playing .viz-bar {
-  animation: vizBounce 0.8s ease-in-out infinite alternate;
+  animation: vizBounce var(--dur) steps(8) infinite alternate;
 }
 
-.viz-bar:nth-child(1) { animation-delay: 0s; }
-.viz-bar:nth-child(2) { animation-delay: 0.05s; }
-.viz-bar:nth-child(3) { animation-delay: 0.1s; }
-.viz-bar:nth-child(4) { animation-delay: 0.15s; }
-.viz-bar:nth-child(5) { animation-delay: 0.2s; }
-.viz-bar:nth-child(6) { animation-delay: 0.25s; }
-.viz-bar:nth-child(7) { animation-delay: 0.3s; }
-.viz-bar:nth-child(8) { animation-delay: 0.35s; }
-.viz-bar:nth-child(9) { animation-delay: 0.4s; }
-.viz-bar:nth-child(10) { animation-delay: 0.45s; }
-.viz-bar:nth-child(11) { animation-delay: 0.5s; }
-.viz-bar:nth-child(12) { animation-delay: 0.55s; }
-.viz-bar:nth-child(13) { animation-delay: 0.6s; }
-.viz-bar:nth-child(14) { animation-delay: 0.5s; }
-.viz-bar:nth-child(15) { animation-delay: 0.4s; }
-.viz-bar:nth-child(16) { animation-delay: 0.3s; }
-.viz-bar:nth-child(17) { animation-delay: 0.2s; }
-.viz-bar:nth-child(18) { animation-delay: 0.1s; }
-.viz-bar:nth-child(19) { animation-delay: 0.05s; }
-.viz-bar:nth-child(20) { animation-delay: 0s; }
-
 @keyframes vizBounce {
-  0% { height: 3px; }
-  100% { height: 18px; }
+  0% { height: 2px; opacity: 0.4; }
+  50% { opacity: 0.8; }
+  100% { height: var(--max-h); opacity: 1; }
 }
 
 .music-info {
@@ -210,13 +190,7 @@ body {
     <div class="play-icon"></div>
     <div class="pause-icon"><span></span><span></span></div>
   </div>
-  <div class="music-visualizer" id="music-viz">
-    <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
-    <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
-    <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
-    <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
-    <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
-  </div>
+  <div class="music-visualizer" id="music-viz"></div>
   <div class="music-info">
     <div class="music-song">A Thousand Years</div>
     <div>Christina Perri</div>
@@ -279,6 +253,30 @@ body {
 <script>
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
+
+// Generate pixel visualizer bars with varied parameters
+(function initViz() {
+  const viz = document.getElementById('music-viz');
+  const barCount = 40;
+  for (let i = 0; i < barCount; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'viz-bar';
+    // Create wave-like max height pattern: higher in middle, lower at edges
+    const center = barCount / 2;
+    const distFromCenter = Math.abs(i - center) / center;
+    const baseMax = 22 - distFromCenter * 14;
+    const randomOffset = (Math.random() - 0.5) * 6;
+    const maxH = Math.max(4, Math.min(24, baseMax + randomOffset));
+    // Varied duration for each bar
+    const dur = (0.4 + Math.random() * 0.8).toFixed(2);
+    // Random delay
+    const delay = (Math.random() * 1.2).toFixed(2);
+    bar.style.setProperty('--max-h', maxH + 'px');
+    bar.style.setProperty('--dur', dur + 's');
+    bar.style.animationDelay = delay + 's';
+    viz.appendChild(bar);
+  }
+})();
 
 // Music player
 const bgMusic = document.getElementById('bg-music');
