@@ -159,13 +159,22 @@ body {
 }
 
 /* ===== Bookshelf Section ===== */
-.shelf-section { margin-bottom: 24px; }
+.shelf-section { margin-bottom: 28px; }
+
+.shelf-label {
+  font-size: 11px;
+  color: var(--text-sub);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  padding-left: 6px;
+}
 
 .bookshelf {
   background: linear-gradient(180deg, rgba(139,109,82,0.08) 0%, rgba(139,109,82,0.03) 100%);
   border-radius: 16px;
   padding: 20px 16px;
-  min-height: 180px;
+  min-height: 140px;
+  margin-bottom: 16px;
 }
 
 .shelf-row {
@@ -181,7 +190,7 @@ body {
 }
 
 .shelf-row::-webkit-scrollbar { display: none; }
-.shelf-row:last-child { margin-bottom: 0; }
+.shelf-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
 
 .book-spine {
   min-width: 36px;
@@ -211,13 +220,6 @@ body {
 }
 
 .book-spine:active { transform: translateY(-2px); }
-
-.type-badge {
-  position: absolute;
-  top: 4px;
-  font-size: 8px;
-  opacity: 0.7;
-}
 
 /* Book detail overlay */
 .book-overlay {
@@ -329,11 +331,16 @@ body {
     </div>
   </div>
 
-  <!-- Bookshelf -->
+  <!-- Bookshelf: Books -->
   <div class="shelf-section">
     <div class="section-title">书架</div>
-    <div class="bookshelf" id="bookshelf">
-      <div class="shelf-empty" id="shelf-empty">书架空空的…</div>
+    <div class="shelf-label">📖 书</div>
+    <div class="bookshelf" id="bookshelf-books">
+      <div class="shelf-empty">还没有书…</div>
+    </div>
+    <div class="shelf-label">🎬 影碟</div>
+    <div class="bookshelf" id="bookshelf-movies">
+      <div class="shelf-empty">还没有影碟…</div>
     </div>
   </div>
 </div>
@@ -404,7 +411,7 @@ function renderMemos() {
 async function loadBooks() {
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/isle_bookshelf?select=id,title,type,color,note,created_at&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/isle_bookshelf?select=id,title,type,color,note,created_at&order=created_at.asc`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
     );
     if (!res.ok) throw new Error('fetch failed');
@@ -416,22 +423,26 @@ async function loadBooks() {
 }
 
 function renderShelf() {
-  const shelf = document.getElementById('bookshelf');
-  const empty = document.getElementById('shelf-empty');
+  const books = allBooks.filter(b => b.type === 'book');
+  const movies = allBooks.filter(b => b.type !== 'book');
 
-  if (allBooks.length === 0) {
-    empty.style.display = 'block';
+  renderShelfSection('bookshelf-books', books);
+  renderShelfSection('bookshelf-movies', movies);
+}
+
+function renderShelfSection(containerId, items) {
+  const container = document.getElementById(containerId);
+  if (items.length === 0) {
+    container.innerHTML = '<div class="shelf-empty">空的…</div>';
     return;
   }
 
-  empty.style.display = 'none';
-  // Split into rows of 6
   const rows = [];
-  for (let i = 0; i < allBooks.length; i += 6) {
-    rows.push(allBooks.slice(i, i + 6));
+  for (let i = 0; i < items.length; i += 7) {
+    rows.push(items.slice(i, i + 7));
   }
 
-  shelf.innerHTML = rows.map(row =>
+  container.innerHTML = rows.map(row =>
     `<div class="shelf-row">${row.map(book =>
       `<div class="book-spine" style="background:${book.color}" onclick="openBook(${book.id})">${escapeHtml(book.title)}</div>`
     ).join('')}</div>`
