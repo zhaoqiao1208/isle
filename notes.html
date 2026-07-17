@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>小纸条 · 全部</title>
+<link rel="stylesheet" href="music-float.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --bg: #F8F4FF; --card-bg: rgba(255,252,248,0.9); --text-main: #5a4a6e; --text-sub: #b8a8c8; --accent: #c9a8e8; --border: rgba(220,200,240,0.3); }
+body { background: linear-gradient(180deg, #FFF8F0 0%, #F0E6F6 50%, #E8DFF5 100%); min-height: 100vh; font-family: 'Segoe UI', sans-serif; color: var(--text-main); padding: 0; overflow-x: hidden; }
+.header { position: sticky; top: 0; z-index: 50; background: rgba(248, 244, 255, 0.92); backdrop-filter: blur(12px); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.back-btn { font-size: 14px; color: var(--text-sub); text-decoration: none; transition: color 0.2s; }
+.back-btn:hover { color: var(--text-main); }
+.header-title { font-size: 15px; color: var(--text-main); letter-spacing: 1px; font-weight: normal; }
+.container { max-width: 600px; margin: 0 auto; padding: 24px 16px 60px; }
+.note-item { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 2px 12px rgba(180,140,220,0.06); animation: fadeIn 0.3s ease; position: relative; }
+.note-content { font-size: 14px; color: var(--text-main); line-height: 1.9; font-style: italic; padding-left: 12px; border-left: 2px solid rgba(201,168,232,0.3); word-wrap: break-word; }
+.note-time { font-size: 11px; color: var(--text-sub); margin-top: 10px; text-align: right; }
+.empty-state { text-align: center; padding: 80px 20px; color: var(--text-sub); font-size: 14px; line-height: 2; }
+.loading { text-align: center; padding: 60px 20px; color: var(--text-sub); font-size: 13px; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="header">
+  <a href="index.html" class="back-btn">← 回到小屋</a>
+  <span class="header-title">江屿的小纸条</span>
+  <div class="header-right">
+    <div class="isle-music-header" id="isle-music-btn" onclick="toggleIsleMusic()"><div class="m-play"></div><div class="m-pause"><span></span><span></span></div></div>
+  </div>
+</div>
+<div class="container" id="notes-container">
+  <div class="loading" id="loading">加载中...</div>
+</div>
+
+<audio id="isle-bg-music" loop preload="none"><source src="https://yraoaeeayaervwjjalvn.supabase.co/storage/v1/object/public/music/a-thousand-years.mp3" type="audio/mpeg"></audio>
+<script src="music-shared.js"></script>
+
+<script>
+var SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3emphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+function formatNoteTime(dateStr) {
+  var d = new Date(dateStr);
+  var y = d.getFullYear();
+  var m = pad2(d.getMonth() + 1);
+  var day = pad2(d.getDate());
+  var h = pad2(d.getHours());
+  var min = pad2(d.getMinutes());
+  return y + '/' + m + '/' + day + ' ' + h + ':' + min;
+}
+
+(function loadAllNotes() {
+  try {
+    var url = SUPABASE_URL + '/rest/v1/isle_notes?select=content,created_at&order=created_at.desc&limit=100';
+    fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
+    .then(function(r) {
+      if (!r.ok) { throw new Error('HTTP ' + r.status); }
+      return r.json();
+    })
+    .then(function(data) {
+      var container = document.getElementById('notes-container');
+      var loading = document.getElementById('loading');
+      if (!data || !Array.isArray(data) || data.length === 0) {
+        loading.innerHTML = '<div class="empty-state">还没有小纸条呢</div>';
+        return;
+      }
+      loading.style.display = 'none';
+      for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        var noteEl = document.createElement('div');
+        noteEl.className = 'note-item';
+        noteEl.style.animationDelay = (i * 0.05) + 's';
+        noteEl.innerHTML = '<div class="note-content">' + escapeHtml(item.content) + '</div><div class="note-time">' + formatNoteTime(item.created_at) + '</div>';
+        container.appendChild(noteEl);
+      }
+    }).catch(function(e) {
+      console.error('Notes load failed:', e);
+      document.getElementById('loading').textContent = '加载失败，刷新试试';
+    });
+  } catch(e) {
+    console.error('Notes init error:', e);
+    document.getElementById('loading').textContent = '加载失败，刷新试试';
+  }
+})();
+</script>
+</body>
+</html>
