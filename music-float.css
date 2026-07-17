@@ -1,0 +1,38 @@
+/* Floating music button for room pages */
+.isle-music-float {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 900;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(201,168,232,0.4);
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 10px rgba(201,168,232,0.15);
+}
+.isle-music-float:active { transform: scale(0.9); }
+.isle-music-float.playing {
+  border-color: rgba(201,168,232,0.7);
+  background: rgba(201,168,232,0.12);
+}
+.isle-music-float .m-play {
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 8px;
+  border-color: transparent transparent transparent #9a8aaa;
+  margin-left: 2px;
+}
+.isle-music-float .m-pause { display: none; gap: 2px; }
+.isle-music-float .m-pause span {
+  width: 2.5px; height: 10px;
+  background: #9a8aaa; border-radius: 1px;
+}
+.isle-music-float.playing .m-play { display: none; }
+.isle-music-float.playing .m-pause { display: flex; }
