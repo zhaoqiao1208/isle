@@ -9,18 +9,21 @@
   var savedTime = parseFloat(localStorage.getItem('isle_music_time') || '0');
 
   if (state === 'playing') {
-    // Must wait for metadata before setting currentTime
-    var resumeFromSaved = function() {
+    var doSeekAndPlay = function() {
       audio.currentTime = savedTime;
-      audio.removeEventListener('loadedmetadata', resumeFromSaved);
+      audio.play().then(function(){ btn.classList.add('playing'); }).catch(function(){});
     };
-    // If metadata already loaded (cached), set directly
+
     if (audio.readyState >= 1) {
-      audio.currentTime = savedTime;
+      doSeekAndPlay();
     } else {
-      audio.addEventListener('loadedmetadata', resumeFromSaved);
+      audio.addEventListener('loadedmetadata', function onMeta() {
+        audio.removeEventListener('loadedmetadata', onMeta);
+        doSeekAndPlay();
+      });
+      // Trigger load since preload=none
+      audio.load();
     }
-    audio.play().then(function(){ btn.classList.add('playing'); }).catch(function(){});
   }
 
   function toggleIsleMusic() {
