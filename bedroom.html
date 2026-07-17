@@ -10,6 +10,7 @@
 :root { --warm-bg: #FDF8F3; --card-bg: #FFFBF7; --text-main: #5a4a3e; --text-sub: #9a8b7e; --accent: #c9a8e8; --border: #f0e6dc; }
 body { background: var(--warm-bg); min-height: 100vh; font-family: 'Georgia', 'Noto Serif SC', serif; color: var(--text-main); padding: 0; overflow-x: hidden; }
 .header { position: sticky; top: 0; z-index: 50; background: rgba(253, 248, 243, 0.92); backdrop-filter: blur(12px); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.header-right { display: flex; align-items: center; gap: 10px; }
 .back-btn { font-size: 14px; color: var(--text-sub); text-decoration: none; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
 .back-btn:hover { color: var(--text-main); }
 .header-title { font-size: 15px; color: var(--text-main); letter-spacing: 1px; font-weight: normal; }
@@ -43,7 +44,9 @@ body { background: var(--warm-bg); min-height: 100vh; font-family: 'Georgia', 'N
 <div class="header">
   <a href="index.html" class="back-btn">← 回到小屋</a>
   <span class="header-title">卧室 · 日记</span>
-  <span style="width:60px;"></span>
+  <div class="header-right">
+    <div class="isle-music-header" id="isle-music-btn" onclick="toggleIsleMusic()"><div class="m-play"></div><div class="m-pause"><span></span><span></span></div></div>
+  </div>
 </div>
 <div class="lock-screen" id="lock-screen">
   <div class="lock-icon">🔒</div>
@@ -60,8 +63,6 @@ body { background: var(--warm-bg); min-height: 100vh; font-family: 'Georgia', 'N
   <div class="overlay-content" id="overlay-content"></div>
 </div>
 
-<!-- Shared music float -->
-<div class="isle-music-float" id="isle-music-float" onclick="toggleIsleMusic()"><div class="m-play"></div><div class="m-pause"><span></span><span></span></div></div>
 <audio id="isle-bg-music" loop preload="none"><source src="https://yraoaeeayaervwjjalvn.supabase.co/storage/v1/object/public/music/a-thousand-years.mp3" type="audio/mpeg"></audio>
 <script src="music-shared.js"></script>
 
