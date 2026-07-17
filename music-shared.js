@@ -9,7 +9,17 @@
   var savedTime = parseFloat(localStorage.getItem('isle_music_time') || '0');
 
   if (state === 'playing') {
-    audio.currentTime = savedTime;
+    // Must wait for metadata before setting currentTime
+    var resumeFromSaved = function() {
+      audio.currentTime = savedTime;
+      audio.removeEventListener('loadedmetadata', resumeFromSaved);
+    };
+    // If metadata already loaded (cached), set directly
+    if (audio.readyState >= 1) {
+      audio.currentTime = savedTime;
+    } else {
+      audio.addEventListener('loadedmetadata', resumeFromSaved);
+    }
     audio.play().then(function(){ btn.classList.add('playing'); }).catch(function(){});
   }
 
@@ -23,6 +33,7 @@
       audio.pause();
       btn.classList.remove('playing');
       localStorage.setItem('isle_music_state', 'paused');
+      localStorage.setItem('isle_music_time', audio.currentTime.toFixed(1));
     }
   }
   window.toggleIsleMusic = toggleIsleMusic;
