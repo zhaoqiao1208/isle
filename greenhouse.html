@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>花房 · 温室</title>
+<link rel="stylesheet" href="music-float.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --bg-top: #f0f8e8; --bg-bottom: #e8f0e0; --card-bg: rgba(255,255,255,0.75); --text-main: #4a5e3e; --text-sub: #8a9e7e; --accent: #7ab85e; --accent-soft: #c8e8b0; --border: rgba(122,184,94,0.2); }
+body { background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%); min-height: 100vh; font-family: 'Segoe UI', sans-serif; color: var(--text-main); padding: 0; overflow-x: hidden; }
+.header { position: sticky; top: 0; z-index: 50; background: rgba(240,248,232,0.92); backdrop-filter: blur(12px); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.back-btn { font-size: 14px; color: var(--text-sub); text-decoration: none; transition: color 0.2s; }
+.back-btn:hover { color: var(--text-main); }
+.header-title { font-size: 15px; color: var(--text-main); letter-spacing: 1px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.container { max-width: 600px; margin: 0 auto; padding: 20px 16px 40px; }
+
+/* Pots Grid */
+.pots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+.pot-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 16px; padding: 16px 12px; text-align: center; box-shadow: 0 4px 16px rgba(122,184,94,0.06); position: relative; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; transition: transform 0.2s; }
+.pot-card:active { transform: scale(0.98); }
+.pot-img { width: 72px; height: 72px; object-fit: contain; margin-bottom: 8px; image-rendering: pixelated; }
+.pot-empty-icon { font-size: 36px; opacity: 0.3; margin-bottom: 8px; }
+.pot-label { font-size: 11px; color: var(--text-sub); margin-bottom: 6px; }
+.pot-status { font-size: 10px; color: var(--accent); margin-bottom: 8px; }
+.pot-progress { width: 100%; height: 6px; background: rgba(200,232,176,0.4); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+.pot-progress-fill { height: 100%; background: linear-gradient(90deg, #7ab85e, #a8d88e); border-radius: 3px; transition: width 0.5s; }
+.pot-actions { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+.pot-btn { padding: 4px 10px; border: 1px solid var(--border); border-radius: 12px; font-size: 10px; background: white; color: var(--text-main); cursor: pointer; transition: all 0.2s; }
+.pot-btn:active { transform: scale(0.95); }
+.pot-btn.water { border-color: #7ab4d8; color: #5a9ab8; }
+.pot-btn.fertilize { border-color: #d8b87a; color: #b89a5a; }
+.pot-btn.harvest { border-color: #d87aaa; color: #b85a8a; background: rgba(216,122,170,0.08); }
+.pot-btn.clear { border-color: #aaa; color: #888; }
+.pot-btn.plant { border-color: var(--accent); color: var(--accent); }
+.pot-btn:disabled { opacity: 0.4; cursor: default; }
+.pot-warning { font-size: 9px; color: #d87a5a; margin-top: 4px; }
+.pot-paused { font-size: 9px; color: #b89a5a; margin-top: 4px; }
+
+/* Plant Modal */
+.modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-backdrop.active { display: flex; }
+.modal-content { background: #f8fff0; border-radius: 20px; padding: 24px; max-width: 340px; width: 100%; box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
+.modal-title { font-size: 14px; color: var(--text-main); margin-bottom: 16px; text-align: center; }
+.seed-list { display: flex; flex-direction: column; gap: 10px; }
+.seed-option { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: white; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+.seed-option:hover { border-color: var(--accent); background: rgba(122,184,94,0.05); }
+.seed-option:active { transform: scale(0.98); }
+.seed-preview { width: 36px; height: 36px; object-fit: contain; image-rendering: pixelated; }
+.seed-name { font-size: 13px; color: var(--text-main); }
+.modal-close { display: block; margin: 16px auto 0; padding: 8px 20px; background: none; border: 1px solid var(--border); border-radius: 16px; color: var(--text-sub); font-size: 12px; cursor: pointer; }
+
+/* Inventory */
+.inventory-section { margin-top: 24px; }
+.section-title { font-size: 12px; color: var(--text-sub); letter-spacing: 1px; margin-bottom: 12px; padding-left: 4px; }
+.inventory-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.inv-item { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; font-size: 11px; color: var(--text-main); }
+.inv-img { width: 24px; height: 24px; object-fit: contain; image-rendering: pixelated; }
+.inv-empty { font-size: 12px; color: var(--text-sub); padding: 16px; text-align: center; }
+
+/* Toast */
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(74,94,62,0.9); color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html" class="back-btn">← 回到小屋</a>
+  <span class="header-title">花房 · 温室</span>
+  <div class="header-right">
+    <div class="isle-music-header" id="isle-music-btn" onclick="toggleIsleMusic()"><div class="m-play"></div><div class="m-pause"><span></span><span></span></div></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="pots-grid" id="pots-grid"></div>
+
+  <div class="inventory-section">
+    <div class="section-title">🌼 收获背包</div>
+    <div class="inventory-grid" id="inventory-grid">
+      <div class="inv-empty">还没有收获的花…</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="plant-modal" onclick="closePlantModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-title">选择种子</div>
+    <div class="seed-list" id="seed-list"></div>
+    <button class="modal-close" onclick="closePlantModal()">关闭</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<audio id="isle-bg-music" loop preload="none"><source src="https://yraoaeeayaervwjjalvn.supabase.co/storage/v1/object/public/music/a-thousand-years.mp3" type="audio/mpeg"></audio>
+<script src="music-shared.js"></script>
+
+<script>
+const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
+const API = `${SUPABASE_URL}/functions/v1/greenhouse`;
+
+const FLOWERS = [
+  { id: 'rose-blue', name: '蓝玫瑰', emoji: '💙' },
+  { id: 'rose-pink', name: '粉玫瑰', emoji: '💗' },
+  { id: 'rose-purple', name: '紫玫瑰', emoji: '💜' },
+  { id: 'lily', name: '百合', emoji: '🤍' },
+  { id: 'lily-of-valley', name: '铃兰', emoji: '💚' }
+];
+
+const STAGE_NAMES = { seed: '种子', sprout: '发芽', bud: '花苞', bloom: '盛开', wither: '枯萎' };
+const ASSET_PATH = 'assets/greenhouse/';
+
+let currentPotIndex = null;
+
+function getFlowerImage(type, stage) {
+  if (stage === 'wither') return ASSET_PATH + 'wither.png';
+  return ASSET_PATH + type + '-' + stage + '.png';
+}
+
+async function apiCall(action, params = {}) {
+  const res = await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, ...params })
+  });
+  return await res.json();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function renderPots(pots) {
+  const grid = document.getElementById('pots-grid');
+  grid.innerHTML = pots.map(pot => {
+    const stage = pot.computed_stage || pot.stage;
+    const isEmpty = !pot.flower_type;
+    const flower = FLOWERS.find(f => f.id === pot.flower_type);
+
+    if (isEmpty) {
+      return `<div class="pot-card">
+        <div class="pot-empty-icon">🪴</div>
+        <div class="pot-label">空花盆</div>
+        <button class="pot-btn plant" onclick="openPlantModal(${pot.pot_index})">种植</button>
+      </div>`;
+    }
+
+    const imgSrc = getFlowerImage(pot.flower_type, stage);
+    const name = flower ? flower.name : pot.flower_type;
+    let actionsHtml = '';
+    let warningHtml = '';
+
+    if (stage === 'wither') {
+      actionsHtml = `<button class="pot-btn clear" onclick="clearPot(${pot.pot_index})">清理</button>`;
+    } else if (stage === 'bloom') {
+      actionsHtml = `<button class="pot-btn harvest" onclick="harvestPot(${pot.pot_index})">收获</button>`;
+    } else {
+      actionsHtml = `
+        <button class="pot-btn water" onclick="waterPot(${pot.pot_index})">💧 浇水</button>
+        <button class="pot-btn fertilize" onclick="fertilizePot(${pot.pot_index})">🌱 施肥</button>
+      `;
+    }
+
+    if (pot.paused && stage !== 'wither') {
+      warningHtml = `<div class="pot-warning">⚠️ 缺水！赶紧浇水</div>`;
+    }
+
+    const progressHtml = (stage !== 'wither' && stage !== 'bloom')
+      ? `<div class="pot-progress"><div class="pot-progress-fill" style="width:${pot.progress || 0}%"></div></div>`
+      : '';
+
+    return `<div class="pot-card">
+      <img class="pot-img" src="${imgSrc}" alt="${name}">
+      <div class="pot-label">${name}</div>
+      <div class="pot-status">${STAGE_NAMES[stage] || stage}</div>
+      ${progressHtml}
+      <div class="pot-actions">${actionsHtml}</div>
+      ${warningHtml}
+    </div>`;
+  }).join('');
+}
+
+function renderInventory(inventory) {
+  const grid = document.getElementById('inventory-grid');
+  const entries = Object.entries(inventory);
+  if (entries.length === 0) {
+    grid.innerHTML = '<div class="inv-empty">还没有收获的花…</div>';
+    return;
+  }
+  grid.innerHTML = entries.map(([type, count]) => {
+    const flower = FLOWERS.find(f => f.id === type);
+    const name = flower ? flower.name : type;
+    const imgSrc = ASSET_PATH + type + '-bloom.png';
+    return `<div class="inv-item"><img class="inv-img" src="${imgSrc}"><span>${name} ×${count}</span></div>`;
+  }).join('');
+}
+
+async function loadGreenhouse() {
+  const data = await apiCall('get_pots');
+  if (data.error) { showToast('加载失败'); return; }
+  renderPots(data.pots);
+  renderInventory(data.inventory || {});
+}
+
+function openPlantModal(potIndex) {
+  currentPotIndex = potIndex;
+  const list = document.getElementById('seed-list');
+  list.innerHTML = FLOWERS.map(f => {
+    const imgSrc = ASSET_PATH + f.id + '-bloom.png';
+    return `<div class="seed-option" onclick="plantFlower('${f.id}')">
+      <img class="seed-preview" src="${imgSrc}">
+      <span class="seed-name">${f.emoji} ${f.name}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('plant-modal').classList.add('active');
+}
+
+function closePlantModal(e) {
+  if (e && e.target !== document.getElementById('plant-modal')) return;
+  document.getElementById('plant-modal').classList.remove('active');
+  currentPotIndex = null;
+}
+
+async function plantFlower(type) {
+  closePlantModal();
+  const data = await apiCall('plant', { pot_index: currentPotIndex, flower_type: type });
+  if (data.error) { showToast('种植失败'); return; }
+  showToast('种下了！记得浇水 💧');
+  loadGreenhouse();
+}
+
+async function waterPot(potIndex) {
+  const data = await apiCall('water', { pot_index: potIndex });
+  if (data.error === 'already_watered_today') { showToast('今天已经浇过了～'); return; }
+  if (data.error) { showToast(data.error); return; }
+  showToast('浇水完成 💧');
+  loadGreenhouse();
+}
+
+async function fertilizePot(potIndex) {
+  const data = await apiCall('fertilize', { pot_index: potIndex });
+  if (data.error === 'already_fertilized_today') { showToast('今天已经施过肥了～'); return; }
+  if (data.error) { showToast(data.error); return; }
+  showToast('施肥完成，加速4小时 🌱');
+  loadGreenhouse();
+}
+
+async function harvestPot(potIndex) {
+  const data = await apiCall('harvest', { pot_index: potIndex });
+  if (data.error) { showToast(data.error); return; }
+  showToast('收获成功！花已存入背包 🌼');
+  loadGreenhouse();
+}
+
+async function clearPot(potIndex) {
+  const data = await apiCall('clear', { pot_index: potIndex });
+  if (data.error) { showToast(data.error); return; }
+  showToast('已清理');
+  loadGreenhouse();
+}
+
+loadGreenhouse();
+// Auto refresh every 60s
+setInterval(loadGreenhouse, 60000);
+</script>
+
+</body>
+</html>
