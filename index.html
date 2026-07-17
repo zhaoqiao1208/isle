@@ -18,15 +18,7 @@ body {
   padding: 0 0 50px;
 }
 
-.time-section {
-  width: 100%;
-  max-width: 900px;
-  padding: 20px 12px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
+.time-section { width: 100%; max-width: 900px; padding: 20px 12px 0; display: flex; align-items: center; justify-content: space-between; }
 .time-box { display: flex; flex-direction: column; align-items: flex-start; }
 .time-date { font-size: 22px; font-weight: 300; color: #5a4a6e; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
 .time-weekday { font-size: 12px; color: #b8a8c8; margin-top: 2px; letter-spacing: 0.5px; }
@@ -34,89 +26,20 @@ body {
 .days-number { font-size: 28px; font-weight: 200; color: #c9a8e8; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
 .days-label { font-size: 10px; color: #b8a8c8; margin-top: 2px; letter-spacing: 0.5px; }
 
-/* ===== Music Player Bar ===== */
-.music-bar {
-  width: 100%;
-  max-width: 900px;
-  padding: 10px 12px 6px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.music-play-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(201,168,232,0.4);
-  background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  flex-shrink: 0;
-}
-
+.music-bar { width: 100%; max-width: 900px; padding: 10px 12px 6px; display: flex; align-items: center; gap: 10px; }
+.music-play-btn { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid rgba(201,168,232,0.4); background: rgba(255,255,255,0.6); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
 .music-play-btn:active { transform: scale(0.9); }
-
-.music-play-btn.playing {
-  border-color: rgba(201,168,232,0.7);
-  background: rgba(201,168,232,0.12);
-}
-
-.play-icon {
-  width: 0; height: 0;
-  border-style: solid;
-  border-width: 5px 0 5px 8px;
-  border-color: transparent transparent transparent #9a8aaa;
-  margin-left: 2px;
-}
-
-.pause-icon {
-  display: none;
-  gap: 2px;
-}
-
-.pause-icon span {
-  width: 2.5px;
-  height: 10px;
-  background: #9a8aaa;
-  border-radius: 1px;
-}
-
+.music-play-btn.playing { border-color: rgba(201,168,232,0.7); background: rgba(201,168,232,0.12); }
+.play-icon { width: 0; height: 0; border-style: solid; border-width: 5px 0 5px 8px; border-color: transparent transparent transparent #9a8aaa; margin-left: 2px; }
+.pause-icon { display: none; gap: 2px; }
+.pause-icon span { width: 2.5px; height: 10px; background: #9a8aaa; border-radius: 1px; }
 .music-play-btn.playing .play-icon { display: none; }
 .music-play-btn.playing .pause-icon { display: flex; }
 
-.music-visualizer {
-  flex: 1;
-  display: flex;
-  align-items: flex-end;
-  gap: 1.5px;
-  height: 24px;
-  overflow: hidden;
-}
+.music-visualizer { flex: 1; display: flex; align-items: flex-end; gap: 1.5px; height: 24px; overflow: hidden; }
+.viz-bar { flex: 1; max-width: 3px; min-width: 2px; background: #c9a8e8; height: 2px; }
 
-.viz-bar {
-  flex: 1;
-  max-width: 3px;
-  min-width: 2px;
-  background: #c9a8e8;
-  height: 2px;
-  transition: height 0.06s steps(6);
-}
-
-.music-info {
-  flex-shrink: 0;
-  font-size: 9px;
-  color: #b8a8c8;
-  letter-spacing: 0.3px;
-  max-width: 90px;
-  text-align: right;
-  line-height: 1.3;
-}
-
+.music-info { flex-shrink: 0; font-size: 9px; color: #b8a8c8; letter-spacing: 0.3px; max-width: 90px; text-align: right; line-height: 1.3; }
 .music-song { font-weight: 500; color: #9a8aaa; font-size: 10px; }
 
 .cottage-wrapper { position: relative; width: 100%; max-width: 900px; margin: 8px auto 0; padding: 0 12px; }
@@ -173,7 +96,6 @@ body {
   </div>
 </div>
 
-<!-- Music Player -->
 <div class="music-bar" id="music-bar">
   <div class="music-play-btn" id="music-btn" onclick="toggleMusic()">
     <div class="play-icon"></div>
@@ -231,18 +153,26 @@ body {
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
 
-// Build visualizer bars
+// Build bars
 const BAR_COUNT = 40;
 const vizContainer = document.getElementById('music-viz');
 const bars = [];
+// Each bar gets a unique "personality" - frequency offset and amplitude sensitivity
+const barSeeds = [];
 for (let i = 0; i < BAR_COUNT; i++) {
   const bar = document.createElement('div');
   bar.className = 'viz-bar';
   vizContainer.appendChild(bar);
   bars.push(bar);
+  barSeeds.push({
+    freq: 0.8 + Math.random() * 3.5,
+    phase: Math.random() * Math.PI * 2,
+    amp: 0.4 + Math.random() * 0.6,
+    // Center bars tend to be taller
+    centerBoost: 1 - Math.abs(i - BAR_COUNT / 2) / (BAR_COUNT / 2) * 0.5
+  });
 }
 
-// Web Audio API setup
 const bgMusic = document.getElementById('bg-music');
 const musicBtn = document.getElementById('music-btn');
 const musicBar = document.getElementById('music-bar');
@@ -253,51 +183,91 @@ let analyser = null;
 let source = null;
 let animId = null;
 let dataArray = null;
+let useRealAnalyser = false;
+let checkFrames = 0;
 
 function initAudio() {
   if (audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 128;
-  analyser.smoothingTimeConstant = 0.75;
-  source = audioCtx.createMediaElementSource(bgMusic);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 128;
+    analyser.smoothingTimeConstant = 0.75;
+    source = audioCtx.createMediaElementSource(bgMusic);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    useRealAnalyser = true;
+  } catch (e) {
+    useRealAnalyser = false;
+  }
 }
 
 function drawViz() {
-  if (!analyser) return;
-  analyser.getByteFrequencyData(dataArray);
-  const binCount = dataArray.length; // 64
-  const step = binCount / BAR_COUNT;
-  for (let i = 0; i < BAR_COUNT; i++) {
-    const idx = Math.floor(i * step);
-    const value = dataArray[idx];
-    // Map 0-255 to 2-24px, quantize to 2px steps for pixel feel
-    const raw = 2 + (value / 255) * 22;
-    const quantized = Math.round(raw / 2) * 2;
-    bars[i].style.height = quantized + 'px';
-    bars[i].style.opacity = 0.4 + (value / 255) * 0.6;
+  if (!bgMusic.paused) {
+    animId = requestAnimationFrame(drawViz);
   }
-  animId = requestAnimationFrame(drawViz);
+
+  // Try real analyser first
+  if (useRealAnalyser && analyser) {
+    analyser.getByteFrequencyData(dataArray);
+    // Check if we're getting real data (first few frames)
+    if (checkFrames < 30) {
+      checkFrames++;
+      const sum = dataArray.reduce((a, b) => a + b, 0);
+      if (checkFrames === 30 && sum === 0) {
+        useRealAnalyser = false; // CORS blocked, switch to fallback
+      }
+    }
+    if (useRealAnalyser) {
+      const step = dataArray.length / BAR_COUNT;
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const idx = Math.floor(i * step);
+        const value = dataArray[idx];
+        const raw = 2 + (value / 255) * 22;
+        const quantized = Math.round(raw / 2) * 2;
+        bars[i].style.height = quantized + 'px';
+        bars[i].style.opacity = 0.4 + (value / 255) * 0.6;
+      }
+      return;
+    }
+  }
+
+  // Fallback: time-based pseudo spectrum
+  const t = bgMusic.currentTime;
+  // A Thousand Years tempo ~100 BPM, so beat every 0.6s
+  const beat = Math.sin(t * Math.PI * 2 / 0.6) * 0.5 + 0.5;
+  // Slow envelope that swells and recedes (simulates verse/chorus dynamics)
+  const envelope = (Math.sin(t * 0.15) * 0.3 + 0.5) + (Math.sin(t * 0.4) * 0.2);
+
+  for (let i = 0; i < BAR_COUNT; i++) {
+    const s = barSeeds[i];
+    // Combine multiple sine waves at different frequencies for organic movement
+    const wave1 = Math.sin(t * s.freq + s.phase);
+    const wave2 = Math.sin(t * s.freq * 1.7 + s.phase * 0.5) * 0.4;
+    const wave3 = Math.sin(t * 0.3 + i * 0.2) * 0.3;
+    const combined = (wave1 + wave2 + wave3) * 0.5 + 0.5;
+    const value = combined * s.amp * s.centerBoost * envelope * (0.6 + beat * 0.4);
+    const px = 2 + value * 20;
+    const quantized = Math.round(px / 2) * 2;
+    bars[i].style.height = Math.max(2, Math.min(24, quantized)) + 'px';
+    bars[i].style.opacity = (0.35 + value * 0.65).toFixed(2);
+  }
 }
 
 function stopViz() {
-  if (animId) {
-    cancelAnimationFrame(animId);
-    animId = null;
-  }
+  if (animId) { cancelAnimationFrame(animId); animId = null; }
   bars.forEach(b => { b.style.height = '2px'; b.style.opacity = '0.4'; });
 }
 
 function toggleMusic() {
   if (bgMusic.paused) {
     initAudio();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     bgMusic.play().then(() => {
       musicBtn.classList.add('playing');
       musicBar.classList.add('playing');
+      checkFrames = 0;
       drawViz();
     }).catch(e => console.log('Play blocked:', e));
   } else {
@@ -312,12 +282,6 @@ bgMusic.addEventListener('pause', () => {
   musicBtn.classList.remove('playing');
   musicBar.classList.remove('playing');
   stopViz();
-});
-
-bgMusic.addEventListener('play', () => {
-  musicBtn.classList.add('playing');
-  musicBar.classList.add('playing');
-  if (analyser && !animId) drawViz();
 });
 
 function updateTime() {
