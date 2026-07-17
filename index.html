@@ -299,14 +299,29 @@ window.addEventListener('beforeunload', () => {
   const savedTime = parseFloat(localStorage.getItem('isle_music_time') || '0');
   if (savedState === 'playing') {
     initAudio();
-    bgMusic.currentTime = savedTime;
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-    bgMusic.play().then(() => {
-      musicBtn.classList.add('playing');
-      musicBar.classList.add('playing');
-      checkFrames = 0;
-      drawViz();
-    }).catch(() => {});
+
+    // Wait for metadata before seeking
+    var doSeekAndPlay = function() {
+      bgMusic.currentTime = savedTime;
+      bgMusic.play().then(() => {
+        musicBtn.classList.add('playing');
+        musicBar.classList.add('playing');
+        checkFrames = 0;
+        drawViz();
+      }).catch(() => {});
+    };
+
+    if (bgMusic.readyState >= 1) {
+      doSeekAndPlay();
+    } else {
+      bgMusic.addEventListener('loadedmetadata', function onMeta() {
+        bgMusic.removeEventListener('loadedmetadata', onMeta);
+        doSeekAndPlay();
+      });
+      // Trigger load since preload=none
+      bgMusic.load();
+    }
   }
 })();
 
