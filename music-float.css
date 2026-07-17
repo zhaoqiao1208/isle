@@ -1,34 +1,4 @@
-/* Music button in header (beside room title) */
-.isle-music-header {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(201,168,232,0.4);
-  background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  flex-shrink: 0;
-}
-.isle-music-header:active { transform: scale(0.9); }
-.isle-music-header.playing {
-  border-color: rgba(201,168,232,0.7);
-  background: rgba(201,168,232,0.12);
-}
-.isle-music-header .m-play {
-  width: 0; height: 0;
-  border-style: solid;
-  border-width: 4px 0 4px 7px;
-  border-color: transparent transparent transparent #9a8aaa;
-  margin-left: 1.5px;
-}
-.isle-music-header .m-pause { display: none; gap: 2px; }
-.isle-music-header .m-pause span {
-  width: 2px; height: 9px;
-  background: #9a8aaa; border-radius: 1px;
-}
-.isle-music-header.playing .m-play { display: none; }
-.isle-music-header.playing .m-pause { display: flex; }
+/* BGM feature disabled - hide all music UI */
+.isle-music-header { display: none !important; }
+.music-bar { display: none !important; }
+#bg-music { display: none; }
