@@ -30,10 +30,23 @@ body {
 .time-box { display: flex; flex-direction: column; align-items: flex-start; }
 .time-date { font-size: 22px; font-weight: 300; color: #5a4a6e; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
 .time-weekday { font-size: 12px; color: #b8a8c8; margin-top: 2px; letter-spacing: 0.5px; }
+.days-box { display: flex; flex-direction: column; align-items: flex-end; }
+.days-number { font-size: 28px; font-weight: 200; color: #c9a8e8; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
+.days-label { font-size: 10px; color: #b8a8c8; margin-top: 2px; letter-spacing: 0.5px; }
 
-.music-btn {
-  width: 32px;
-  height: 32px;
+/* ===== Music Player Bar ===== */
+.music-bar {
+  width: 100%;
+  max-width: 900px;
+  padding: 10px 12px 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.music-play-btn {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: 1.5px solid rgba(201,168,232,0.4);
   background: rgba(255,255,255,0.6);
@@ -42,72 +55,102 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
   flex-shrink: 0;
 }
 
-.music-btn:hover { background: rgba(201,168,232,0.15); }
-.music-btn:active { transform: scale(0.92); }
+.music-play-btn:active { transform: scale(0.9); }
 
-.music-btn.playing {
+.music-play-btn.playing {
   border-color: rgba(201,168,232,0.7);
-  background: rgba(201,168,232,0.1);
-  animation: musicPulse 2s ease-in-out infinite;
+  background: rgba(201,168,232,0.12);
 }
 
-@keyframes musicPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,232,0); }
-  50% { box-shadow: 0 0 0 6px rgba(201,168,232,0.15); }
-}
-
-.music-icon {
-  width: 14px;
-  height: 14px;
-  position: relative;
-}
-
-.music-icon-play {
-  width: 0;
-  height: 0;
+.play-icon {
+  width: 0; height: 0;
   border-style: solid;
-  border-width: 6px 0 6px 10px;
+  border-width: 5px 0 5px 8px;
   border-color: transparent transparent transparent #9a8aaa;
   margin-left: 2px;
 }
 
-.music-icon-pause {
+.pause-icon {
   display: none;
-  gap: 3px;
+  gap: 2px;
 }
 
-.music-icon-pause span {
-  width: 3px;
-  height: 12px;
+.pause-icon span {
+  width: 2.5px;
+  height: 10px;
   background: #9a8aaa;
   border-radius: 1px;
 }
 
-.music-btn.playing .music-icon-play { display: none; }
-.music-btn.playing .music-icon-pause { display: flex; }
+.music-play-btn.playing .play-icon { display: none; }
+.music-play-btn.playing .pause-icon { display: flex; }
 
-.music-title {
-  font-size: 9px;
-  color: #b8a8c8;
-  margin-top: 4px;
-  text-align: center;
-  letter-spacing: 0.3px;
-  opacity: 0;
-  transition: opacity 0.3s;
+.music-visualizer {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 20px;
+  overflow: hidden;
 }
 
-.music-wrapper:hover .music-title { opacity: 1; }
-.music-wrapper { display: flex; flex-direction: column; align-items: center; }
+.viz-bar {
+  flex: 1;
+  max-width: 4px;
+  min-width: 2px;
+  background: linear-gradient(180deg, #c9a8e8, #e0c3fc);
+  border-radius: 2px;
+  height: 3px;
+  transition: height 0.15s ease;
+}
 
-.days-box { display: flex; flex-direction: column; align-items: flex-end; }
-.days-number { font-size: 28px; font-weight: 200; color: #c9a8e8; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
-.days-label { font-size: 10px; color: #b8a8c8; margin-top: 2px; letter-spacing: 0.5px; }
+.music-bar.playing .viz-bar {
+  animation: vizBounce 0.8s ease-in-out infinite alternate;
+}
 
-.cottage-wrapper { position: relative; width: 100%; max-width: 900px; margin: 14px auto 0; padding: 0 12px; }
+.viz-bar:nth-child(1) { animation-delay: 0s; }
+.viz-bar:nth-child(2) { animation-delay: 0.05s; }
+.viz-bar:nth-child(3) { animation-delay: 0.1s; }
+.viz-bar:nth-child(4) { animation-delay: 0.15s; }
+.viz-bar:nth-child(5) { animation-delay: 0.2s; }
+.viz-bar:nth-child(6) { animation-delay: 0.25s; }
+.viz-bar:nth-child(7) { animation-delay: 0.3s; }
+.viz-bar:nth-child(8) { animation-delay: 0.35s; }
+.viz-bar:nth-child(9) { animation-delay: 0.4s; }
+.viz-bar:nth-child(10) { animation-delay: 0.45s; }
+.viz-bar:nth-child(11) { animation-delay: 0.5s; }
+.viz-bar:nth-child(12) { animation-delay: 0.55s; }
+.viz-bar:nth-child(13) { animation-delay: 0.6s; }
+.viz-bar:nth-child(14) { animation-delay: 0.5s; }
+.viz-bar:nth-child(15) { animation-delay: 0.4s; }
+.viz-bar:nth-child(16) { animation-delay: 0.3s; }
+.viz-bar:nth-child(17) { animation-delay: 0.2s; }
+.viz-bar:nth-child(18) { animation-delay: 0.1s; }
+.viz-bar:nth-child(19) { animation-delay: 0.05s; }
+.viz-bar:nth-child(20) { animation-delay: 0s; }
+
+@keyframes vizBounce {
+  0% { height: 3px; }
+  100% { height: 18px; }
+}
+
+.music-info {
+  flex-shrink: 0;
+  font-size: 9px;
+  color: #b8a8c8;
+  letter-spacing: 0.3px;
+  max-width: 90px;
+  text-align: right;
+  line-height: 1.3;
+}
+
+.music-song { font-weight: 500; color: #9a8aaa; font-size: 10px; }
+
+.cottage-wrapper { position: relative; width: 100%; max-width: 900px; margin: 8px auto 0; padding: 0 12px; }
 .cottage-wrapper img { width: 100%; height: auto; display: block; border-radius: 14px; box-shadow: 0 8px 32px rgba(120, 80, 150, 0.15); }
 .room-overlay { position: absolute; top: 0; left: 12px; width: calc(100% - 24px); height: 100%; }
 .room-hotspot { position: absolute; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
@@ -155,18 +198,28 @@ body {
     <div class="time-date" id="time-date">--</div>
     <div class="time-weekday" id="time-weekday">--</div>
   </div>
-  <div class="music-wrapper">
-    <div class="music-btn" id="music-btn" onclick="toggleMusic()">
-      <div class="music-icon">
-        <div class="music-icon-play"></div>
-        <div class="music-icon-pause"><span></span><span></span></div>
-      </div>
-    </div>
-    <div class="music-title">A Thousand Years</div>
-  </div>
   <div class="days-box">
     <div class="days-number" id="days-number">--</div>
     <div class="days-label">在一起的第 — 天</div>
+  </div>
+</div>
+
+<!-- Music Player -->
+<div class="music-bar" id="music-bar">
+  <div class="music-play-btn" id="music-btn" onclick="toggleMusic()">
+    <div class="play-icon"></div>
+    <div class="pause-icon"><span></span><span></span></div>
+  </div>
+  <div class="music-visualizer" id="music-viz">
+    <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
+    <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
+    <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
+    <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
+    <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
+  </div>
+  <div class="music-info">
+    <div class="music-song">A Thousand Years</div>
+    <div>Christina Perri</div>
   </div>
 </div>
 
@@ -230,23 +283,27 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 // Music player
 const bgMusic = document.getElementById('bg-music');
 const musicBtn = document.getElementById('music-btn');
+const musicBar = document.getElementById('music-bar');
 bgMusic.volume = 0.35;
 
 function toggleMusic() {
   if (bgMusic.paused) {
     bgMusic.play().then(() => {
       musicBtn.classList.add('playing');
+      musicBar.classList.add('playing');
     }).catch(e => {
       console.log('Play blocked:', e);
     });
   } else {
     bgMusic.pause();
     musicBtn.classList.remove('playing');
+    musicBar.classList.remove('playing');
   }
 }
 
-bgMusic.addEventListener('ended', () => {
+bgMusic.addEventListener('pause', () => {
   musicBtn.classList.remove('playing');
+  musicBar.classList.remove('playing');
 });
 
 function updateTime() {
