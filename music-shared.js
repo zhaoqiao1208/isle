@@ -5,12 +5,20 @@
   if (!audio || !btn) return;
   audio.volume = 0.35;
 
+  function saveTime() {
+    if (!audio.paused && isFinite(audio.currentTime)) {
+      localStorage.setItem('isle_music_time', audio.currentTime.toFixed(1));
+    }
+  }
+
   var state = localStorage.getItem('isle_music_state');
   var savedTime = parseFloat(localStorage.getItem('isle_music_time') || '0');
 
   if (state === 'playing') {
     var doSeekAndPlay = function() {
-      audio.currentTime = savedTime;
+      // Re-read in case it was updated between script start and metadata load
+      var t = parseFloat(localStorage.getItem('isle_music_time') || '0');
+      if (isFinite(t) && t > 0) audio.currentTime = t;
       audio.play().then(function(){ btn.classList.add('playing'); }).catch(function(){});
     };
 
@@ -21,13 +29,17 @@
         audio.removeEventListener('loadedmetadata', onMeta);
         doSeekAndPlay();
       });
-      // Trigger load since preload=none
       audio.load();
     }
   }
 
   function toggleIsleMusic() {
     if (audio.paused) {
+      // Re-read saved time for fresh seek
+      var t = parseFloat(localStorage.getItem('isle_music_time') || '0');
+      if (isFinite(t) && t > 0 && audio.readyState >= 1) {
+        audio.currentTime = t;
+      }
       audio.play().then(function(){
         btn.classList.add('playing');
         localStorage.setItem('isle_music_state', 'playing');
@@ -36,17 +48,27 @@
       audio.pause();
       btn.classList.remove('playing');
       localStorage.setItem('isle_music_state', 'paused');
-      localStorage.setItem('isle_music_time', audio.currentTime.toFixed(1));
+      saveTime();
     }
   }
   window.toggleIsleMusic = toggleIsleMusic;
 
-  setInterval(function(){
-    if (!audio.paused) localStorage.setItem('isle_music_time', audio.currentTime.toFixed(1));
-  }, 1000);
+  // Save time on every playback position update (most reliable)
+  audio.addEventListener('timeupdate', saveTime);
 
-  window.addEventListener('beforeunload', function(){
-    if (!audio.paused) localStorage.setItem('isle_music_time', audio.currentTime.toFixed(1));
+  // Save on page hide (mobile-friendly alternative to beforeunload)
+  window.addEventListener('pagehide', saveTime);
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') saveTime();
+  });
+  window.addEventListener('beforeunload', saveTime);
+
+  // Intercept all link clicks to save time before navigation
+  document.addEventListener('click', function(e) {
+    var link = e.target.closest('a[href]');
+    if (link && !link.getAttribute('href').startsWith('#')) {
+      saveTime();
+    }
   });
 
   audio.addEventListener('pause', function(){ btn.classList.remove('playing'); });
