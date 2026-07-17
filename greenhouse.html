@@ -122,9 +122,9 @@ function renderPots(pots) {
     if (stage === 'wither') {
       actionsHtml = `<button class="pot-btn clear" onclick="clearPot(${pot.pot_index})">清理</button>`;
     } else if (stage === 'bloom') {
-      actionsHtml = `<button class="pot-btn harvest" onclick="harvestPot(${pot.pot_index})">收获</button>`;
+      actionsHtml = `<button class="pot-btn harvest" onclick="harvestPot(${pot.pot_index})">收获</button><button class="pot-btn clear" onclick="clearPot(${pot.pot_index})">清理</button>`;
     } else {
-      actionsHtml = `<button class="pot-btn water" onclick="waterPot(${pot.pot_index})">💧 浇水</button><button class="pot-btn fertilize" onclick="fertilizePot(${pot.pot_index})">🌱 施肥</button>`;
+      actionsHtml = `<button class="pot-btn water" onclick="waterPot(${pot.pot_index})">💧 浇水</button><button class="pot-btn fertilize" onclick="fertilizePot(${pot.pot_index})">🌱 施肥</button><button class="pot-btn clear" onclick="clearPot(${pot.pot_index})">清理</button>`;
     }
     if (pot.paused && stage !== 'wither') { warningHtml = `<div class="pot-warning">⚠️ 缺水！赶紧浇水</div>`; }
     const progressHtml = (stage !== 'wither' && stage !== 'bloom') ? `<div class="pot-progress"><div class="pot-progress-fill" style="width:${pot.progress || 0}%"></div></div>` : '';
