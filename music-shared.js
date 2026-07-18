@@ -6,11 +6,28 @@
   if (audio) audio.remove();
 })();
 
-// Report room visit to update 江屿's 想念 status (miss -1, 1h cooldown per room, handled server-side).
+// Visitor mode detection (shared across all pages)
+var ISLE_VISITOR = (new URLSearchParams(window.location.search)).get('visitor') === '1';
+
+// Propagate visitor param to all internal links on the page
+if (ISLE_VISITOR) {
+  document.addEventListener('DOMContentLoaded', function() {
+    var links = document.querySelectorAll('a[href]');
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute('href');
+      if (href && href.indexOf('http') !== 0 && href.indexOf('//') !== 0 && href.indexOf('mailto') !== 0) {
+        links[i].setAttribute('href', href + (href.indexOf('?') === -1 ? '?' : '&') + 'visitor=1');
+      }
+    }
+  });
+}
+
+// Report room visit to update status (miss -1, 1h cooldown per room).
+// Visitors do NOT trigger status changes.
 (function(){
+  if (ISLE_VISITOR) return;
   try {
     var STATUS_API = 'https://yraoaeeayaervwjjalvn.supabase.co/functions/v1/isle-status';
-    // Map current page filename to a room id recognized by the isle-status function.
     var path = (location.pathname || '').toLowerCase();
     var ROOM_MAP = {
       'bedroom': 'bedroom',
@@ -24,7 +41,7 @@
     for (var key in ROOM_MAP) {
       if (path.indexOf(key) !== -1) { room = ROOM_MAP[key]; break; }
     }
-    if (!room) return; // not a known room page, skip
+    if (!room) return;
     fetch(STATUS_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
