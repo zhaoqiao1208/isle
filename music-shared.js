@@ -53,7 +53,8 @@ if (ISLE_VISITOR) {
 })();
 
 // ===== Visitor mode UI restrictions =====
-// Hides interactive elements on all pages when ?visitor=1
+// Hides interactive elements on relevant pages when ?visitor=1
+// NOTE: Living room (留言板) stays fully interactive — it's meant for guests to leave messages.
 (function(){
   if (!ISLE_VISITOR) return;
 
@@ -79,10 +80,6 @@ if (ISLE_VISITOR) {
     // Bathroom: hide reply area
     var replyArea = document.getElementById('reply-area');
     if (replyArea) replyArea.style.display = 'none';
-
-    // Living: hide input area
-    var inputArea = document.querySelector('.input-area');
-    if (inputArea) inputArea.style.display = 'none';
 
     // Add a subtle visitor badge
     var badge = document.createElement('div');
