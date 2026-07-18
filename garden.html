@@ -49,12 +49,12 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
 }
 .back-btn:active { background: rgba(0,0,0,0.5); color: #fff; }
 
-/* Glowing nodes */
+/* Glowing nodes - WHITE */
 .glow-node {
   position: absolute;
   z-index: 10;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -65,54 +65,56 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
 .glow-node::before {
   content: '';
   position: absolute;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(220,200,255,0.9) 0%, rgba(155,123,207,0.6) 60%, transparent 100%);
+  background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.5) 50%, transparent 100%);
   animation: glowPulse 2.4s ease-in-out infinite;
 }
 .glow-node::after {
   content: '';
   position: absolute;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(155,123,207,0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%);
   animation: glowPulse 2.4s ease-in-out infinite 0.3s;
 }
 @keyframes glowPulse {
-  0%, 100% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.4); opacity: 1; }
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.5); opacity: 1; }
 }
 .glow-node .node-label {
   position: absolute;
-  bottom: -18px;
+  bottom: -20px;
   white-space: nowrap;
   font-size: 10px;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.7);
   letter-spacing: 0.5px;
   pointer-events: none;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 
-/* Node positions - placed around the tree canopy */
+/* Node positions */
 .node-personality { top: 28%; left: 26%; }
 .node-about_her { top: 22%; right: 26%; }
 .node-origin { top: 48%; left: 20%; }
 .node-secret { top: 44%; right: 18%; }
 
-/* Falling petals */
-.petal {
+/* Floating light particles */
+.particle {
   position: absolute;
   z-index: 5;
   pointer-events: none;
+  border-radius: 50%;
   opacity: 0;
-  animation: petalDrift linear infinite;
+  animation: particleDrift linear infinite;
 }
-@keyframes petalDrift {
-  0% { transform: translate(0, -30px) rotate(0deg); opacity: 0; }
-  8% { opacity: 0.8; }
-  85% { opacity: 0.5; }
-  100% { transform: translate(var(--drift-x), calc(100vh + 30px)) rotate(var(--rotate-end)); opacity: 0; }
+@keyframes particleDrift {
+  0% { transform: translate(0, -20px) scale(0.5); opacity: 0; }
+  10% { opacity: var(--p-opacity); transform: translate(0, 0) scale(1); }
+  80% { opacity: calc(var(--p-opacity) * 0.6); }
+  100% { transform: translate(var(--drift-x), calc(100vh + 20px)) scale(0.3); opacity: 0; }
 }
 
 /* Modal overlay */
@@ -266,34 +268,37 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
 
   var personaData = null;
 
-  // === Falling Petals ===
-  function initPetals() {
+  // === Floating light particles ===
+  function initParticles() {
     var scene = document.getElementById('garden-scene');
-    var petalSrcs = [
-      'assets/greenhouse/petal1.png',
-      'assets/greenhouse/petal2.png',
-      'assets/greenhouse/petal3.png',
-      'assets/greenhouse/petal4.png'
+    var count = 22;
+    var colors = [
+      'rgba(255,255,255,0.8)',
+      'rgba(220,200,255,0.7)',
+      'rgba(180,160,240,0.6)',
+      'rgba(255,240,255,0.7)'
     ];
-    var petalCount = 18;
 
-    for (var i = 0; i < petalCount; i++) {
-      var img = document.createElement('img');
-      img.className = 'petal';
-      img.src = petalSrcs[Math.floor(Math.random() * petalSrcs.length)];
-      img.alt = '';
+    for (var i = 0; i < count; i++) {
+      var dot = document.createElement('div');
+      dot.className = 'particle';
 
-      var size = 16 + Math.random() * 20;
-      img.style.width = size + 'px';
-      img.style.height = 'auto';
-      img.style.left = (5 + Math.random() * 90) + '%';
-      img.style.top = -(10 + Math.random() * 60) + 'px';
-      img.style.animationDuration = (6 + Math.random() * 7) + 's';
-      img.style.animationDelay = (Math.random() * 10) + 's';
-      img.style.setProperty('--drift-x', (Math.random() * 80 - 40) + 'px');
-      img.style.setProperty('--rotate-end', (180 + Math.random() * 360) + 'deg');
+      var size = 4 + Math.random() * 8;
+      var opacity = 0.4 + Math.random() * 0.5;
+      var color = colors[Math.floor(Math.random() * colors.length)];
 
-      scene.appendChild(img);
+      dot.style.width = size + 'px';
+      dot.style.height = size + 'px';
+      dot.style.background = 'radial-gradient(circle, ' + color + ' 0%, transparent 70%)';
+      dot.style.boxShadow = '0 0 ' + (size + 4) + 'px ' + color;
+      dot.style.left = (5 + Math.random() * 90) + '%';
+      dot.style.top = -(Math.random() * 80) + 'px';
+      dot.style.animationDuration = (8 + Math.random() * 10) + 's';
+      dot.style.animationDelay = (Math.random() * 12) + 's';
+      dot.style.setProperty('--drift-x', (Math.random() * 60 - 30) + 'px');
+      dot.style.setProperty('--p-opacity', opacity);
+
+      scene.appendChild(dot);
     }
   }
 
@@ -381,7 +386,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
   }
 
   // === Init ===
-  initPetals();
+  initParticles();
   loadPersona();
 })();
 </script>
