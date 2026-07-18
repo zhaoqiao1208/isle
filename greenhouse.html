@@ -51,6 +51,28 @@ body { background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 10
 .inv-item { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; font-size: 11px; color: var(--text-main); }
 .inv-img { width: 24px; height: 24px; object-fit: contain; image-rendering: pixelated; }
 .inv-empty { font-size: 12px; color: var(--text-sub); padding: 16px; text-align: center; }
+/* Bouquet section */
+.bouquet-section { margin-top: 32px; }
+.bouquet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.bouquet-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 14px 10px; text-align: center; min-height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s; position: relative; overflow: hidden; }
+.bouquet-card.crafted { border-color: rgba(122,184,94,0.5); box-shadow: 0 4px 16px rgba(122,184,94,0.12); }
+.bouquet-card.locked { opacity: 0.5; }
+.bouquet-img { width: 64px; height: 64px; object-fit: contain; margin-bottom: 6px; image-rendering: pixelated; }
+.bouquet-name { font-size: 11px; color: var(--text-main); margin-bottom: 4px; font-weight: 500; }
+.bouquet-status { font-size: 9px; color: var(--text-sub); }
+.bouquet-craft-btn { margin-top: 6px; padding: 4px 12px; border: 1px solid var(--accent); border-radius: 10px; font-size: 10px; background: rgba(122,184,94,0.08); color: var(--accent); cursor: pointer; transition: all 0.2s; }
+.bouquet-craft-btn:active { transform: scale(0.95); }
+.bouquet-craft-btn:disabled { opacity: 0.4; cursor: default; }
+.bouquet-lock-icon { font-size: 24px; opacity: 0.3; margin-bottom: 6px; }
+/* Bouquet card modal */
+.card-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; align-items: center; justify-content: center; padding: 20px; }
+.card-overlay.active { display: flex; }
+.card-inner { background: linear-gradient(160deg, #fefff8, #f0f8e8); border-radius: 24px; padding: 28px 22px; max-width: 340px; width: 100%; text-align: center; box-shadow: 0 16px 48px rgba(0,0,0,0.2); animation: cardPop 0.4s ease; }
+@keyframes cardPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.card-img { width: 120px; height: 120px; object-fit: contain; margin: 0 auto 16px; display: block; }
+.card-name { font-size: 18px; color: var(--text-main); margin-bottom: 12px; font-weight: 300; letter-spacing: 1px; }
+.card-text { font-size: 13px; color: var(--text-sub); line-height: 1.9; text-align: left; margin-bottom: 16px; padding: 0 4px; }
+.card-close { padding: 8px 24px; background: none; border: 1px solid var(--border); border-radius: 16px; color: var(--text-sub); font-size: 12px; cursor: pointer; }
 .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(74,94,62,0.9); color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
 .toast.show { opacity: 1; }
 </style>
@@ -69,12 +91,24 @@ body { background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 10
     <div class="section-title">🌼 收获背包</div>
     <div class="inventory-grid" id="inventory-grid"><div class="inv-empty">还没有收获的花…</div></div>
   </div>
+  <div class="bouquet-section">
+    <div class="section-title">💐 花束</div>
+    <div class="bouquet-grid" id="bouquet-grid"></div>
+  </div>
 </div>
 <div class="modal-backdrop" id="plant-modal" onclick="closePlantModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <div class="modal-title">选择种子</div>
     <div class="seed-list" id="seed-list"></div>
     <button class="modal-close" onclick="closePlantModal()">关闭</button>
+  </div>
+</div>
+<div class="card-overlay" id="card-overlay" onclick="closeCard(event)">
+  <div class="card-inner" id="card-inner" onclick="event.stopPropagation()">
+    <img class="card-img" id="card-img" src="" alt="">
+    <div class="card-name" id="card-name"></div>
+    <div class="card-text" id="card-text"></div>
+    <button class="card-close" onclick="closeCard()">收好</button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -91,9 +125,13 @@ const FLOWERS = [
   { id: 'lily', name: '百合', emoji: '🤍' },
   { id: 'lily-of-valley', name: '铃兰', emoji: '💚' }
 ];
+const MATERIAL_NAMES = { 'rose-blue': '蓝玫瑰', 'rose-pink': '粉玫瑰', 'rose-purple': '紫玫瑰', 'lily': '百合', 'lily-of-valley': '铃兰', 'plush': '小玩偶' };
 const STAGE_NAMES = { seed: '种子', sprout: '发芽', bud: '花苞', bloom: '盛开', wither: '枯萎' };
 const ASSET_PATH = 'assets/greenhouse/';
 let currentPotIndex = null;
+let cachedInventory = {};
+let cachedRecipes = [];
+let cachedBouquets = [];
 
 function getFlowerImage(type, stage) {
   if (stage === 'wither') return ASSET_PATH + 'wither.png';
@@ -140,20 +178,76 @@ function renderPots(pots) {
 
 function renderInventory(inventory) {
   const grid = document.getElementById('inventory-grid');
-  const entries = Object.entries(inventory);
+  const entries = Object.entries(inventory).filter(([k]) => k !== 'plush');
   if (entries.length === 0) { grid.innerHTML = '<div class="inv-empty">还没有收获的花…</div>'; return; }
-  grid.innerHTML = entries.map(([type, count]) => {
-    const flower = FLOWERS.find(f => f.id === type);
-    const name = flower ? flower.name : type;
+  let html = entries.map(([type, count]) => {
+    const name = MATERIAL_NAMES[type] || type;
     return `<div class="inv-item"><img class="inv-img" src="${ASSET_PATH}${type}-bloom.png"><span>${name} ×${count}</span></div>`;
   }).join('');
+  if (inventory['plush']) {
+    html += `<div class="inv-item"><span style="font-size:18px">🧸</span><span>小玩偶 ×1</span></div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function renderBouquets(recipes, bouquets, inventory) {
+  const grid = document.getElementById('bouquet-grid');
+  const craftedSet = new Set(bouquets.map(b => b.bouquet_index));
+
+  grid.innerHTML = recipes.map(r => {
+    const isCrafted = craftedSet.has(r.bouquet_index);
+    if (isCrafted) {
+      return `<div class="bouquet-card crafted" onclick="showCard(${r.bouquet_index})"><img class="bouquet-img" src="${r.image}"><div class="bouquet-name">${r.name}</div><div class="bouquet-status">已完成 ✓</div></div>`;
+    }
+    // Check if can craft
+    const recipe = r.recipe;
+    let canCraft = true;
+    let statusParts = [];
+    for (const [mat, need] of Object.entries(recipe)) {
+      const have = inventory[mat] || 0;
+      if (have < need) canCraft = false;
+      const matName = MATERIAL_NAMES[mat] || mat;
+      statusParts.push(`${matName} ${have}/${need}`);
+    }
+    const statusStr = statusParts.join(' · ');
+    const btnHtml = canCraft ? `<button class="bouquet-craft-btn" onclick="event.stopPropagation(); craftBouquet(${r.bouquet_index})">合成</button>` : '';
+    return `<div class="bouquet-card${canCraft ? '' : ' locked'}"><div class="bouquet-lock-icon">💐</div><div class="bouquet-name">${r.name}</div><div class="bouquet-status">${statusStr}</div>${btnHtml}</div>`;
+  }).join('');
+}
+
+function showCard(bouquetIndex) {
+  const r = cachedRecipes.find(x => x.bouquet_index === bouquetIndex);
+  if (!r) return;
+  document.getElementById('card-img').src = r.image;
+  document.getElementById('card-name').textContent = r.name;
+  document.getElementById('card-text').textContent = r.card_text;
+  document.getElementById('card-overlay').classList.add('active');
+}
+
+function closeCard(e) {
+  if (e && e.target !== document.getElementById('card-overlay') && e.target !== document.querySelector('.card-close')) return;
+  document.getElementById('card-overlay').classList.remove('active');
+}
+
+async function craftBouquet(bouquetIndex) {
+  const data = await apiCall('craft_bouquet', { bouquet_index: bouquetIndex });
+  if (data.error === 'already_crafted') { showToast('这束花已经做过了'); return; }
+  if (data.error && data.error.startsWith('not_enough_')) { showToast('材料不够～'); return; }
+  if (data.error) { showToast(data.error); return; }
+  showToast('花束完成！');
+  await loadGreenhouse();
+  showCard(bouquetIndex);
 }
 
 async function loadGreenhouse() {
   const data = await apiCall('get_pots');
   if (data.error) { showToast('加载失败'); return; }
+  cachedInventory = data.inventory || {};
+  cachedRecipes = data.recipes || [];
+  cachedBouquets = data.bouquets || [];
   renderPots(data.pots);
-  renderInventory(data.inventory || {});
+  renderInventory(cachedInventory);
+  renderBouquets(cachedRecipes, cachedBouquets, cachedInventory);
 }
 
 function openPlantModal(potIndex) {
