@@ -1,10 +1,10 @@
-const CACHE_NAME = 'isle-v1';
+const CACHE_NAME = 'isle-v2';
 const PRECACHE = [
-  '/',
-  '/index.html',
-  '/music-shared.js',
-  '/visitor.js',
-  '/cottage.png'
+  '/isle/',
+  '/isle/index.html',
+  '/isle/music-shared.js',
+  '/isle/visitor.js',
+  '/isle/cottage.png'
 ];
 
 self.addEventListener('install', event => {
@@ -22,10 +22,8 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Network first, fall back to cache
   event.respondWith(
     fetch(event.request).then(response => {
-      // Cache successful GET requests
       if (event.request.method === 'GET' && response.status === 200) {
         const clone = response.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
