@@ -51,3 +51,43 @@ if (ISLE_VISITOR) {
     console.error('room visit report error:', e);
   }
 })();
+
+// ===== Visitor mode UI restrictions =====
+// Hides interactive elements on all pages when ?visitor=1
+(function(){
+  if (!ISLE_VISITOR) return;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Kitchen: hide regen buttons and order section
+    var voiceActions = document.getElementById('voice-actions');
+    if (voiceActions) voiceActions.style.display = 'none';
+    var orderSection = document.querySelector('.order-section');
+    if (orderSection) orderSection.style.display = 'none';
+
+    // Greenhouse: hide all action buttons (rendered dynamically)
+    var potsGrid = document.getElementById('pots-grid');
+    if (potsGrid) {
+      var hideGreenActions = function() {
+        var btns = potsGrid.querySelectorAll('.pot-btn');
+        for (var i = 0; i < btns.length; i++) btns[i].style.display = 'none';
+      };
+      hideGreenActions();
+      var obs = new MutationObserver(hideGreenActions);
+      obs.observe(potsGrid, { childList: true, subtree: true });
+    }
+
+    // Bathroom: hide reply area
+    var replyArea = document.getElementById('reply-area');
+    if (replyArea) replyArea.style.display = 'none';
+
+    // Living: hide input area
+    var inputArea = document.querySelector('.input-area');
+    if (inputArea) inputArea.style.display = 'none';
+
+    // Add a subtle visitor badge
+    var badge = document.createElement('div');
+    badge.style.cssText = 'position:fixed;bottom:12px;right:12px;background:rgba(0,0,0,0.05);color:rgba(0,0,0,0.3);padding:4px 10px;border-radius:12px;font-size:10px;z-index:9999;pointer-events:none;';
+    badge.textContent = '\ud83d\udc41\ufe0f \u8bbf\u5ba2\u6a21\u5f0f';
+    document.body.appendChild(badge);
+  });
+})();
