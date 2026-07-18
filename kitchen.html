@@ -7,17 +7,7 @@
 <link rel="stylesheet" href="music-float.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
-:root {
-  --bg: #FFF8F0;
-  --card-bg: rgba(255,255,255,0.85);
-  --text-main: #5a4a3e;
-  --text-sub: #a89b8e;
-  --accent: #f0a868;
-  --accent-soft: #fce4c8;
-  --border: rgba(240,180,120,0.2);
-}
-
+:root { --bg: #FFF8F0; --card-bg: rgba(255,255,255,0.85); --text-main: #5a4a3e; --text-sub: #a89b8e; --accent: #f0a868; --accent-soft: #fce4c8; --border: rgba(240,180,120,0.2); }
 body { background: linear-gradient(180deg, #FFF8F0 0%, #FFF0E0 100%); min-height: 100vh; font-family: 'Segoe UI', sans-serif; color: var(--text-main); padding: 0; overflow-x: hidden; }
 .header { position: sticky; top: 0; z-index: 50; background: rgba(255, 248, 240, 0.92); backdrop-filter: blur(12px); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
 .back-btn { font-size: 14px; color: var(--text-sub); text-decoration: none; transition: color 0.2s; }
@@ -46,7 +36,7 @@ body { background: linear-gradient(180deg, #FFF8F0 0%, #FFF0E0 100%); min-height
 .voice-overlay.active { opacity: 1; pointer-events: auto; }
 .voice-close { position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; border: none; background: rgba(90,74,62,0.08); border-radius: 50%; font-size: 16px; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
 .voice-close:hover { background: rgba(90,74,62,0.15); }
-.voice-pulse-container { position: relative; width: 260px; height: 260px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; flex-shrink: 0; }
+.voice-pulse-container { position: relative; width: 260px; height: 260px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; flex-shrink: 0; }
 .voice-pulse-ring { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(240,168,104,0.35) 0%, rgba(240,168,104,0) 70%); animation: none; }
 .voice-pulse-ring:nth-child(1) { width: 36px; height: 36px; }
 .voice-pulse-ring:nth-child(2) { width: 64px; height: 64px; }
@@ -73,51 +63,37 @@ body { background: linear-gradient(180deg, #FFF8F0 0%, #FFF0E0 100%); min-height
 .voice-overlay.playing .voice-core { animation: coreBreath 2s ease-in-out infinite; }
 @keyframes coreBreath { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } }
 
-/* ===== Scrolling Lyrics ===== */
-.voice-lyrics-window {
+/* ===== Subtitle (movie-style) ===== */
+.voice-subtitle {
   width: 100%;
-  max-width: 320px;
-  height: 100px;
-  overflow: hidden;
-  position: relative;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
-}
-
-.voice-lyrics-track {
+  max-width: 340px;
+  min-height: 72px;
+  text-align: center;
+  padding: 0 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  text-align: center;
-  padding: 40px 16px;
-  transform: translateY(0);
-  transition: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
-
-.voice-overlay.playing .voice-lyrics-track {
-  animation: lyricsScroll var(--lyrics-duration, 12s) linear forwards;
-}
-
-.voice-lyrics-zh {
-  font-size: 14px;
-  color: var(--text-main);
-  line-height: 1.8;
-  opacity: 0.9;
-}
-
-.voice-lyrics-en {
-  font-size: 12px;
+.voice-sub-en {
+  font-size: 13px;
   color: var(--text-sub);
-  line-height: 1.7;
+  line-height: 1.6;
   font-style: italic;
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
-
-@keyframes lyricsScroll {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(var(--lyrics-scroll-distance, -120px)); }
+.voice-sub-zh {
+  font-size: 15px;
+  color: var(--text-main);
+  line-height: 1.7;
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
+.voice-sub-en.show, .voice-sub-zh.show { opacity: 1; }
 
-.voice-status { margin-top: 14px; font-size: 11px; color: var(--text-sub); letter-spacing: 1px; min-height: 16px; }
+.voice-status { margin-top: 16px; font-size: 11px; color: var(--text-sub); letter-spacing: 1px; min-height: 16px; }
 .voice-overlay.loading .voice-status::after { content: ''; animation: dots 1.5s steps(3) infinite; }
 @keyframes dots { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
 .voice-actions { margin-top: 16px; display: none; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 340px; padding: 0 16px; }
@@ -176,14 +152,10 @@ body { background: linear-gradient(180deg, #FFF8F0 0%, #FFF0E0 100%); min-height
       <button class="audio-btn" id="audio-btn" onclick="event.stopPropagation(); playDishAudio(todayDish)">🔊 听江屿说</button>
     </div>
   </div>
-
   <div class="history-section">
     <div class="section-title">往期菜单</div>
-    <div class="history-list" id="history-list">
-      <div class="history-empty" id="history-empty">还没有往期记录</div>
-    </div>
+    <div class="history-list" id="history-list"><div class="history-empty" id="history-empty">还没有往期记录</div></div>
   </div>
-
   <div class="order-section">
     <div class="order-card">
       <div class="order-title">📝 点菜本</div>
@@ -193,9 +165,7 @@ body { background: linear-gradient(180deg, #FFF8F0 0%, #FFF0E0 100%); min-height
     </div>
     <div class="order-history-section">
       <div class="section-title" style="margin-top:16px;">我的点菜记录</div>
-      <div class="order-history-list" id="order-history-list">
-        <div class="order-history-empty" id="order-history-empty">还没有点过菜</div>
-      </div>
+      <div class="order-history-list" id="order-history-list"><div class="order-history-empty" id="order-history-empty">还没有点过菜</div></div>
     </div>
   </div>
 </div>
@@ -204,20 +174,12 @@ body { background: linear-gradient(180deg, #FFF8F0 0%, #FFF0E0 100%); min-height
 <div class="voice-overlay" id="voice-overlay">
   <button class="voice-close" id="voice-close" onclick="closeVoicePlayer()">✕</button>
   <div class="voice-pulse-container">
-    <div class="voice-pulse-ring"></div>
-    <div class="voice-pulse-ring"></div>
-    <div class="voice-pulse-ring"></div>
-    <div class="voice-pulse-ring"></div>
-    <div class="voice-pulse-ring"></div>
-    <div class="voice-pulse-ring"></div>
-    <div class="voice-pulse-ring"></div>
+    <div class="voice-pulse-ring"></div><div class="voice-pulse-ring"></div><div class="voice-pulse-ring"></div><div class="voice-pulse-ring"></div><div class="voice-pulse-ring"></div><div class="voice-pulse-ring"></div><div class="voice-pulse-ring"></div>
     <div class="voice-core"></div>
   </div>
-  <div class="voice-lyrics-window">
-    <div class="voice-lyrics-track" id="voice-lyrics-track">
-      <div class="voice-lyrics-zh" id="voice-lyrics-zh"></div>
-      <div class="voice-lyrics-en" id="voice-lyrics-en"></div>
-    </div>
+  <div class="voice-subtitle">
+    <div class="voice-sub-en" id="voice-sub-en"></div>
+    <div class="voice-sub-zh" id="voice-sub-zh"></div>
   </div>
   <div class="voice-status" id="voice-status"></div>
   <div class="voice-actions" id="voice-actions">
@@ -235,59 +197,76 @@ const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_RoXOyXj6HCsOI8f01LpC2Q_XVRXSNuF';
 const TTS_URL = `${SUPABASE_URL}/functions/v1/tts`;
 const GENERATE_URL = `${SUPABASE_URL}/functions/v1/generate-kitchen-dish`;
-
 const today = new Date().toISOString().slice(0, 10);
 const currentHour = new Date().getHours();
 const timeMeal = currentHour < 12 ? 'morning' : 'evening';
-
-let todayDish = null;
-let activeMealType = null;
-let currentAudio = null;
-let currentPlayingDish = null;
+let todayDish = null, activeMealType = null, currentAudio = null, currentPlayingDish = null;
 const audioBlobCache = {};
+let subtitleTimer = null;
 
-function getOpenedKey(mealType) { return `isle_kitchen_opened_${mealType}`; }
-function isDishOpened(mealType) { return localStorage.getItem(getOpenedKey(mealType)) === today; }
+function getOpenedKey(t) { return `isle_kitchen_opened_${t}`; }
+function isDishOpened(t) { return localStorage.getItem(getOpenedKey(t)) === today; }
 
-// Strip audio tags like [softly], [pause] etc from TTS text for display
-function cleanTtsText(text) {
-  if (!text) return '';
-  return text.replace(/\[.*?\]/g, '').replace(/\s{2,}/g, ' ').trim();
+// ===== Subtitle logic =====
+function cleanTags(text) { return (text || '').replace(/\[.*?\]/g, '').replace(/\s{2,}/g, ' ').trim(); }
+
+// Split text into sentence-like chunks
+function splitSentences(text, isEnglish) {
+  if (!text) return [''];
+  const cleaned = isEnglish ? cleanTags(text) : text;
+  // Split on sentence-ending punctuation
+  const parts = cleaned.split(/(?<=[.!?。！？…—])\s*/);
+  // Merge very short fragments
+  const result = [];
+  let buf = '';
+  for (const p of parts) {
+    buf += (buf ? ' ' : '') + p.trim();
+    if (buf.length > (isEnglish ? 30 : 12)) { result.push(buf); buf = ''; }
+  }
+  if (buf) result.push(buf);
+  return result.length ? result : [cleaned];
 }
 
-// Set up lyrics content and scroll distance
-function setupLyrics(dish) {
-  const zhEl = document.getElementById('voice-lyrics-zh');
-  const enEl = document.getElementById('voice-lyrics-en');
-  const track = document.getElementById('voice-lyrics-track');
-  zhEl.textContent = dish.content || '';
-  enEl.textContent = cleanTtsText(dish.tts_text) || '';
-  // Reset scroll
-  track.style.animation = 'none';
-  track.offsetHeight; // force reflow
-  track.style.animation = '';
+function startSubtitles(dish, duration) {
+  stopSubtitles();
+  const enSentences = splitSentences(dish.tts_text, true);
+  const zhSentences = splitSentences(dish.content, false);
+  const count = Math.max(enSentences.length, zhSentences.length);
+  const interval = (duration * 1000) / count;
+  let idx = 0;
+
+  const enEl = document.getElementById('voice-sub-en');
+  const zhEl = document.getElementById('voice-sub-zh');
+
+  function showFrame() {
+    // Fade out
+    enEl.classList.remove('show');
+    zhEl.classList.remove('show');
+    setTimeout(() => {
+      enEl.textContent = enSentences[Math.min(idx, enSentences.length - 1)] || '';
+      zhEl.textContent = zhSentences[Math.min(idx, zhSentences.length - 1)] || '';
+      enEl.classList.add('show');
+      zhEl.classList.add('show');
+      idx++;
+    }, 200);
+  }
+
+  showFrame(); // Show first frame immediately
+  subtitleTimer = setInterval(() => {
+    if (idx >= count) { clearInterval(subtitleTimer); subtitleTimer = null; return; }
+    showFrame();
+  }, interval);
 }
 
-// Start lyrics scroll synchronized with audio duration
-function startLyricsScroll(duration) {
-  const track = document.getElementById('voice-lyrics-track');
-  const trackHeight = track.scrollHeight;
-  const windowHeight = 100; // matches .voice-lyrics-window height
-  const scrollDist = Math.max(0, trackHeight - windowHeight + 20);
-  track.style.setProperty('--lyrics-scroll-distance', `-${scrollDist}px`);
-  track.style.setProperty('--lyrics-duration', `${duration}s`);
+function stopSubtitles() {
+  if (subtitleTimer) { clearInterval(subtitleTimer); subtitleTimer = null; }
+  const enEl = document.getElementById('voice-sub-en');
+  const zhEl = document.getElementById('voice-sub-zh');
+  enEl.classList.remove('show'); enEl.textContent = '';
+  zhEl.classList.remove('show'); zhEl.textContent = '';
 }
 
-// Reset lyrics scroll position
-function resetLyricsScroll() {
-  const track = document.getElementById('voice-lyrics-track');
-  track.style.animation = 'none';
-  track.offsetHeight;
-  track.style.animation = '';
-  track.style.removeProperty('--lyrics-scroll-distance');
-  track.style.removeProperty('--lyrics-duration');
-}
-
+// ===== Core player =====
 async function loadKitchen() {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/isle_kitchen?select=id,content,tts_text,dish_date,meal,audio_url&order=dish_date.desc,created_at.desc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
@@ -300,34 +279,30 @@ async function loadKitchen() {
     else if (todaySpecial) { todayDish = todaySpecial; activeMealType = 'special'; }
     else if (todayTimeMeal) { todayDish = todayTimeMeal; activeMealType = timeMeal; }
     else { todayDish = null; activeMealType = null; }
-    if (!todayDish) { const hint = timeMeal === 'morning' ? '今天早上还没开火…过会儿再来看看' : '晚上的惊喜还没准备好…过会儿再来'; document.getElementById('lid-hint').textContent = hint; document.getElementById('lid-card').style.cursor = 'default'; document.getElementById('lid-card').onclick = null; }
+    if (!todayDish) { document.getElementById('lid-hint').textContent = timeMeal === 'morning' ? '今天早上还没开火…过会儿再来看看' : '晚上的惊喜还没准备好…过会儿再来'; document.getElementById('lid-card').style.cursor = 'default'; document.getElementById('lid-card').onclick = null; }
     else if (isDishOpened(activeMealType)) { showDish(); }
     else { if (activeMealType === 'special') { document.getElementById('lid-emoji').textContent = '🎁'; document.getElementById('lid-hint').textContent = '你的点菜有回应了！点一下揭开'; } }
-    const history = data.filter(d => { if (!todayDish) return true; return d.id !== todayDish.id; });
-    const historyList = document.getElementById('history-list');
-    const historyEmpty = document.getElementById('history-empty');
+    const history = data.filter(d => !todayDish || d.id !== todayDish.id);
+    const historyList = document.getElementById('history-list'), historyEmpty = document.getElementById('history-empty');
     if (history.length === 0) { historyEmpty.style.display = 'block'; } else {
       historyEmpty.style.display = 'none';
-      history.forEach(item => { const card = document.createElement('div'); card.className = 'history-card'; const d = new Date(item.dish_date + 'T00:00:00'); const mealLabel = item.meal === 'morning' ? '早' : (item.meal === 'evening' ? '晚' : (item.meal === 'special' ? '惊喜' : '')); let html = `<div class="history-date">${d.getMonth()+1}月${d.getDate()}日${mealLabel ? ' · ' + mealLabel : ''}</div><div class="history-text">${escapeHtml(item.content)}</div>`; if (item.tts_text || item.audio_url) { html += `<button class="history-audio-btn" onclick="playDishAudio(historyDishes[${item.id}])">🔊 听江屿说</button>`; } card.innerHTML = html; historyList.appendChild(card); });
+      history.forEach(item => { const card = document.createElement('div'); card.className = 'history-card'; const d = new Date(item.dish_date + 'T00:00:00'); const ml = item.meal === 'morning' ? '早' : (item.meal === 'evening' ? '晚' : (item.meal === 'special' ? '惊喜' : '')); let h = `<div class="history-date">${d.getMonth()+1}月${d.getDate()}日${ml ? ' · '+ml : ''}</div><div class="history-text">${escapeHtml(item.content)}</div>`; if (item.tts_text || item.audio_url) h += `<button class="history-audio-btn" onclick="playDishAudio(historyDishes[${item.id}])">🔊 听江屿说</button>`; card.innerHTML = h; historyList.appendChild(card); });
       history.forEach(item => { historyDishes[item.id] = item; });
     }
   } catch (e) { console.error('Kitchen load failed:', e); }
   loadOrderHistory();
 }
-
 const historyDishes = {};
-function openLid() { if (!todayDish) return; if (isDishOpened(activeMealType)) return; localStorage.setItem(getOpenedKey(activeMealType), today); showDish(); }
-function showDish() { const card = document.getElementById('lid-card'); card.classList.add('opened'); card.onclick = null; card.style.cursor = 'default'; document.getElementById('lid-content').textContent = todayDish.content; const d = new Date(todayDish.dish_date + 'T00:00:00'); let mealLabel = '早安'; if (activeMealType === 'evening') mealLabel = '晚安'; else if (activeMealType === 'special') mealLabel = '惊喜回应'; document.getElementById('lid-date').textContent = `${d.getMonth()+1}月${d.getDate()}日 · ${mealLabel}`; if (todayDish.tts_text || todayDish.audio_url) { document.getElementById('audio-btn').style.display = 'inline-block'; } }
-
-function updateVoiceActions(dish) { const actions = document.getElementById('voice-actions'); const btnFull = document.getElementById('btn-full'); const btnRetone = document.getElementById('btn-retone'); const btnReplay = document.getElementById('btn-replay'); const hasTts = !!(dish.tts_text); btnReplay.style.display = hasTts ? 'inline-block' : 'none'; btnRetone.style.display = hasTts ? 'inline-block' : 'none'; btnFull.style.display = (dish.dish_date === today) ? 'inline-block' : 'none'; if (hasTts || dish.dish_date === today) { actions.classList.add('visible'); } else { actions.classList.remove('visible'); } }
-function setActionsDisabled(disabled) { document.querySelectorAll('.voice-act-btn').forEach(b => { b.disabled = disabled; }); }
+function openLid() { if (!todayDish || isDishOpened(activeMealType)) return; localStorage.setItem(getOpenedKey(activeMealType), today); showDish(); }
+function showDish() { const card = document.getElementById('lid-card'); card.classList.add('opened'); card.onclick = null; card.style.cursor = 'default'; document.getElementById('lid-content').textContent = todayDish.content; const d = new Date(todayDish.dish_date + 'T00:00:00'); let ml = '早安'; if (activeMealType === 'evening') ml = '晚安'; else if (activeMealType === 'special') ml = '惊喜回应'; document.getElementById('lid-date').textContent = `${d.getMonth()+1}月${d.getDate()}日 · ${ml}`; if (todayDish.tts_text || todayDish.audio_url) document.getElementById('audio-btn').style.display = 'inline-block'; }
+function updateVoiceActions(dish) { const actions = document.getElementById('voice-actions'), btnFull = document.getElementById('btn-full'), btnRetone = document.getElementById('btn-retone'), btnReplay = document.getElementById('btn-replay'); const hasTts = !!dish.tts_text; btnReplay.style.display = hasTts ? 'inline-block' : 'none'; btnRetone.style.display = hasTts ? 'inline-block' : 'none'; btnFull.style.display = dish.dish_date === today ? 'inline-block' : 'none'; (hasTts || dish.dish_date === today) ? actions.classList.add('visible') : actions.classList.remove('visible'); }
+function setActionsDisabled(d) { document.querySelectorAll('.voice-act-btn').forEach(b => { b.disabled = d; }); }
 
 function openVoicePlayer(dish) {
   const overlay = document.getElementById('voice-overlay');
   overlay.classList.add('active');
   document.body.style.overflow = 'hidden';
   currentPlayingDish = dish;
-  setupLyrics(dish);
   updateVoiceActions(dish);
 }
 
@@ -338,7 +313,7 @@ function closeVoicePlayer() {
   document.getElementById('voice-status').textContent = '';
   document.getElementById('voice-actions').classList.remove('visible');
   setActionsDisabled(false);
-  resetLyricsScroll();
+  stopSubtitles();
   currentPlayingDish = null;
   if (currentAudio) { currentAudio.pause(); currentAudio = null; }
 }
@@ -351,50 +326,43 @@ function playBlob(blob) {
   status.textContent = '正在播放';
   const url = URL.createObjectURL(blob);
   currentAudio = new Audio(url);
-  // When we know duration, sync lyrics scroll
   currentAudio.addEventListener('loadedmetadata', () => {
-    const dur = currentAudio.duration;
-    if (dur && isFinite(dur)) startLyricsScroll(dur);
-  });
-  // Fallback: if loadedmetadata fires too fast or duration unknown, use estimate
-  setTimeout(() => {
-    if (currentAudio && currentAudio.duration && isFinite(currentAudio.duration)) {
-      startLyricsScroll(currentAudio.duration);
-    } else {
-      startLyricsScroll(12); // default 12s
+    if (currentAudio.duration && isFinite(currentAudio.duration) && currentPlayingDish) {
+      startSubtitles(currentPlayingDish, currentAudio.duration);
     }
-  }, 300);
-  currentAudio.onended = () => {
-    overlay.classList.remove('playing');
-    status.textContent = '播放结束';
-  };
+  });
+  setTimeout(() => {
+    if (currentAudio && currentPlayingDish) {
+      const dur = (currentAudio.duration && isFinite(currentAudio.duration)) ? currentAudio.duration : 12;
+      if (!subtitleTimer) startSubtitles(currentPlayingDish, dur);
+    }
+  }, 500);
+  currentAudio.onended = () => { overlay.classList.remove('playing'); status.textContent = '播放结束'; };
   currentAudio.play();
 }
 
 async function playDishAudio(dish) {
   if (!dish) return;
   openVoicePlayer(dish);
-  const overlay = document.getElementById('voice-overlay');
-  const status = document.getElementById('voice-status');
+  const overlay = document.getElementById('voice-overlay'), status = document.getElementById('voice-status');
   if (audioBlobCache[dish.id]) { playBlob(audioBlobCache[dish.id]); return; }
   if (dish.audio_url) { overlay.classList.add('loading'); status.textContent = '加载中'; try { const res = await fetch(dish.audio_url); if (res.ok) { const blob = await res.blob(); audioBlobCache[dish.id] = blob; playBlob(blob); return; } } catch (e) { console.error('audio_url fetch failed:', e); } }
   overlay.classList.add('loading'); status.textContent = '生成中';
-  try { const ttsContent = dish.tts_text || dish.content; const res = await fetch(TTS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: ttsContent, dish_id: dish.id }) }); if (!res.ok) throw new Error('TTS failed'); const blob = await res.blob(); audioBlobCache[dish.id] = blob; playBlob(blob); } catch (e) { console.error('TTS error:', e); overlay.classList.remove('loading'); status.textContent = '暂时听不了…'; setTimeout(() => { closeVoicePlayer(); }, 2000); }
+  try { const ttsContent = dish.tts_text || dish.content; const res = await fetch(TTS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: ttsContent, dish_id: dish.id }) }); if (!res.ok) throw new Error('TTS failed'); const blob = await res.blob(); audioBlobCache[dish.id] = blob; playBlob(blob); } catch (e) { console.error('TTS error:', e); overlay.classList.remove('loading'); status.textContent = '暂时听不了…'; setTimeout(() => closeVoicePlayer(), 2000); }
 }
 
-async function reSynthesize() { if (!currentPlayingDish) return; const dish = currentPlayingDish; const ttsContent = dish.tts_text || dish.content; if (!ttsContent) return; const overlay = document.getElementById('voice-overlay'); const status = document.getElementById('voice-status'); if (currentAudio) { currentAudio.pause(); currentAudio = null; } overlay.classList.remove('playing'); overlay.classList.add('loading'); status.textContent = '再念一遍'; setActionsDisabled(true); resetLyricsScroll(); try { const res = await fetch(TTS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: ttsContent, dish_id: dish.id }) }); if (!res.ok) throw new Error('re-synthesize failed'); const blob = await res.blob(); audioBlobCache[dish.id] = blob; setActionsDisabled(false); playBlob(blob); } catch (e) { console.error('reSynthesize error:', e); overlay.classList.remove('loading'); status.textContent = '再念失败了…'; setActionsDisabled(false); setTimeout(() => { status.textContent = ''; }, 2000); } }
+async function reSynthesize() { if (!currentPlayingDish) return; const dish = currentPlayingDish, ttsContent = dish.tts_text || dish.content; if (!ttsContent) return; const overlay = document.getElementById('voice-overlay'), status = document.getElementById('voice-status'); if (currentAudio) { currentAudio.pause(); currentAudio = null; } overlay.classList.remove('playing'); overlay.classList.add('loading'); status.textContent = '再念一遍'; setActionsDisabled(true); stopSubtitles(); try { const res = await fetch(TTS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: ttsContent, dish_id: dish.id }) }); if (!res.ok) throw new Error('failed'); const blob = await res.blob(); audioBlobCache[dish.id] = blob; setActionsDisabled(false); playBlob(blob); } catch (e) { console.error('reSynthesize error:', e); overlay.classList.remove('loading'); status.textContent = '再念失败了…'; setActionsDisabled(false); setTimeout(() => { status.textContent = ''; }, 2000); } }
 
-async function reNarrate() { if (!currentPlayingDish) return; const dish = currentPlayingDish; const overlay = document.getElementById('voice-overlay'); const status = document.getElementById('voice-status'); if (currentAudio) { currentAudio.pause(); currentAudio = null; } overlay.classList.remove('playing'); overlay.classList.add('loading'); status.textContent = '换个语气重念'; setActionsDisabled(true); resetLyricsScroll(); try { const res = await fetch(GENERATE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'retts', dish_id: dish.id }) }); if (!res.ok) throw new Error('re-narrate failed'); const result = await res.json(); if (!result.ok) throw new Error(result.error || 'unknown error'); dish.tts_text = result.tts_text || dish.tts_text; if (historyDishes[dish.id]) historyDishes[dish.id].tts_text = dish.tts_text; delete audioBlobCache[dish.id]; setupLyrics(dish); status.textContent = '加载新语音'; if (dish.audio_url) { try { const audioRes = await fetch(dish.audio_url + '?t=' + Date.now()); if (audioRes.ok) { const blob = await audioRes.blob(); audioBlobCache[dish.id] = blob; setActionsDisabled(false); playBlob(blob); return; } } catch (e) { console.error('fetch refreshed audio failed:', e); } } const ttsRes = await fetch(TTS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: dish.tts_text, dish_id: dish.id }) }); if (!ttsRes.ok) throw new Error('fallback synth failed'); const blob = await ttsRes.blob(); audioBlobCache[dish.id] = blob; setActionsDisabled(false); playBlob(blob); } catch (e) { console.error('reNarrate error:', e); overlay.classList.remove('loading'); status.textContent = '重念失败了…'; setActionsDisabled(false); setTimeout(() => { status.textContent = ''; }, 2000); } }
+async function reNarrate() { if (!currentPlayingDish) return; const dish = currentPlayingDish; const overlay = document.getElementById('voice-overlay'), status = document.getElementById('voice-status'); if (currentAudio) { currentAudio.pause(); currentAudio = null; } overlay.classList.remove('playing'); overlay.classList.add('loading'); status.textContent = '换个语气重念'; setActionsDisabled(true); stopSubtitles(); try { const res = await fetch(GENERATE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'retts', dish_id: dish.id }) }); if (!res.ok) throw new Error('failed'); const result = await res.json(); if (!result.ok) throw new Error(result.error || 'err'); dish.tts_text = result.tts_text || dish.tts_text; if (historyDishes[dish.id]) historyDishes[dish.id].tts_text = dish.tts_text; delete audioBlobCache[dish.id]; status.textContent = '加载新语音'; if (dish.audio_url) { try { const ar = await fetch(dish.audio_url + '?t=' + Date.now()); if (ar.ok) { const blob = await ar.blob(); audioBlobCache[dish.id] = blob; setActionsDisabled(false); playBlob(blob); return; } } catch (e) {} } const tr = await fetch(TTS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: dish.tts_text, dish_id: dish.id }) }); if (!tr.ok) throw new Error('synth failed'); const blob = await tr.blob(); audioBlobCache[dish.id] = blob; setActionsDisabled(false); playBlob(blob); } catch (e) { console.error('reNarrate error:', e); overlay.classList.remove('loading'); status.textContent = '重念失败了…'; setActionsDisabled(false); setTimeout(() => { status.textContent = ''; }, 2000); } }
 
-async function regenerateDish() { if (!currentPlayingDish || currentPlayingDish.dish_date !== today) return; const overlay = document.getElementById('voice-overlay'); const status = document.getElementById('voice-status'); if (currentAudio) { currentAudio.pause(); currentAudio = null; } overlay.classList.remove('playing'); overlay.classList.add('loading'); status.textContent = '重做整份'; setActionsDisabled(true); try { const mealType = currentPlayingDish.meal; const reqBody = { meal: mealType, force: true }; if (mealType === 'special') { try { const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/isle_orders?select=content&order=created_at.desc&limit=1`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }); if (orderRes.ok) { const orders = await orderRes.json(); if (orders.length > 0) { reqBody.order_content = orders[0].content; } } } catch (e) { console.error('Failed to fetch latest order for regen:', e); } } const res = await fetch(GENERATE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) }); if (!res.ok) throw new Error('Regenerate failed'); const result = await res.json(); if (!result.ok) throw new Error(result.error || 'Unknown error'); delete audioBlobCache[currentPlayingDish.id]; closeVoicePlayer(); localStorage.removeItem(getOpenedKey(mealType)); location.reload(); } catch (e) { console.error('Regenerate error:', e); overlay.classList.remove('loading'); status.textContent = '重做失败了…'; setActionsDisabled(false); setTimeout(() => { status.textContent = ''; }, 2000); } }
+async function regenerateDish() { if (!currentPlayingDish || currentPlayingDish.dish_date !== today) return; const overlay = document.getElementById('voice-overlay'), status = document.getElementById('voice-status'); if (currentAudio) { currentAudio.pause(); currentAudio = null; } overlay.classList.remove('playing'); overlay.classList.add('loading'); status.textContent = '重做整份'; setActionsDisabled(true); stopSubtitles(); try { const mealType = currentPlayingDish.meal; const reqBody = { meal: mealType, force: true }; if (mealType === 'special') { try { const or = await fetch(`${SUPABASE_URL}/rest/v1/isle_orders?select=content&order=created_at.desc&limit=1`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }); if (or.ok) { const os = await or.json(); if (os.length > 0) reqBody.order_content = os[0].content; } } catch (e) {} } const res = await fetch(GENERATE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) }); if (!res.ok) throw new Error('failed'); const result = await res.json(); if (!result.ok) throw new Error(result.error || 'err'); delete audioBlobCache[currentPlayingDish.id]; closeVoicePlayer(); localStorage.removeItem(getOpenedKey(mealType)); location.reload(); } catch (e) { console.error('Regenerate error:', e); overlay.classList.remove('loading'); status.textContent = '重做失败了…'; setActionsDisabled(false); setTimeout(() => { status.textContent = ''; }, 2000); } }
 
-async function submitOrder() { const input = document.getElementById('order-input'); const btn = document.getElementById('order-btn'); const content = input.value.trim(); if (!content) { input.focus(); return; } btn.disabled = true; try { const res = await fetch(`${SUPABASE_URL}/rest/v1/isle_orders`, { method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, body: JSON.stringify({ content }) }); if (!res.ok) throw new Error('post failed'); input.value = ''; document.getElementById('order-success').style.display = 'block'; setTimeout(() => { document.getElementById('order-success').style.display = 'none'; }, 3000); loadOrderHistory(); } catch (e) { alert('提交失败，再试一次？'); } finally { btn.disabled = false; } }
+async function submitOrder() { const input = document.getElementById('order-input'), btn = document.getElementById('order-btn'), content = input.value.trim(); if (!content) { input.focus(); return; } btn.disabled = true; try { const res = await fetch(`${SUPABASE_URL}/rest/v1/isle_orders`, { method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, body: JSON.stringify({ content }) }); if (!res.ok) throw new Error('post failed'); input.value = ''; document.getElementById('order-success').style.display = 'block'; setTimeout(() => { document.getElementById('order-success').style.display = 'none'; }, 3000); loadOrderHistory(); } catch (e) { alert('提交失败，再试一次？'); } finally { btn.disabled = false; } }
 
-async function loadOrderHistory() { try { const res = await fetch(`${SUPABASE_URL}/rest/v1/isle_orders?select=id,content,created_at&order=created_at.desc&limit=20`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }); if (!res.ok) return; const orders = await res.json(); const list = document.getElementById('order-history-list'); const empty = document.getElementById('order-history-empty'); list.innerHTML = ''; if (orders.length === 0) { list.appendChild(empty); empty.style.display = 'block'; } else { empty.style.display = 'none'; orders.forEach(order => { const item = document.createElement('div'); item.className = 'order-history-item'; const d = new Date(order.created_at); const timeStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; item.innerHTML = `<span class="order-history-time">${timeStr}</span><span class="order-history-content">${escapeHtml(order.content)}</span>`; list.appendChild(item); }); } } catch (e) { console.error('Load order history failed:', e); } }
+async function loadOrderHistory() { try { const res = await fetch(`${SUPABASE_URL}/rest/v1/isle_orders?select=id,content,created_at&order=created_at.desc&limit=20`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }); if (!res.ok) return; const orders = await res.json(); const list = document.getElementById('order-history-list'), empty = document.getElementById('order-history-empty'); list.innerHTML = ''; if (orders.length === 0) { list.appendChild(empty); empty.style.display = 'block'; } else { empty.style.display = 'none'; orders.forEach(order => { const item = document.createElement('div'); item.className = 'order-history-item'; const d = new Date(order.created_at); item.innerHTML = `<span class="order-history-time">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span><span class="order-history-content">${escapeHtml(order.content)}</span>`; list.appendChild(item); }); } } catch (e) { console.error('Load order history failed:', e); } }
 
 function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
 loadKitchen();
 </script>
-
 </body>
 </html>
