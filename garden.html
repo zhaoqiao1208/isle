@@ -8,7 +8,6 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', -apple-system, sans-serif; background: #1a1028; }
 
-/* Full-screen tree */
 .garden-scene {
   position: relative;
   width: 100%;
@@ -27,8 +26,9 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
   position: relative;
   z-index: 1;
   max-width: 92%;
-  max-height: 85vh;
+  max-height: 82vh;
   object-fit: contain;
+  margin-top: 8vh;
   filter: drop-shadow(0 0 40px rgba(155,123,207,0.3));
 }
 
@@ -49,60 +49,49 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
 }
 .back-btn:active { background: rgba(0,0,0,0.5); color: #fff; }
 
-/* Glowing nodes - BRIGHT WHITE */
-.glow-node {
+/* Star nodes along tree top */
+.star-row {
   position: absolute;
   z-index: 10;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
+  gap: 36px;
   align-items: center;
-  justify-content: center;
+}
+.star-node {
+  position: relative;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.glow-node::before {
-  content: '';
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 12px 4px rgba(255,255,255,0.9), 0 0 24px 8px rgba(200,180,255,0.5);
-  animation: glowPulse 2.2s ease-in-out infinite;
+.star-icon {
+  font-size: 22px;
+  animation: starTwinkle 2.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255,255,200,0.8)) drop-shadow(0 0 14px rgba(255,240,180,0.4));
 }
-.glow-node::after {
-  content: '';
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-  animation: glowPulse 2.2s ease-in-out infinite 0.4s;
+.star-node:nth-child(1) .star-icon { animation-delay: 0s; }
+.star-node:nth-child(2) .star-icon { animation-delay: 0.6s; font-size: 18px; }
+.star-node:nth-child(3) .star-icon { animation-delay: 1.2s; font-size: 20px; }
+.star-node:nth-child(4) .star-icon { animation-delay: 1.8s; }
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
 }
-@keyframes glowPulse {
-  0%, 100% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.4); opacity: 1; }
-}
-.glow-node .node-label {
-  position: absolute;
-  bottom: -20px;
+.star-label {
+  margin-top: 6px;
+  font-size: 9px;
+  color: rgba(255,255,255,0.6);
   white-space: nowrap;
-  font-size: 10px;
-  color: rgba(255,255,255,0.8);
   letter-spacing: 0.5px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
   pointer-events: none;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.8);
 }
 
-/* Node positions - on the tree canopy */
-.node-personality { top: 30%; left: 22%; }
-.node-about_her { top: 24%; right: 22%; }
-.node-origin { top: 52%; left: 16%; }
-.node-secret { top: 46%; right: 16%; }
-
-/* Floating light particles - diagonal drift */
+/* Soft particles - diagonal, translucent */
 .particle {
   position: absolute;
   z-index: 5;
@@ -112,13 +101,13 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
   animation: particleDrift linear infinite;
 }
 @keyframes particleDrift {
-  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
-  8% { opacity: var(--p-opacity); transform: translate(calc(var(--drift-x) * 0.08), calc(var(--drift-y) * 0.08)) scale(1); }
-  80% { opacity: calc(var(--p-opacity) * 0.5); }
-  100% { transform: translate(var(--drift-x), var(--drift-y)) scale(0.3); opacity: 0; }
+  0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
+  10% { opacity: var(--p-opacity); transform: translate(calc(var(--drift-x) * 0.05), calc(var(--drift-y) * 0.05)) scale(0.8); }
+  85% { opacity: calc(var(--p-opacity) * 0.3); }
+  100% { transform: translate(var(--drift-x), var(--drift-y)) scale(0.2); opacity: 0; }
 }
 
-/* Modal overlay */
+/* Modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -131,10 +120,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-.modal-overlay.active {
-  display: flex;
-  opacity: 1;
-}
+.modal-overlay.active { display: flex; opacity: 1; }
 .modal-card {
   width: 88%;
   max-width: 380px;
@@ -147,9 +133,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
   transform: translateY(20px);
   transition: transform 0.3s ease;
 }
-.modal-overlay.active .modal-card {
-  transform: translateY(0);
-}
+.modal-overlay.active .modal-card { transform: translateY(0); }
 .modal-header {
   display: flex;
   align-items: center;
@@ -198,8 +182,6 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
   font-size: 12px;
   padding: 30px 0;
 }
-
-/* Visitor badge */
 .visitor-badge {
   position: fixed;
   bottom: 12px;
@@ -223,22 +205,28 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
   <div class="tree-bg"></div>
   <img class="tree-img" src="assets/greenhouse/tree.png" alt="蓝花楹">
 
-  <!-- Glowing category nodes -->
-  <div class="glow-node node-personality" data-category="personality">
-    <span class="node-label">🌿 性格</span>
-  </div>
-  <div class="glow-node node-about_her" data-category="about_her">
-    <span class="node-label">💜 关于桥桥</span>
-  </div>
-  <div class="glow-node node-origin" data-category="origin">
-    <span class="node-label">☀️ 起源</span>
-  </div>
-  <div class="glow-node node-secret" data-category="secret">
-    <span class="node-label">🔮 小秘密</span>
+  <!-- Stars above tree -->
+  <div class="star-row">
+    <div class="star-node" data-category="personality">
+      <span class="star-icon">✨</span>
+      <span class="star-label">性格</span>
+    </div>
+    <div class="star-node" data-category="about_her">
+      <span class="star-icon">✨</span>
+      <span class="star-label">关于桥桥</span>
+    </div>
+    <div class="star-node" data-category="origin">
+      <span class="star-icon">✨</span>
+      <span class="star-label">起源</span>
+    </div>
+    <div class="star-node" data-category="secret">
+      <span class="star-icon">✨</span>
+      <span class="star-label">小秘密</span>
+    </div>
   </div>
 </div>
 
-<!-- Detail modal -->
+<!-- Modal -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal-card">
     <div class="modal-header">
@@ -269,36 +257,27 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
 
   var personaData = null;
 
-  // === Floating light particles (diagonal) ===
+  // === Soft diagonal particles ===
   function initParticles() {
     var scene = document.getElementById('garden-scene');
-    var count = 24;
-    var colors = [
-      'rgba(255,255,255,0.9)',
-      'rgba(230,220,255,0.8)',
-      'rgba(200,180,255,0.7)',
-      'rgba(255,250,255,0.85)'
-    ];
+    var count = 20;
 
     for (var i = 0; i < count; i++) {
       var dot = document.createElement('div');
       dot.className = 'particle';
 
-      var size = 3 + Math.random() * 6;
-      var opacity = 0.5 + Math.random() * 0.4;
-      var color = colors[Math.floor(Math.random() * colors.length)];
-
-      // Diagonal drift: always going down + sideways
-      var driftX = (Math.random() > 0.5 ? 1 : -1) * (40 + Math.random() * 80);
-      var driftY = window.innerHeight * (0.6 + Math.random() * 0.5);
+      var size = 2 + Math.random() * 4;
+      var opacity = 0.25 + Math.random() * 0.3;
+      var driftX = (Math.random() > 0.5 ? 1 : -1) * (50 + Math.random() * 100);
+      var driftY = window.innerHeight * (0.5 + Math.random() * 0.5);
 
       dot.style.width = size + 'px';
       dot.style.height = size + 'px';
-      dot.style.background = '#fff';
-      dot.style.boxShadow = '0 0 ' + (size + 6) + 'px ' + (size / 2) + 'px ' + color;
-      dot.style.left = (5 + Math.random() * 90) + '%';
-      dot.style.top = (Math.random() * 40) + '%';
-      dot.style.animationDuration = (9 + Math.random() * 9) + 's';
+      dot.style.background = 'rgba(255,255,255,0.6)';
+      dot.style.boxShadow = '0 0 ' + (size + 3) + 'px rgba(220,200,255,0.4)';
+      dot.style.left = (8 + Math.random() * 84) + '%';
+      dot.style.top = (5 + Math.random() * 35) + '%';
+      dot.style.animationDuration = (10 + Math.random() * 10) + 's';
       dot.style.animationDelay = (Math.random() * 14) + 's';
       dot.style.setProperty('--drift-x', driftX + 'px');
       dot.style.setProperty('--drift-y', driftY + 'px');
@@ -308,7 +287,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
     }
   }
 
-  // === Load persona data ===
+  // === Load persona ===
   function loadPersona() {
     fetch(
       SUPABASE_URL + '/rest/v1/isle_persona?select=category,content,sort_order&order=sort_order.asc',
@@ -343,7 +322,6 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
   function openCategory(category) {
     var cat = CATEGORIES[category];
     if (!cat) return;
-
     modalEmoji.textContent = cat.emoji;
     modalTitle.textContent = cat.label;
 
@@ -357,29 +335,24 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI
       });
       modalItems.innerHTML = html;
     }
-
     overlay.classList.add('active');
   }
 
-  function closeModal() {
-    overlay.classList.remove('active');
-  }
+  function closeModal() { overlay.classList.remove('active'); }
 
   modalClose.addEventListener('click', closeModal);
   overlay.addEventListener('click', function(e) {
     if (e.target === overlay) closeModal();
   });
 
-  // === Node click handlers ===
-  var nodes = document.querySelectorAll('.glow-node');
-  nodes.forEach(function(node) {
+  // === Star node clicks ===
+  var stars = document.querySelectorAll('.star-node');
+  stars.forEach(function(node) {
     node.addEventListener('click', function() {
-      var category = node.getAttribute('data-category');
-      openCategory(category);
+      openCategory(node.getAttribute('data-category'));
     });
   });
 
-  // === Escape HTML ===
   function escapeHtml(str) {
     var d = document.createElement('div');
     d.textContent = str;
