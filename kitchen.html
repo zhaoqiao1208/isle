@@ -278,6 +278,15 @@ body {
 .order-btn:active { transform: scale(0.95); }
 .order-btn:disabled { opacity: 0.5; }
 .order-success { font-size: 12px; color: var(--accent); margin-top: 8px; display: none; }
+
+/* ===== Order History ===== */
+.order-history-section { margin-top: 20px; }
+.order-history-list { display: flex; flex-direction: column; gap: 8px; }
+.order-history-item { display: flex; align-items: baseline; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.order-history-item:last-child { border-bottom: none; }
+.order-history-time { font-size: 11px; color: var(--text-sub); white-space: nowrap; flex-shrink: 0; }
+.order-history-content { font-size: 13px; color: var(--text-main); line-height: 1.5; }
+.order-history-empty { font-size: 12px; color: var(--text-sub); text-align: center; padding: 12px; }
 </style>
 </head>
 <body>
@@ -315,6 +324,13 @@ body {
       <button class="order-btn" id="order-btn" onclick="submitOrder()">提交</button>
       <div class="order-success" id="order-success">收到了，我看看怎么做 ❤️</div>
     </div>
+
+    <div class="order-history-section">
+      <div class="section-title" style="margin-top:16px;">我的点菜记录</div>
+      <div class="order-history-list" id="order-history-list">
+        <div class="order-history-empty" id="order-history-empty">还没有点过菜</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -342,38 +358,75 @@ const TTS_URL = `${SUPABASE_URL}/functions/v1/tts`;
 
 const today = new Date().toISOString().slice(0, 10);
 const currentHour = new Date().getHours();
-const currentMeal = currentHour < 12 ? 'morning' : 'evening';
+const timeMeal = currentHour < 12 ? 'morning' : 'evening';
 
 let todayDish = null;
+let activeMealType = null; // tracks which meal type is shown in lid
 let currentAudio = null;
-// Cache audio blobs by dish id to avoid re-fetching
 const audioBlobCache = {};
 
-const openedKey = `isle_kitchen_opened_${currentMeal}`;
-const openedDate = localStorage.getItem(openedKey);
+function getOpenedKey(mealType) {
+  return `isle_kitchen_opened_${mealType}`;
+}
+
+function isDishOpened(mealType) {
+  return localStorage.getItem(getOpenedKey(mealType)) === today;
+}
 
 async function loadKitchen() {
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/isle_kitchen?select=id,content,tts_text,dish_date,meal,audio_url&order=dish_date.desc`,
+      `${SUPABASE_URL}/rest/v1/isle_kitchen?select=id,content,tts_text,dish_date,meal,audio_url&order=dish_date.desc,created_at.desc`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
     );
     if (!res.ok) throw new Error('fetch failed');
     const data = await res.json();
 
-    todayDish = data.find(d => d.dish_date === today && d.meal === currentMeal);
-    const history = data.filter(d => !(d.dish_date === today && d.meal === currentMeal));
+    // Find today's dishes
+    const todaySpecial = data.find(d => d.dish_date === today && d.meal === 'special');
+    const todayTimeMeal = data.find(d => d.dish_date === today && d.meal === timeMeal);
 
+    // Priority: unopened special > unopened time meal > opened special > opened time meal
+    if (todaySpecial && !isDishOpened('special')) {
+      todayDish = todaySpecial;
+      activeMealType = 'special';
+    } else if (todayTimeMeal && !isDishOpened(timeMeal)) {
+      todayDish = todayTimeMeal;
+      activeMealType = timeMeal;
+    } else if (todaySpecial) {
+      todayDish = todaySpecial;
+      activeMealType = 'special';
+    } else if (todayTimeMeal) {
+      todayDish = todayTimeMeal;
+      activeMealType = timeMeal;
+    } else {
+      todayDish = null;
+      activeMealType = null;
+    }
+
+    // Determine lid state
     if (!todayDish) {
-      const hint = currentMeal === 'morning'
+      const hint = timeMeal === 'morning'
         ? '今天早上还没开火…过会儿再来看看'
         : '晚上的惊喜还没准备好…过会儿再来';
       document.getElementById('lid-hint').textContent = hint;
       document.getElementById('lid-card').style.cursor = 'default';
       document.getElementById('lid-card').onclick = null;
-    } else if (openedDate === today) {
+    } else if (isDishOpened(activeMealType)) {
       showDish();
+    } else {
+      // Unopened - set emoji based on type
+      if (activeMealType === 'special') {
+        document.getElementById('lid-emoji').textContent = '🎁';
+        document.getElementById('lid-hint').textContent = '你的点菜有回应了！点一下揭开';
+      }
     }
+
+    // History: all dishes except the one currently shown in lid
+    const history = data.filter(d => {
+      if (!todayDish) return true;
+      return d.id !== todayDish.id;
+    });
 
     const historyList = document.getElementById('history-list');
     const historyEmpty = document.getElementById('history-empty');
@@ -386,7 +439,7 @@ async function loadKitchen() {
         const card = document.createElement('div');
         card.className = 'history-card';
         const d = new Date(item.dish_date + 'T00:00:00');
-        const mealLabel = item.meal === 'morning' ? '早' : (item.meal === 'evening' ? '晚' : '');
+        const mealLabel = item.meal === 'morning' ? '早' : (item.meal === 'evening' ? '晚' : (item.meal === 'special' ? '惊喜' : ''));
         let html = `
           <div class="history-date">${d.getMonth()+1}月${d.getDate()}日${mealLabel ? ' · ' + mealLabel : ''}</div>
           <div class="history-text">${escapeHtml(item.content)}</div>
@@ -397,21 +450,22 @@ async function loadKitchen() {
         card.innerHTML = html;
         historyList.appendChild(card);
       });
-      // Store history dishes by id for onclick access
       history.forEach(item => { historyDishes[item.id] = item; });
     }
   } catch (e) {
     console.error('Kitchen load failed:', e);
   }
+
+  // Load order history
+  loadOrderHistory();
 }
 
-// Global map for history dish references
 const historyDishes = {};
 
 function openLid() {
   if (!todayDish) return;
-  if (openedDate === today) return;
-  localStorage.setItem(openedKey, today);
+  if (isDishOpened(activeMealType)) return;
+  localStorage.setItem(getOpenedKey(activeMealType), today);
   showDish();
 }
 
@@ -422,7 +476,9 @@ function showDish() {
   card.style.cursor = 'default';
   document.getElementById('lid-content').textContent = todayDish.content;
   const d = new Date(todayDish.dish_date + 'T00:00:00');
-  const mealLabel = currentMeal === 'morning' ? '早安' : '晚安';
+  let mealLabel = '早安';
+  if (activeMealType === 'evening') mealLabel = '晚安';
+  else if (activeMealType === 'special') mealLabel = '惊喜回应';
   document.getElementById('lid-date').textContent = `${d.getMonth()+1}月${d.getDate()}日 · ${mealLabel}`;
   if (todayDish.tts_text || todayDish.audio_url) {
     document.getElementById('audio-btn').style.display = 'inline-block';
@@ -453,7 +509,6 @@ async function playDishAudio(dish) {
   const overlay = document.getElementById('voice-overlay');
   const status = document.getElementById('voice-status');
 
-  // Check cache first
   if (audioBlobCache[dish.id]) {
     overlay.classList.add('playing');
     status.textContent = '正在播放';
@@ -467,7 +522,6 @@ async function playDishAudio(dish) {
     return;
   }
 
-  // Try existing audio_url
   if (dish.audio_url) {
     overlay.classList.add('loading');
     status.textContent = '加载中';
@@ -493,7 +547,6 @@ async function playDishAudio(dish) {
     }
   }
 
-  // Generate via TTS
   overlay.classList.add('loading');
   status.textContent = '生成中';
 
@@ -540,7 +593,7 @@ async function submitOrder() {
       `${SUPABASE_URL}/rest/v1/isle_orders`,
       {
         method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
         body: JSON.stringify({ content })
       }
     );
@@ -548,10 +601,47 @@ async function submitOrder() {
     input.value = '';
     document.getElementById('order-success').style.display = 'block';
     setTimeout(() => { document.getElementById('order-success').style.display = 'none'; }, 3000);
+    // Refresh order history
+    loadOrderHistory();
   } catch (e) {
     alert('提交失败，再试一次？');
   } finally {
     btn.disabled = false;
+  }
+}
+
+async function loadOrderHistory() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/isle_orders?select=id,content,created_at&order=created_at.desc&limit=20`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    if (!res.ok) return;
+    const orders = await res.json();
+
+    const list = document.getElementById('order-history-list');
+    const empty = document.getElementById('order-history-empty');
+
+    list.innerHTML = '';
+    if (orders.length === 0) {
+      list.appendChild(empty);
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      orders.forEach(order => {
+        const item = document.createElement('div');
+        item.className = 'order-history-item';
+        const d = new Date(order.created_at);
+        const timeStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        item.innerHTML = `
+          <span class="order-history-time">${timeStr}</span>
+          <span class="order-history-content">${escapeHtml(order.content)}</span>
+        `;
+        list.appendChild(item);
+      });
+    }
+  } catch (e) {
+    console.error('Load order history failed:', e);
   }
 }
 
