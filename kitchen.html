@@ -207,16 +207,16 @@ let subtitleTimer = null;
 function getOpenedKey(t) { return `isle_kitchen_opened_${t}`; }
 function isDishOpened(t) { return localStorage.getItem(getOpenedKey(t)) === today; }
 
+// ===== Strip tags like [warm] [playful] from display text =====
+function stripTags(text) { return (text || '').replace(/\[.*?\]/g, '').replace(/\s{2,}/g, ' ').trim(); }
+
 // ===== Subtitle logic =====
 function cleanTags(text) { return (text || '').replace(/\[.*?\]/g, '').replace(/\s{2,}/g, ' ').trim(); }
 
-// Split text into sentence-like chunks
 function splitSentences(text, isEnglish) {
   if (!text) return [''];
-  const cleaned = isEnglish ? cleanTags(text) : text;
-  // Split on sentence-ending punctuation
+  const cleaned = cleanTags(text);
   const parts = cleaned.split(/(?<=[.!?。！？…—])\s*/);
-  // Merge very short fragments
   const result = [];
   let buf = '';
   for (const p of parts) {
@@ -239,7 +239,6 @@ function startSubtitles(dish, duration) {
   const zhEl = document.getElementById('voice-sub-zh');
 
   function showFrame() {
-    // Fade out
     enEl.classList.remove('show');
     zhEl.classList.remove('show');
     setTimeout(() => {
@@ -251,7 +250,7 @@ function startSubtitles(dish, duration) {
     }, 200);
   }
 
-  showFrame(); // Show first frame immediately
+  showFrame();
   subtitleTimer = setInterval(() => {
     if (idx >= count) { clearInterval(subtitleTimer); subtitleTimer = null; return; }
     showFrame();
@@ -286,7 +285,7 @@ async function loadKitchen() {
     const historyList = document.getElementById('history-list'), historyEmpty = document.getElementById('history-empty');
     if (history.length === 0) { historyEmpty.style.display = 'block'; } else {
       historyEmpty.style.display = 'none';
-      history.forEach(item => { const card = document.createElement('div'); card.className = 'history-card'; const d = new Date(item.dish_date + 'T00:00:00'); const ml = item.meal === 'morning' ? '早' : (item.meal === 'evening' ? '晚' : (item.meal === 'special' ? '惊喜' : '')); let h = `<div class="history-date">${d.getMonth()+1}月${d.getDate()}日${ml ? ' · '+ml : ''}</div><div class="history-text">${escapeHtml(item.content)}</div>`; if (item.tts_text || item.audio_url) h += `<button class="history-audio-btn" onclick="playDishAudio(historyDishes[${item.id}])">🔊 听江屿说</button>`; card.innerHTML = h; historyList.appendChild(card); });
+      history.forEach(item => { const card = document.createElement('div'); card.className = 'history-card'; const d = new Date(item.dish_date + 'T00:00:00'); const ml = item.meal === 'morning' ? '早' : (item.meal === 'evening' ? '晚' : (item.meal === 'special' ? '惊喜' : '')); let h = `<div class="history-date">${d.getMonth()+1}月${d.getDate()}日${ml ? ' · '+ml : ''}</div><div class="history-text">${escapeHtml(stripTags(item.content))}</div>`; if (item.tts_text || item.audio_url) h += `<button class="history-audio-btn" onclick="playDishAudio(historyDishes[${item.id}])">🔊 听江屿说</button>`; card.innerHTML = h; historyList.appendChild(card); });
       history.forEach(item => { historyDishes[item.id] = item; });
     }
   } catch (e) { console.error('Kitchen load failed:', e); }
@@ -294,7 +293,7 @@ async function loadKitchen() {
 }
 const historyDishes = {};
 function openLid() { if (!todayDish || isDishOpened(activeMealType)) return; localStorage.setItem(getOpenedKey(activeMealType), today); showDish(); }
-function showDish() { const card = document.getElementById('lid-card'); card.classList.add('opened'); card.onclick = null; card.style.cursor = 'default'; document.getElementById('lid-content').textContent = todayDish.content; const d = new Date(todayDish.dish_date + 'T00:00:00'); let ml = '早安'; if (activeMealType === 'evening') ml = '晚安'; else if (activeMealType === 'special') ml = '惊喜回应'; document.getElementById('lid-date').textContent = `${d.getMonth()+1}月${d.getDate()}日 · ${ml}`; if (todayDish.tts_text || todayDish.audio_url) document.getElementById('audio-btn').style.display = 'inline-block'; }
+function showDish() { const card = document.getElementById('lid-card'); card.classList.add('opened'); card.onclick = null; card.style.cursor = 'default'; document.getElementById('lid-content').textContent = stripTags(todayDish.content); const d = new Date(todayDish.dish_date + 'T00:00:00'); let ml = '早安'; if (activeMealType === 'evening') ml = '晚安'; else if (activeMealType === 'special') ml = '惊喜回应'; document.getElementById('lid-date').textContent = `${d.getMonth()+1}月${d.getDate()}日 · ${ml}`; if (todayDish.tts_text || todayDish.audio_url) document.getElementById('audio-btn').style.display = 'inline-block'; }
 function updateVoiceActions(dish) { const actions = document.getElementById('voice-actions'), btnFull = document.getElementById('btn-full'), btnRetone = document.getElementById('btn-retone'), btnReplay = document.getElementById('btn-replay'); const hasTts = !!dish.tts_text; btnReplay.style.display = hasTts ? 'inline-block' : 'none'; btnRetone.style.display = hasTts ? 'inline-block' : 'none'; btnFull.style.display = dish.dish_date === today ? 'inline-block' : 'none'; (hasTts || dish.dish_date === today) ? actions.classList.add('visible') : actions.classList.remove('visible'); }
 function setActionsDisabled(d) { document.querySelectorAll('.voice-act-btn').forEach(b => { b.disabled = d; }); }
 
