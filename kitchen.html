@@ -202,7 +202,7 @@ const currentHour = new Date().getHours();
 const timeMeal = currentHour < 12 ? 'morning' : 'evening';
 let todayDish = null, activeMealType = null, currentAudio = null, currentPlayingDish = null;
 const audioBlobCache = {};
-let subtitleTimer = null;
+let subtitleTimers = [];
 
 function getOpenedKey(t) { return `isle_kitchen_opened_${t}`; }
 function isDishOpened(t) { return localStorage.getItem(getOpenedKey(t)) === today; }
@@ -232,13 +232,35 @@ function startSubtitles(dish, duration) {
   const enSentences = splitSentences(dish.tts_text, true);
   const zhSentences = splitSentences(dish.content, false);
   const count = Math.max(enSentences.length, zhSentences.length);
-  const interval = (duration * 1000) / count;
-  let idx = 0;
+  if (count === 0) return;
+
+  // Calculate total character length to distribute time proportionally
+  const totalMs = duration * 1000;
+  const lengths = [];
+  let totalChars = 0;
+  for (let i = 0; i < count; i++) {
+    // Use the longer of en/zh sentence length as weight
+    const enLen = (enSentences[Math.min(i, enSentences.length - 1)] || '').length;
+    const zhLen = (zhSentences[Math.min(i, zhSentences.length - 1)] || '').length;
+    const len = Math.max(enLen, zhLen, 1);
+    lengths.push(len);
+    totalChars += len;
+  }
+
+  // Build schedule: each sentence gets time proportional to its char count
+  const schedule = [];
+  let elapsed = 0;
+  for (let i = 0; i < count; i++) {
+    const sentenceMs = (lengths[i] / totalChars) * totalMs;
+    schedule.push({ idx: i, startAt: elapsed });
+    elapsed += sentenceMs;
+  }
 
   const enEl = document.getElementById('voice-sub-en');
   const zhEl = document.getElementById('voice-sub-zh');
+  const startTime = Date.now();
 
-  function showFrame() {
+  function showFrame(idx) {
     enEl.classList.remove('show');
     zhEl.classList.remove('show');
     setTimeout(() => {
@@ -246,23 +268,25 @@ function startSubtitles(dish, duration) {
       zhEl.textContent = zhSentences[Math.min(idx, zhSentences.length - 1)] || '';
       enEl.classList.add('show');
       zhEl.classList.add('show');
-      idx++;
-    }, 200);
+    }, 150);
   }
 
-  showFrame();
-  subtitleTimer = setInterval(() => {
-    if (idx >= count) { clearInterval(subtitleTimer); subtitleTimer = null; return; }
-    showFrame();
-  }, interval);
+  // Schedule each frame with setTimeout based on proportional timing
+  for (let i = 0; i < schedule.length; i++) {
+    const timer = setTimeout(() => { showFrame(schedule[i].idx); }, schedule[i].startAt);
+    subtitleTimers.push(timer);
+  }
 }
 
 function stopSubtitles() {
-  if (subtitleTimer) { clearInterval(subtitleTimer); subtitleTimer = null; }
+  for (let i = 0; i < subtitleTimers.length; i++) {
+    clearTimeout(subtitleTimers[i]);
+  }
+  subtitleTimers = [];
   const enEl = document.getElementById('voice-sub-en');
   const zhEl = document.getElementById('voice-sub-zh');
-  enEl.classList.remove('show'); enEl.textContent = '';
-  zhEl.classList.remove('show'); zhEl.textContent = '';
+  if (enEl) { enEl.classList.remove('show'); enEl.textContent = ''; }
+  if (zhEl) { zhEl.classList.remove('show'); zhEl.textContent = ''; }
 }
 
 // ===== Core player =====
@@ -333,7 +357,7 @@ function playBlob(blob) {
   setTimeout(() => {
     if (currentAudio && currentPlayingDish) {
       const dur = (currentAudio.duration && isFinite(currentAudio.duration)) ? currentAudio.duration : 12;
-      if (!subtitleTimer) startSubtitles(currentPlayingDish, dur);
+      if (subtitleTimers.length === 0) startSubtitles(currentPlayingDish, dur);
     }
   }, 500);
   currentAudio.onended = () => { overlay.classList.remove('playing'); status.textContent = '播放结束'; };
