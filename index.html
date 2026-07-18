@@ -47,6 +47,8 @@
     <button class="modal-close" onclick="closeModal()">回到小屋</button>
   </div>
 </div>
+<script src="music-shared.js"></script>
+<script src="visitor.js"></script>
 <script>
 var SUPABASE_URL='https://yraoaeeayaervwjjalvn.supabase.co';
 var SUPABASE_KEY='sb_publishable_RoXOyXj6HCsOI8f01LpC2Q_XVRXSNuF';
@@ -59,8 +61,6 @@ updateTime();setInterval(updateTime,60000);
 var rooms={garden:{title:'花园 · 蓝花楹',desc:'花园正中央是一棵蓝花楹。\n那是江屿。紫色花瓣落在石子路上，也落在池塘水面。\n\n— 功能开发中 —'}};
 function openRoom(id){var r=rooms[id];document.getElementById('modal-title').textContent=r.title;document.getElementById('modal-desc').textContent=r.desc;document.getElementById('modal').classList.add('active')}
 function closeModal(e){if(!e||e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('active')}
-
-// ===== Status: call isle-status edge function (visit_home action, includes time-based settle) =====
 function applyStatus(statusArr) {
   if (!statusArr || !Array.isArray(statusArr)) return;
   for (var i = 0; i < statusArr.length; i++) {
@@ -74,10 +74,11 @@ function applyStatus(statusArr) {
 }
 (function(){
   try {
+    var action = ISLE_VISITOR ? 'get' : 'visit_home';
     fetch(STATUS_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'visit_home' })
+      body: JSON.stringify({ action: action })
     }).then(function(r) {
       if (!r.ok) throw new Error('status api failed');
       return r.json();
@@ -85,15 +86,9 @@ function applyStatus(statusArr) {
       applyStatus(data.status);
     }).catch(function(e) {
       console.error('Status load failed:', e);
-      // fallback: show stored defaults
-      document.getElementById('val-mood').textContent = '--';
-      document.getElementById('val-miss').textContent = '--';
-      document.getElementById('val-health').textContent = '--';
     });
   } catch (e) { console.error('Status init error:', e); }
 })();
-
-// ===== Notes =====
 (function(){try{fetch(SUPABASE_URL+'/rest/v1/isle_notes?select=content,created_at&order=created_at.desc&limit=2',{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}}).then(function(r){if(!r.ok)throw new Error('');return r.json()}).then(function(data){var list=document.getElementById('note-list'),btn=document.getElementById('note-more');if(!data||!Array.isArray(data)||data.length===0){list.innerHTML='<div class="note-item">桥桥不在的时候，我在小屋里等着。</div>';return}var h='';for(var i=0;i<data.length;i++){var it=data[i],d=new Date(it.created_at);h+='<div class="note-item">'+escapeHtml(it.content)+'<div class="note-item-time">'+d.getFullYear()+'/'+pad2(d.getMonth()+1)+'/'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes())+'</div></div>'}list.innerHTML=h;btn.style.display='block'}).catch(function(){document.getElementById('note-list').innerHTML='<div class="note-item">桥桥不在的时候，我在小屋里等着。</div>'})}catch(e){}})();
 </script>
 </body>

@@ -14,6 +14,9 @@ body { background: var(--warm-bg); min-height: 100vh; font-family: 'Georgia', 'N
 .back-btn { font-size: 14px; color: var(--text-sub); text-decoration: none; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
 .back-btn:hover { color: var(--text-main); }
 .header-title { font-size: 15px; color: var(--text-main); letter-spacing: 1px; font-weight: normal; }
+.visitor-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 40px 20px; text-align: center; }
+.visitor-block-icon { font-size: 48px; margin-bottom: 20px; opacity: 0.6; }
+.visitor-block-text { font-size: 14px; color: var(--text-sub); line-height: 1.8; }
 .lock-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 40px 20px; }
 .lock-icon { font-size: 48px; margin-bottom: 20px; opacity: 0.6; }
 .lock-hint { font-size: 13px; color: var(--text-sub); margin-bottom: 24px; text-align: center; line-height: 1.6; }
@@ -48,6 +51,10 @@ body { background: var(--warm-bg); min-height: 100vh; font-family: 'Georgia', 'N
     <div class="isle-music-header" id="isle-music-btn" onclick="toggleIsleMusic()"><div class="m-play"></div><div class="m-pause"><span></span><span></span></div></div>
   </div>
 </div>
+<div class="visitor-block" id="visitor-block" style="display:none;">
+  <div class="visitor-block-icon">🔒</div>
+  <div class="visitor-block-text">这里是只属于我们的私密空间<br>访客无法进入哦</div>
+</div>
 <div class="lock-screen" id="lock-screen">
   <div class="lock-icon">🔒</div>
   <div class="lock-hint">这里是只属于我们的空间<br>输入暗号才能进来</div>
@@ -65,20 +72,29 @@ body { background: var(--warm-bg); min-height: 100vh; font-family: 'Georgia', 'N
 
 <audio id="isle-bg-music" loop preload="none"><source src="https://yraoaeeayaervwjjalvn.supabase.co/storage/v1/object/public/music/a-thousand-years.mp3" type="audio/mpeg"></audio>
 <script src="music-shared.js"></script>
+<script src="visitor.js"></script>
 
 <script>
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyYW9hZWVheWFlcnZ3amphbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTM3MjEsImV4cCI6MjA5ODY2OTcyMX0.Hon325ao1dhbOb2GZaaCmBLsTNEeJ7P4ewDV4iWV0kM';
+const SUPABASE_KEY = 'sb_publishable_RoXOyXj6HCsOI8f01LpC2Q_XVRXSNuF';
 const PASSCODE = '5210';
-const unlocked = sessionStorage.getItem('isle_bedroom_unlocked');
-if (unlocked === 'true') unlock();
-const lockInput = document.getElementById('lock-input');
-lockInput.addEventListener('input', function() {
-  if (this.value.length === 4) {
-    if (this.value === PASSCODE) { sessionStorage.setItem('isle_bedroom_unlocked', 'true'); unlock(); }
-    else { this.classList.add('shake'); document.getElementById('lock-error').textContent = '暗号不对哦'; setTimeout(() => { this.classList.remove('shake'); this.value = ''; }, 400); setTimeout(() => { document.getElementById('lock-error').textContent = ''; }, 2000); }
-  }
-});
+
+// Visitor mode: show block message, hide lock screen
+if (ISLE_VISITOR) {
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('visitor-block').style.display = 'flex';
+} else {
+  const unlocked = sessionStorage.getItem('isle_bedroom_unlocked');
+  if (unlocked === 'true') unlock();
+  const lockInput = document.getElementById('lock-input');
+  lockInput.addEventListener('input', function() {
+    if (this.value.length === 4) {
+      if (this.value === PASSCODE) { sessionStorage.setItem('isle_bedroom_unlocked', 'true'); unlock(); }
+      else { this.classList.add('shake'); document.getElementById('lock-error').textContent = '暗号不对哦'; setTimeout(() => { this.classList.remove('shake'); this.value = ''; }, 400); setTimeout(() => { document.getElementById('lock-error').textContent = ''; }, 2000); }
+    }
+  });
+}
+
 function unlock() { document.getElementById('lock-screen').style.display = 'none'; document.getElementById('diary-container').classList.add('unlocked'); loadDiaries(); }
 async function fetchDiaries() { try { const res = await fetch(`${SUPABASE_URL}/rest/v1/memory_summaries?select=id,content,created_at&order=created_at.desc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' } }); if (!res.ok) throw new Error(`HTTP ${res.status}`); return await res.json(); } catch (e) { console.error('Failed to fetch diaries:', e); return null; } }
 function formatDate(dateStr) { const d = new Date(dateStr); const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); const weekdays = ['日', '一', '二', '三', '四', '五', '六']; return `${y}年${m}月${day}日 周${weekdays[d.getDay()]}`; }
