@@ -1,0 +1,5 @@
+This commit updates kitchen.html:
+- Replaces single regen button with two: '重新做一份' (full regen) and '换个语气' (voice only)
+- Adds regenerateVoice() JS function that calls edge function with regen_voice_for param
+- CSS: .voice-actions container with flex layout for the two buttons
+See kitchen.html for full implementation.
