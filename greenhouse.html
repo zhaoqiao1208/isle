@@ -186,7 +186,7 @@ async function waterPot(potIndex) {
 
 async function fertilizePot(potIndex) {
   const data = await apiCall('fertilize', { pot_index: potIndex });
-  if (data.error === 'already_fertilized_today') { showToast('今天已经施过肥了～'); return; }
+  if (data.error === 'already_fertilized_this_stage') { showToast('这个阶段已经施过肥了～'); return; }
   if (data.error) { showToast(data.error); return; }
   showToast('施肥完成，加速4小时 🌱');
   loadGreenhouse();
