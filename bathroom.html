@@ -95,9 +95,15 @@ body { background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 10
 <script src="music-shared.js"></script>
 <script>
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
+const STATUS_API = `${SUPABASE_URL}/functions/v1/isle-status`;
 
 let allMessages = [];
 let latestMsg = null;
+
+function reportInteract(type) {
+  if (typeof ISLE_VISITOR !== 'undefined' && ISLE_VISITOR) return;
+  try { fetch(STATUS_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'interact', type: type }) }).catch(function(e) { console.error('[status report]', e); }); } catch (e) { console.error('[status report]', e); }
+}
 
 (function initSteam() {
   const steamBg = document.getElementById('steam-bg');
@@ -177,6 +183,7 @@ async function sendReply() {
     document.getElementById('reply-sent').style.display = 'block';
     document.getElementById('existing-reply').style.display = 'block';
     document.getElementById('existing-reply-text').textContent = text;
+    reportInteract('reply_bubble');
   } catch (e) {
     console.error('Reply failed:', e);
   }
