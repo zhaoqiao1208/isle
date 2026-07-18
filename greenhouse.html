@@ -83,6 +83,7 @@ body { background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 10
 <script>
 const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
 const API = `${SUPABASE_URL}/functions/v1/greenhouse`;
+const STATUS_API = `${SUPABASE_URL}/functions/v1/isle-status`;
 const FLOWERS = [
   { id: 'rose-blue', name: '蓝玫瑰', emoji: '💙' },
   { id: 'rose-pink', name: '粉玫瑰', emoji: '💗' },
@@ -102,6 +103,11 @@ function getFlowerImage(type, stage) {
 async function apiCall(action, params = {}) {
   const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ...params }) });
   return await res.json();
+}
+
+function reportInteract(type) {
+  if (typeof ISLE_VISITOR !== 'undefined' && ISLE_VISITOR) return;
+  try { fetch(STATUS_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'interact', type: type }) }).catch(function(e) { console.error('[status report]', e); }); } catch (e) { console.error('[status report]', e); }
 }
 
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
@@ -181,6 +187,7 @@ async function waterPot(potIndex) {
   if (data.error === 'already_watered_today') { showToast('今天已经浇过了～'); return; }
   if (data.error) { showToast(data.error); return; }
   showToast('浇水完成 💧');
+  reportInteract('water');
   loadGreenhouse();
 }
 
@@ -189,6 +196,7 @@ async function fertilizePot(potIndex) {
   if (data.error === 'already_fertilized_this_stage') { showToast('这个阶段已经施过肥了～'); return; }
   if (data.error) { showToast(data.error); return; }
   showToast('施肥完成，加速4小时 🌱');
+  reportInteract('fertilize');
   loadGreenhouse();
 }
 
