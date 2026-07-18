@@ -42,12 +42,11 @@ body { background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 10
 .existing-reply-label { font-size: 10px; color: var(--text-sub); margin-bottom: 4px; }
 .no-msg { font-size: 13px; color: var(--text-sub); text-align: center; padding: 20px; }
 .history-section { position: relative; z-index: 1; margin-top: 32px; }
-.history-toggle { font-size: 12px; color: var(--text-sub); cursor: pointer; letter-spacing: 0.5px; padding: 8px 0; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
-.history-toggle:hover { color: var(--text-main); }
-.history-arrow { display: inline-block; transition: transform 0.3s; font-size: 10px; }
-.history-toggle.open .history-arrow { transform: rotate(90deg); }
-.history-list { display: none; flex-direction: column; gap: 12px; margin-top: 12px; }
-.history-list.open { display: flex; }
+.history-header { font-size: 12px; color: var(--text-sub); letter-spacing: 0.5px; padding: 8px 0; margin-bottom: 12px; }
+.history-scroll { max-height: 400px; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 12px; padding-right: 4px; }
+.history-scroll::-webkit-scrollbar { width: 4px; }
+.history-scroll::-webkit-scrollbar-track { background: transparent; }
+.history-scroll::-webkit-scrollbar-thumb { background: rgba(124,181,212,0.3); border-radius: 2px; }
 .history-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 16px; padding: 16px 18px; box-shadow: 0 2px 12px rgba(124,181,212,0.06); }
 .history-date { font-size: 11px; color: var(--accent); margin-bottom: 8px; }
 .history-text { font-size: 13px; color: var(--text-main); line-height: 1.7; }
@@ -87,11 +86,9 @@ body { background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 10
     </div>
     <div class="reply-sent" id="reply-sent">收到了 ♡</div>
   </div>
-  <div class="history-section">
-    <div class="history-toggle" id="history-toggle" onclick="toggleHistory()">
-      <span class="history-arrow">▶</span> 往期气泡
-    </div>
-    <div class="history-list" id="history-list"></div>
+  <div class="history-section" id="history-section" style="display:none;">
+    <div class="history-header">往期气泡</div>
+    <div class="history-scroll" id="history-scroll"></div>
   </div>
 </div>
 <audio id="isle-bg-music" loop preload="none"><source src="https://yraoaeeayaervwjjalvn.supabase.co/storage/v1/object/public/music/a-thousand-years.mp3" type="audio/mpeg"></audio>
@@ -186,13 +183,15 @@ async function sendReply() {
 }
 
 function renderHistory() {
-  const list = document.getElementById('history-list');
+  const section = document.getElementById('history-section');
+  const scroll = document.getElementById('history-scroll');
   const history = allMessages.slice(1);
   if (history.length === 0) {
-    list.innerHTML = '<div class="no-msg">还没有往期气泡</div>';
+    section.style.display = 'none';
     return;
   }
-  list.innerHTML = history.map(item => {
+  section.style.display = 'block';
+  scroll.innerHTML = history.map(item => {
     const d = new Date(item.created_at);
     const dateStr = `${d.getMonth()+1}月${d.getDate()}日`;
     let replyHtml = '';
@@ -201,13 +200,6 @@ function renderHistory() {
     }
     return `<div class="history-card"><div class="history-date">${dateStr}</div><div class="history-text">${escapeHtml(item.content)}</div>${replyHtml}</div>`;
   }).join('');
-}
-
-function toggleHistory() {
-  const toggle = document.getElementById('history-toggle');
-  const list = document.getElementById('history-list');
-  toggle.classList.toggle('open');
-  list.classList.toggle('open');
 }
 
 function escapeHtml(str) {
