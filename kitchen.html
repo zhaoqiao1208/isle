@@ -73,7 +73,7 @@ body {
 }
 
 .lid-card.opened .lid-emoji {
-  transform: rotateX(180deg) translateY(-20px);
+  transform: translateY(-30px) scale(0.7);
   opacity: 0.3;
 }
 
@@ -383,7 +383,7 @@ const timeMeal = currentHour < 12 ? 'morning' : 'evening';
 let todayDish = null;
 let activeMealType = null;
 let currentAudio = null;
-let currentPlayingDish = null; // tracks the dish currently in voice overlay
+let currentPlayingDish = null;
 const audioBlobCache = {};
 
 function getOpenedKey(mealType) {
@@ -507,7 +507,6 @@ function openVoicePlayer(dish) {
   document.body.style.overflow = 'hidden';
   currentPlayingDish = dish;
 
-  // Show regen button only for today's dishes
   const regenBtn = document.getElementById('voice-regen-btn');
   if (dish.dish_date === today) {
     regenBtn.classList.add('visible');
@@ -617,7 +616,6 @@ async function regenerateDish() {
   regenBtn.disabled = true;
   regenBtn.textContent = '🔄 重新生成中…';
 
-  // Stop any playing audio
   if (currentAudio) {
     currentAudio.pause();
     currentAudio = null;
@@ -630,7 +628,6 @@ async function regenerateDish() {
     const mealType = currentPlayingDish.meal;
     const reqBody = { meal: mealType, force: true };
 
-    // For special meals, we need order_content. Try to get it from isle_orders.
     if (mealType === 'special') {
       try {
         const orderRes = await fetch(
@@ -658,14 +655,10 @@ async function regenerateDish() {
     const result = await res.json();
     if (!result.ok) throw new Error(result.error || 'Unknown error');
 
-    // Clear old cache
     delete audioBlobCache[currentPlayingDish.id];
 
-    // Close overlay and reload
     closeVoicePlayer();
-    // Clear opened state so lid can re-reveal
     localStorage.removeItem(getOpenedKey(mealType));
-    // Reload page to get fresh data
     location.reload();
   } catch (e) {
     console.error('Regenerate error:', e);
