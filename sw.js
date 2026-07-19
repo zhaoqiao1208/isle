@@ -1,10 +1,9 @@
-const CACHE_NAME = 'isle-v2';
+const CACHE_NAME = 'isle-v3';
 const PRECACHE = [
   '/isle/',
   '/isle/index.html',
   '/isle/music-shared.js',
-  '/isle/visitor.js',
-  '/isle/cottage.png'
+  '/isle/visitor.js'
 ];
 
 self.addEventListener('install', event => {
