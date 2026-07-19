@@ -2,8 +2,8 @@
   "name": "屿",
   "short_name": "屿",
   "description": "江屿和桥桥的小屋",
-  "start_url": "/isle/",
-  "scope": "/isle/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#FFF8F0",
   "theme_color": "#E8DFF5",
@@ -13,7 +13,13 @@
       "src": "assets/greenhouse/tree.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "assets/greenhouse/tree.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
