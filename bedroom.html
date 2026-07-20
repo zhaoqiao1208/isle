@@ -13,7 +13,6 @@ body { background: #FDF8F3; min-height: 100vh; font-family: 'Segoe UI', sans-ser
 .header-title { font-size: 15px; color: #5a4a3e; letter-spacing: 1px; font-weight: normal; }
 .header-right { display: flex; align-items: center; gap: 10px; }
 
-/* Top section: diary entry */
 .diary-section { padding: 20px 16px; display: flex; justify-content: center; }
 .diary-card { background: #FFFBF7; border: 1px solid #f0e6dc; border-radius: 14px; padding: 18px 22px; width: 100%; max-width: 400px; cursor: pointer; transition: background 0.3s, transform 0.2s, box-shadow 0.3s; text-align: center; box-shadow: 0 2px 12px rgba(120,80,60,0.04); }
 .diary-card:active { background: #faf3ec; transform: scale(0.97); box-shadow: 0 4px 16px rgba(120,80,60,0.08); }
@@ -21,7 +20,6 @@ body { background: #FDF8F3; min-height: 100vh; font-family: 'Segoe UI', sans-ser
 .diary-card-title { font-size: 14px; color: #5a4a3e; letter-spacing: 0.5px; }
 .diary-card-sub { font-size: 11px; color: #9a8b7e; margin-top: 6px; }
 
-/* Middle section: scene with hotspots */
 .scene-section { position: relative; width: 100%; }
 .scene-bg { width: 100%; display: block; }
 .hotspot { position: absolute; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
@@ -31,26 +29,37 @@ body { background: #FDF8F3; min-height: 100vh; font-family: 'Segoe UI', sans-ser
 .hotspot-desk { bottom: 4%; right: 2%; width: 24%; height: 34%; }
 .hotspot-window { top: 5%; left: 2%; width: 22%; height: 60%; }
 
-/* Tap ripple effect */
 .ripple { position: absolute; border-radius: 50%; background: rgba(201,168,232,0.3); pointer-events: none; animation: rippleAnim 0.6s ease-out forwards; }
 @keyframes rippleAnim { 0%{width:0;height:0;opacity:1} 100%{width:60px;height:60px;opacity:0} }
 
-/* Bottom section: bubble left-center, character right */
-.character-section { padding: 6px 16px 30px; display: flex; align-items: flex-start; justify-content: flex-end; gap: 8px; min-height: 200px; }
-.character-img { width: 160px; height: auto; image-rendering: pixelated; filter: drop-shadow(0 4px 16px rgba(120,80,60,0.15)); cursor: pointer; transition: transform 0.15s ease; flex-shrink: 0; animation: breathe 3.5s ease-in-out infinite; }
+/* Bottom section */
+.character-section { padding: 6px 16px 30px; display: flex; align-items: flex-start; justify-content: flex-end; min-height: 200px; position: relative; }
+.character-wrap { position: relative; flex-shrink: 0; }
+.character-img { width: 160px; height: auto; image-rendering: pixelated; filter: drop-shadow(0 4px 16px rgba(120,80,60,0.15)); cursor: pointer; transition: transform 0.15s ease; animation: breathe 3.5s ease-in-out infinite; }
 .character-img:active { transform: scale(0.93); animation: none; }
 .character-img.bounce { animation: charBounce 0.4s ease forwards; }
 @keyframes breathe { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
 @keyframes charBounce { 0%{transform:translateY(0)} 30%{transform:translateY(-8px)} 60%{transform:translateY(2px)} 100%{transform:translateY(0)} }
 
-.speech-bubble { flex: 1; min-height: 120px; max-width: 210px; background: #f8f0fa; color: #5a4a5e; font-size: 14px; line-height: 1.8; padding: 18px 20px; border-radius: 18px 18px 4px 18px; box-shadow: 0 2px 12px rgba(160,120,180,0.08); border: 1px solid #ece0f0; opacity: 0; transform: translateY(6px); transition: opacity 0.4s ease, transform 0.4s ease; display: flex; align-items: center; justify-content: center; text-align: center; margin-top: 30px; }
+/* Particles */
+.particles { position: absolute; top: -10px; right: -20px; width: 60px; height: 100%; pointer-events: none; overflow: visible; }
+.particle { position: absolute; font-size: 12px; opacity: 0; animation: particleFloat var(--dur) ease-in-out infinite; animation-delay: var(--delay); }
+@keyframes particleFloat {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  20% { opacity: 0.9; }
+  50% { transform: translateY(-18px) scale(1); opacity: 0.7; }
+  80% { opacity: 0.4; }
+  100% { transform: translateY(-36px) scale(0.5); opacity: 0; }
+}
+.particle-glow { text-shadow: 0 0 6px rgba(255,200,100,0.6); }
+.particle-heart { text-shadow: 0 0 6px rgba(230,140,180,0.5); }
+
+.speech-bubble { max-width: 200px; min-height: 120px; background: #f8f0fa; color: #5a4a5e; font-size: 14px; line-height: 1.8; padding: 18px 20px; border-radius: 18px 18px 18px 4px; box-shadow: 0 2px 12px rgba(160,120,180,0.08); border: 1px solid #ece0f0; opacity: 0; transform: translateY(6px); transition: opacity 0.4s ease, transform 0.4s ease; display: flex; align-items: center; justify-content: center; text-align: center; margin-top: 30px; margin-right: -12px; }
 .speech-bubble.show { opacity: 1; transform: translateY(0); }
 
-/* Miss indicator */
 .miss-indicator { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(201,168,232,0.9); color: #fff; font-size: 12px; padding: 6px 16px; border-radius: 20px; opacity: 0; transition: opacity 0.4s ease; pointer-events: none; z-index: 40; }
 .miss-indicator.show { opacity: 1; }
 
-/* Visitor */
 .visitor-block { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #FDF8F3; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
 .visitor-block-icon { font-size: 48px; margin-bottom: 20px; opacity: 0.6; }
 .visitor-block-text { font-size: 14px; color: #9a8b7e; line-height: 1.8; text-align: center; }
@@ -71,7 +80,6 @@ body { background: #FDF8F3; min-height: 100vh; font-family: 'Segoe UI', sans-ser
 </div>
 
 <div id="main-content">
-  <!-- Top: diary entry -->
   <div class="diary-section">
     <div class="diary-card" id="diary-card" onclick="location.href='diary.html'">
       <div class="diary-card-icon">📖</div>
@@ -80,7 +88,6 @@ body { background: #FDF8F3; min-height: 100vh; font-family: 'Segoe UI', sans-ser
     </div>
   </div>
 
-  <!-- Middle: scene -->
   <div class="scene-section" id="scene-section">
     <img class="scene-bg" src="assets/bedroom/bedroom-bg.webp" alt="卧室">
     <div class="hotspot hotspot-bed" data-zone="bed"></div>
@@ -89,10 +96,20 @@ body { background: #FDF8F3; min-height: 100vh; font-family: 'Segoe UI', sans-ser
     <div class="hotspot hotspot-window" data-zone="window"></div>
   </div>
 
-  <!-- Bottom: bubble left, character right -->
   <div class="character-section">
     <div class="speech-bubble" id="speech-bubble"></div>
-    <img class="character-img" id="character" src="assets/bedroom/jiangyu.png" alt="江屿">
+    <div class="character-wrap">
+      <img class="character-img" id="character" src="assets/bedroom/jiangyu.png" alt="江屿">
+      <div class="particles" id="particles">
+        <span class="particle particle-glow" style="--dur:3.2s;--delay:0s;top:20%;right:0">✨</span>
+        <span class="particle particle-heart" style="--dur:4s;--delay:0.8s;top:45%;right:10px">♥</span>
+        <span class="particle particle-glow" style="--dur:3.6s;--delay:1.6s;top:65%;right:2px">✨</span>
+        <span class="particle particle-heart" style="--dur:3.8s;--delay:2.4s;top:30%;right:18px">♥</span>
+        <span class="particle particle-glow" style="--dur:4.2s;--delay:0.4s;top:55%;right:22px">✨</span>
+        <span class="particle particle-heart" style="--dur:3.4s;--delay:1.2s;top:75%;right:8px">♥</span>
+        <span class="particle particle-glow" style="--dur:3.9s;--delay:2s;top:10%;right:14px">✨</span>
+      </div>
+    </div>
   </div>
 </div>
 
