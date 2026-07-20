@@ -54,16 +54,17 @@ body { background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 10
 /* Bouquet section */
 .bouquet-section { margin-top: 32px; }
 .bouquet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.bouquet-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 14px 10px; text-align: center; min-height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s; position: relative; overflow: hidden; }
-.bouquet-card.crafted { border-color: rgba(122,184,94,0.5); box-shadow: 0 4px 16px rgba(122,184,94,0.12); }
-.bouquet-card.locked { opacity: 0.5; }
-.bouquet-img { width: 64px; height: 64px; object-fit: contain; margin-bottom: 6px; image-rendering: pixelated; }
+.bouquet-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 14px 10px; text-align: center; min-height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s, box-shadow 0.3s; position: relative; overflow: hidden; cursor: pointer; }
+.bouquet-card.crafted { border-color: rgba(122,184,94,0.5); box-shadow: 0 4px 20px rgba(122,184,94,0.18); }
+.bouquet-card.locked .bouquet-img { filter: grayscale(1) brightness(0.45); transition: filter 0.4s; }
+.bouquet-card.crafted .bouquet-img { filter: none; animation: bouquetGlow 3s ease-in-out infinite; }
+@keyframes bouquetGlow { 0%,100%{ filter: drop-shadow(0 0 0px transparent); } 50%{ filter: drop-shadow(0 0 8px rgba(122,184,94,0.35)); } }
+.bouquet-img { width: 64px; height: 64px; object-fit: contain; margin-bottom: 6px; }
 .bouquet-name { font-size: 11px; color: var(--text-main); margin-bottom: 4px; font-weight: 500; }
 .bouquet-status { font-size: 9px; color: var(--text-sub); }
 .bouquet-craft-btn { margin-top: 6px; padding: 4px 12px; border: 1px solid var(--accent); border-radius: 10px; font-size: 10px; background: rgba(122,184,94,0.08); color: var(--accent); cursor: pointer; transition: all 0.2s; }
 .bouquet-craft-btn:active { transform: scale(0.95); }
 .bouquet-craft-btn:disabled { opacity: 0.4; cursor: default; }
-.bouquet-lock-icon { font-size: 24px; opacity: 0.3; margin-bottom: 6px; }
 /* Bouquet card modal */
 .card-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; align-items: center; justify-content: center; padding: 20px; }
 .card-overlay.active { display: flex; }
@@ -92,7 +93,7 @@ body { background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 10
     <div class="inventory-grid" id="inventory-grid"><div class="inv-empty">还没有收获的花…</div></div>
   </div>
   <div class="bouquet-section">
-    <div class="section-title">💐 花束</div>
+    <div class="section-title">💐 花束展柜</div>
     <div class="bouquet-grid" id="bouquet-grid"></div>
   </div>
 </div>
@@ -196,10 +197,13 @@ function renderBouquets(recipes, bouquets, inventory) {
 
   grid.innerHTML = recipes.map(r => {
     const isCrafted = craftedSet.has(r.bouquet_index);
+    const imgSrc = r.image;
+
     if (isCrafted) {
-      return `<div class="bouquet-card crafted" onclick="showCard(${r.bouquet_index})"><img class="bouquet-img" src="${r.image}"><div class="bouquet-name">${r.name}</div><div class="bouquet-status">已完成 ✓</div></div>`;
+      return `<div class="bouquet-card crafted" onclick="showCard(${r.bouquet_index})"><img class="bouquet-img" src="${imgSrc}"><div class="bouquet-name">${r.name}</div><div class="bouquet-status">已完成 ✓</div></div>`;
     }
-    // Check if can craft
+
+    // Not crafted: show image but dark
     const recipe = r.recipe;
     let canCraft = true;
     let statusParts = [];
@@ -211,7 +215,7 @@ function renderBouquets(recipes, bouquets, inventory) {
     }
     const statusStr = statusParts.join(' · ');
     const btnHtml = canCraft ? `<button class="bouquet-craft-btn" onclick="event.stopPropagation(); craftBouquet(${r.bouquet_index})">合成</button>` : '';
-    return `<div class="bouquet-card${canCraft ? '' : ' locked'}"><div class="bouquet-lock-icon">💐</div><div class="bouquet-name">${r.name}</div><div class="bouquet-status">${statusStr}</div>${btnHtml}</div>`;
+    return `<div class="bouquet-card locked"><img class="bouquet-img" src="${imgSrc}"><div class="bouquet-name">${r.name}</div><div class="bouquet-status">${statusStr}</div>${btnHtml}</div>`;
   }).join('');
 }
 
@@ -240,14 +244,19 @@ async function craftBouquet(bouquetIndex) {
 }
 
 async function loadGreenhouse() {
-  const data = await apiCall('get_pots');
-  if (data.error) { showToast('加载失败'); return; }
-  cachedInventory = data.inventory || {};
-  cachedRecipes = data.recipes || [];
-  cachedBouquets = data.bouquets || [];
-  renderPots(data.pots);
-  renderInventory(cachedInventory);
-  renderBouquets(cachedRecipes, cachedBouquets, cachedInventory);
+  try {
+    const data = await apiCall('get_pots');
+    if (data.error) { showToast('加载失败'); return; }
+    cachedInventory = data.inventory || {};
+    cachedRecipes = data.recipes || [];
+    cachedBouquets = data.bouquets || [];
+    renderPots(data.pots);
+    renderInventory(cachedInventory);
+    renderBouquets(cachedRecipes, cachedBouquets, cachedInventory);
+  } catch (e) {
+    console.error('[greenhouse] load error:', e);
+    showToast('加载失败');
+  }
 }
 
 function openPlantModal(potIndex) {
