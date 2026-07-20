@@ -35,15 +35,15 @@ body { background: #FDF8F3; min-height: 100vh; font-family: 'Segoe UI', sans-ser
 .ripple { position: absolute; border-radius: 50%; background: rgba(201,168,232,0.3); pointer-events: none; animation: rippleAnim 0.6s ease-out forwards; }
 @keyframes rippleAnim { 0%{width:0;height:0;opacity:1} 100%{width:60px;height:60px;opacity:0} }
 
-/* Bottom section: bubble left, character right */
-.character-section { padding: 12px 16px 30px; display: flex; align-items: flex-start; justify-content: flex-end; gap: 12px; min-height: 200px; }
-.character-img { width: 160px; height: auto; image-rendering: pixelated; filter: drop-shadow(0 4px 16px rgba(120,80,60,0.15)); cursor: pointer; transition: transform 0.15s ease; flex-shrink: 0; animation: breathe 3.5s ease-in-out infinite; }
+/* Bottom section: bubble left-center, character right */
+.character-section { padding: 0 16px 30px; display: flex; align-items: flex-start; justify-content: flex-end; gap: 10px; min-height: 200px; position: relative; }
+.character-img { width: 160px; height: auto; image-rendering: pixelated; filter: drop-shadow(0 4px 16px rgba(120,80,60,0.15)); cursor: pointer; transition: transform 0.15s ease; flex-shrink: 0; margin-top: -20px; animation: breathe 3.5s ease-in-out infinite; }
 .character-img:active { transform: scale(0.93); animation: none; }
 .character-img.bounce { animation: charBounce 0.4s ease forwards; }
 @keyframes breathe { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
 @keyframes charBounce { 0%{transform:translateY(0)} 30%{transform:translateY(-8px)} 60%{transform:translateY(2px)} 100%{transform:translateY(0)} }
 
-.speech-bubble { flex: 1; min-height: 120px; background: #FFFBF7; color: #5a4a3e; font-size: 14px; line-height: 1.8; padding: 18px 20px; border-radius: 18px 18px 4px 18px; box-shadow: 0 2px 12px rgba(120,80,60,0.08); border: 1px solid #f0e6dc; opacity: 0; transform: translateY(6px); transition: opacity 0.4s ease, transform 0.4s ease; display: flex; align-items: center; justify-content: center; text-align: center; margin-top: 10px; }
+.speech-bubble { flex: 1; min-height: 120px; max-width: 210px; background: #f8f0fa; color: #5a4a5e; font-size: 14px; line-height: 1.8; padding: 18px 20px; border-radius: 18px 18px 4px 18px; box-shadow: 0 2px 12px rgba(160,120,180,0.08); border: 1px solid #ece0f0; opacity: 0; transform: translateY(6px); transition: opacity 0.4s ease, transform 0.4s ease; display: flex; align-items: center; justify-content: center; text-align: center; margin-top: 40px; margin-right: -6px; }
 .speech-bubble.show { opacity: 1; transform: translateY(0); }
 
 /* Miss indicator */
