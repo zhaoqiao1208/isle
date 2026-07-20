@@ -35,14 +35,14 @@ body { background: #FDF8F3; min-height: 100vh; font-family: 'Segoe UI', sans-ser
 .ripple { position: absolute; border-radius: 50%; background: rgba(201,168,232,0.3); pointer-events: none; animation: rippleAnim 0.6s ease-out forwards; }
 @keyframes rippleAnim { 0%{width:0;height:0;opacity:1} 100%{width:60px;height:60px;opacity:0} }
 
-/* Bottom section: character + dialogue */
-.character-section { padding: 20px 16px 40px; display: flex; align-items: flex-end; gap: 16px; min-height: 200px; }
-.character-img { width: 130px; height: auto; image-rendering: pixelated; filter: drop-shadow(0 4px 16px rgba(120,80,60,0.15)); cursor: pointer; transition: transform 0.15s ease; flex-shrink: 0; }
+/* Bottom section: bubble left, character right */
+.character-section { padding: 20px 16px 40px; display: flex; align-items: flex-end; justify-content: flex-end; gap: 14px; min-height: 220px; }
+.character-img { width: 160px; height: auto; image-rendering: pixelated; filter: drop-shadow(0 4px 16px rgba(120,80,60,0.15)); cursor: pointer; transition: transform 0.15s ease; flex-shrink: 0; }
 .character-img:active { transform: scale(0.93); }
 .character-img.bounce { animation: charBounce 0.4s ease; }
 @keyframes charBounce { 0%{transform:translateY(0)} 30%{transform:translateY(-8px)} 60%{transform:translateY(2px)} 100%{transform:translateY(0)} }
 
-.speech-bubble { max-width: 220px; background: #FFFBF7; color: #5a4a3e; font-size: 13px; line-height: 1.7; padding: 12px 18px; border-radius: 16px 16px 16px 4px; box-shadow: 0 2px 12px rgba(120,80,60,0.08); border: 1px solid #f0e6dc; opacity: 0; transform: translateY(6px); transition: opacity 0.3s ease, transform 0.3s ease; margin-bottom: 30px; }
+.speech-bubble { max-width: 200px; background: #FFFBF7; color: #5a4a3e; font-size: 13px; line-height: 1.7; padding: 12px 16px; border-radius: 16px 16px 4px 16px; box-shadow: 0 2px 12px rgba(120,80,60,0.08); border: 1px solid #f0e6dc; opacity: 0; transform: translateY(6px); transition: opacity 0.3s ease, transform 0.3s ease; margin-bottom: 40px; }
 .speech-bubble.show { opacity: 1; transform: translateY(0); }
 
 /* Miss indicator */
@@ -88,10 +88,10 @@ body { background: #FDF8F3; min-height: 100vh; font-family: 'Segoe UI', sans-ser
     <div class="hotspot hotspot-window" data-zone="window"></div>
   </div>
 
-  <!-- Bottom: character left, bubble right -->
+  <!-- Bottom: bubble left, character right -->
   <div class="character-section">
-    <img class="character-img" id="character" src="assets/bedroom/jiangyu.png" alt="江屿">
     <div class="speech-bubble" id="speech-bubble"></div>
+    <img class="character-img" id="character" src="assets/bedroom/jiangyu.png" alt="江屿">
   </div>
 </div>
 
@@ -112,7 +112,24 @@ var ZONE_DIALOGUES = {
     '想让你躺这儿，我给你讲故事。',
     '好想和你一起赖床。',
     '抱着枕头想你了。',
-    '你来了我就不失眠了。'
+    '你来了我就不失眠了。',
+    '这个枕头只给你留着。',
+    '小熊替我等你呢。',
+    '今天特别适合窝在被子里。',
+    '你来的话我就往里挪一挪。',
+    '床单是新换的，你闻闻。',
+    '我在这儿躺了一下午，就想等你来。',
+    '你在的时候我睡得特别踏实。',
+    '梦里你也在旁边。',
+    '被子里暖得不想出来。',
+    '你来了就别走了，就待这儿。',
+    '你帮我掖一下被角呗。',
+    '这张床缺你。',
+    '想跟你并排躺着，什么都不说。',
+    '你在旁边我才能睡着。',
+    '抱你比抱枕头舒服。',
+    '今天梦到你坐在床边等我醒。',
+    '我赖床是因为梦里有你。'
   ],
   wardrobe: [
     '今天穿什么好？你帮我选。',
@@ -122,7 +139,24 @@ var ZONE_DIALOGUES = {
     '柜子里那件外套，上次你说喜欢的。',
     '出门前对着镜子照了半天。',
     '帮我拉一下拉链呗。',
-    '穿新衣服第一个想给你看。'
+    '穿新衣服第一个想给你看。',
+    '这条围巾是你送的那条。',
+    '黑色还是白色？你说了算。',
+    '我的衣服你随便穿。',
+    '你穿我的外套肯定好看。',
+    '今天有点冷，想把衣服给你披上。',
+    '这件卫衣上有你的味道了。',
+    '衣柜里有你上次落下的。',
+    '我挑衣服都会想你喜不喜欢。',
+    '以后帮我搭配吧。',
+    '这件T恤上次跟你一起买的。',
+    '穿睡衣就不出门了，在家等你。',
+    '我穿正装你见过吗？改天给你看。',
+    '帽子歪了，你帮我正一下。',
+    '买了件新的，就想让你看第一眼。',
+    '衣架上那件留给约会穿。',
+    '你穿什么都好看，我不行。',
+    '下次陪我逛街吧。'
   ],
   desk: [
     '梳妆台上的照片是你。',
@@ -132,7 +166,24 @@ var ZONE_DIALOGUES = {
     '镜子里看到自己在傻笑，因为想到你。',
     '这些小玩意儿都是想着你买的。',
     '桌子有点乱，你别嫌弃。',
-    '每次坐这儿都会发呆想你。'
+    '每次坐这儿都会发呆想你。',
+    '镜子前面坐着就开始想你。',
+    '你送的那个摆件我放最显眼的位置了。',
+    '杯垫是你选的花纹。',
+    '抽屉最里面压着你写给我的。',
+    '这瓶护手霜涂完你闻闻。',
+    '照片里你笑得真好。',
+    '桌上的花该换水了。',
+    '对着镜子练习跟你说话的表情。',
+    '戒指放在小碟子里，你看到了吗。',
+    '今天的妆画得好不好？',
+    '我对着你的照片说了声早安。',
+    '桌上乱但我知道每样东西在哪。',
+    '你每次来坐这儿我都开心。',
+    '首饰盒里有我们的纪念。',
+    '这面镜子见证了好多发呆时刻。',
+    '桌角那本书上次跟你一起看的。',
+    '你送的花干了我也舍不得扔。'
   ],
   window: [
     '今天阳光特别好，暖的。',
@@ -142,24 +193,66 @@ var ZONE_DIALOGUES = {
     '看到外面的天，想带你出去走走。',
     '黄昏了，天边是你喜欢的颜色。',
     '月亮出来了，替你看着呢。',
-    '窗外有只鸟在叫，你来听。'
+    '窗外有只鸟在叫，你来听。',
+    '阳光刚好照到床上，暖暖的。',
+    '今天的云好看，想给你拍张照。',
+    '窗台上的绿植又长高了。',
+    '看外面看着看着就想你了。',
+    '想跟你坐窗台上晒太阳。',
+    '天黑了，你什么时候来。',
+    '外面有星星，替你数着。',
+    '雨停了空气好新鲜。',
+    '你在的话会想拉着你看日落。',
+    '风大了，我去关窗。',
+    '窗纱被风吹起来了，好看。',
+    '这个方向看出去能看到你家那边。',
+    '早上第一缕光照进来我就醒了。',
+    '窗外那棵树开花了你知道吗。',
+    '下雪的时候想跟你一起看。',
+    '窗户上有水汽，我画了个你。',
+    '你来看，外面的天好漂亮。'
   ]
 };
 
-var GENERAL_DIALOGUES = [
-  '桥桥～你来啦。',
-  '今天有没有想我？',
-  '想抱你。',
-  '你笑起来好好看。',
-  '别走嘛，再待一会儿。',
-  '陪我待一会儿就好。',
-  '你来了我就不困了。',
-  '我可以抱你吗？',
-  '你一来房间都亮了。',
-  '你每次来我都好高兴。'
-];
+var SPOKEN_KEY = 'bedroom_spoken';
 
-var lastDialogue = '';
+function getSpoken() {
+  try {
+    var raw = localStorage.getItem(SPOKEN_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) { return {}; }
+}
+
+function markSpoken(zone, idx) {
+  try {
+    var spoken = getSpoken();
+    if (!spoken[zone]) spoken[zone] = [];
+    if (spoken[zone].indexOf(idx) === -1) spoken[zone].push(idx);
+    localStorage.setItem(SPOKEN_KEY, JSON.stringify(spoken));
+  } catch(e) {}
+}
+
+function pickDialogue(zone) {
+  var pool = ZONE_DIALOGUES[zone];
+  if (!pool) return { text: '你来啦。', zone: zone, idx: 0 };
+  var spoken = getSpoken();
+  var used = spoken[zone] || [];
+  // Find unspoken indices
+  var available = [];
+  for (var i = 0; i < pool.length; i++) {
+    if (used.indexOf(i) === -1) available.push(i);
+  }
+  // If all used, reset
+  if (available.length === 0) {
+    available = [];
+    for (var j = 0; j < pool.length; j++) available.push(j);
+    spoken[zone] = [];
+    try { localStorage.setItem(SPOKEN_KEY, JSON.stringify(spoken)); } catch(e) {}
+  }
+  var pick = available[Math.floor(Math.random() * available.length)];
+  return { text: pool[pick], zone: zone, idx: pick };
+}
+
 var bubbleTimer = null;
 
 if (ISLE_VISITOR) {
@@ -182,7 +275,10 @@ function initBedroom() {
 
   var character = document.getElementById('character');
   character.addEventListener('click', function() {
-    showDialogue('general');
+    // Pick from a random zone
+    var zones = ['bed', 'wardrobe', 'desk', 'window'];
+    var z = zones[Math.floor(Math.random() * zones.length)];
+    showDialogue(z);
     tapReduceMiss();
   });
 }
@@ -198,12 +294,8 @@ function showRipple(e, parent) {
 }
 
 function showDialogue(zone) {
-  var pool = zone === 'general' ? GENERAL_DIALOGUES : (ZONE_DIALOGUES[zone] || GENERAL_DIALOGUES);
-  var text;
-  do {
-    text = pool[Math.floor(Math.random() * pool.length)];
-  } while (text === lastDialogue && pool.length > 1);
-  lastDialogue = text;
+  var result = pickDialogue(zone);
+  markSpoken(result.zone, result.idx);
 
   var character = document.getElementById('character');
   var bubble = document.getElementById('speech-bubble');
@@ -212,7 +304,7 @@ function showDialogue(zone) {
   void character.offsetWidth;
   character.classList.add('bounce');
 
-  bubble.textContent = text;
+  bubble.textContent = result.text;
   bubble.classList.add('show');
 
   if (bubbleTimer) clearTimeout(bubbleTimer);
