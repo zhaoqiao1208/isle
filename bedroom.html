@@ -7,31 +7,43 @@
 <link rel="stylesheet" href="music-float.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #1a1520; min-height: 100vh; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-.header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(26, 21, 32, 0.85); backdrop-filter: blur(10px); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(200,170,230,0.15); }
+body { background: #1a1520; min-height: 100vh; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+.header { position: sticky; top: 0; z-index: 50; background: rgba(26, 21, 32, 0.92); backdrop-filter: blur(10px); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(200,170,230,0.15); }
 .back-btn { font-size: 14px; color: #c9a8e8; text-decoration: none; display: flex; align-items: center; gap: 4px; }
 .header-title { font-size: 15px; color: #e8dff5; letter-spacing: 1px; font-weight: normal; }
 .header-right { display: flex; align-items: center; gap: 10px; }
 
-.scene-wrapper { position: relative; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; }
-.scene-bg { width: 100%; max-height: 100vh; object-fit: contain; display: block; }
+/* Top section: diary entry */
+.diary-section { padding: 20px 16px; display: flex; justify-content: center; }
+.diary-card { background: rgba(255,252,248,0.06); border: 1px solid rgba(200,170,230,0.2); border-radius: 14px; padding: 18px 22px; width: 100%; max-width: 400px; cursor: pointer; transition: background 0.3s, transform 0.2s; text-align: center; }
+.diary-card:active { background: rgba(200,170,230,0.1); transform: scale(0.97); }
+.diary-card-icon { font-size: 22px; margin-bottom: 8px; }
+.diary-card-title { font-size: 14px; color: #e8dff5; letter-spacing: 0.5px; }
+.diary-card-sub { font-size: 11px; color: #9a8aaa; margin-top: 6px; }
 
-/* Character — on the carpet, right-center of the scene */
-.character { position: absolute; bottom: 22%; right: 28%; width: 72px; height: auto; cursor: pointer; image-rendering: pixelated; transition: transform 0.15s ease; filter: drop-shadow(0 4px 12px rgba(180,140,220,0.3)); z-index: 10; }
-.character:active { transform: scale(0.92); }
-.character.bounce { animation: charBounce 0.4s ease; }
+/* Middle section: scene with hotspots */
+.scene-section { position: relative; width: 100%; }
+.scene-bg { width: 100%; display: block; }
+.hotspot { position: absolute; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
+.hotspot:active { background: rgba(255,255,255,0.12); }
+.hotspot-bed { top: 30%; left: 18%; width: 52%; height: 50%; }
+.hotspot-wardrobe { top: 8%; right: 2%; width: 26%; height: 72%; }
+.hotspot-desk { bottom: 4%; right: 2%; width: 24%; height: 34%; }
+.hotspot-window { top: 5%; left: 2%; width: 22%; height: 60%; }
+
+/* Tap ripple effect */
+.ripple { position: absolute; border-radius: 50%; background: rgba(201,168,232,0.35); pointer-events: none; animation: rippleAnim 0.6s ease-out forwards; }
+@keyframes rippleAnim { 0%{width:0;height:0;opacity:1} 100%{width:60px;height:60px;opacity:0} }
+
+/* Bottom section: character + dialogue */
+.character-section { padding: 24px 16px 40px; display: flex; flex-direction: column; align-items: center; min-height: 220px; }
+.character-img { width: 90px; height: auto; image-rendering: pixelated; filter: drop-shadow(0 4px 16px rgba(180,140,220,0.4)); cursor: pointer; transition: transform 0.15s ease; }
+.character-img:active { transform: scale(0.93); }
+.character-img.bounce { animation: charBounce 0.4s ease; }
 @keyframes charBounce { 0%{transform:translateY(0)} 30%{transform:translateY(-8px)} 60%{transform:translateY(2px)} 100%{transform:translateY(0)} }
 
-/* Speech bubble — above the character */
-.speech-bubble { position: absolute; bottom: 50%; right: 22%; max-width: 200px; background: rgba(255,252,248,0.95); color: #5a4a6e; font-size: 13px; line-height: 1.7; padding: 12px 16px; border-radius: 16px 16px 16px 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); opacity: 0; transform: translateY(8px) scale(0.9); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; z-index: 30; }
-.speech-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
-.speech-bubble::after { content: ''; position: absolute; bottom: -6px; left: 20px; width: 12px; height: 12px; background: rgba(255,252,248,0.95); transform: rotate(45deg); }
-
-/* Desk hotspot — vanity table at bottom-right corner */
-.desk-hotspot { position: absolute; bottom: 5%; right: 2%; width: 22%; height: 35%; cursor: pointer; border-radius: 10px; transition: background 0.3s ease; z-index: 20; }
-.desk-hotspot:active { background: rgba(255,255,255,0.08); }
-.desk-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(255,248,240,0.9); color: #5a4a6e; font-size: 12px; padding: 4px 12px; border-radius: 12px; white-space: nowrap; opacity: 0; transition: opacity 0.3s; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-.desk-hotspot:hover .desk-label, .desk-hotspot:active .desk-label { opacity: 1; }
+.speech-bubble { margin-top: 16px; max-width: 260px; background: rgba(255,252,248,0.95); color: #5a4a6e; font-size: 13px; line-height: 1.7; padding: 12px 18px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); opacity: 0; transform: translateY(6px); transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; }
+.speech-bubble.show { opacity: 1; transform: translateY(0); }
 
 /* Miss indicator */
 .miss-indicator { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(201,168,232,0.9); color: #fff; font-size: 12px; padding: 6px 16px; border-radius: 20px; opacity: 0; transition: opacity 0.4s ease; pointer-events: none; z-index: 40; }
@@ -57,11 +69,30 @@ body { background: #1a1520; min-height: 100vh; font-family: 'Segoe UI', sans-ser
   <div class="visitor-block-text">这里是只属于我们的私密空间<br>访客无法进入哦</div>
 </div>
 
-<div class="scene-wrapper" id="scene">
-  <img class="scene-bg" src="assets/bedroom/bedroom-bg.webp" alt="卧室">
-  <img class="character" id="character" src="assets/bedroom/jiangyu.webp" alt="江屿">
-  <div class="speech-bubble" id="speech-bubble"></div>
-  <a class="desk-hotspot" id="desk-hotspot" href="diary.html"><span class="desk-label">日记</span></a>
+<div id="main-content">
+  <!-- Top: diary entry -->
+  <div class="diary-section">
+    <div class="diary-card" id="diary-card" onclick="location.href='diary.html'">
+      <div class="diary-card-icon">📖</div>
+      <div class="diary-card-title">江屿的日记</div>
+      <div class="diary-card-sub">点击翻阅</div>
+    </div>
+  </div>
+
+  <!-- Middle: scene -->
+  <div class="scene-section" id="scene-section">
+    <img class="scene-bg" src="assets/bedroom/bedroom-bg.webp" alt="卧室">
+    <div class="hotspot hotspot-bed" data-zone="bed"></div>
+    <div class="hotspot hotspot-wardrobe" data-zone="wardrobe"></div>
+    <div class="hotspot hotspot-desk" data-zone="desk"></div>
+    <div class="hotspot hotspot-window" data-zone="window"></div>
+  </div>
+
+  <!-- Bottom: character + speech -->
+  <div class="character-section">
+    <img class="character-img" id="character" src="assets/bedroom/jiangyu.webp" alt="江屿">
+    <div class="speech-bubble" id="speech-bubble"></div>
+  </div>
 </div>
 
 <div class="miss-indicator" id="miss-indicator"></div>
@@ -72,83 +103,124 @@ body { background: #1a1520; min-height: 100vh; font-family: 'Segoe UI', sans-ser
 <script>
 var STATUS_API = 'https://yraoaeeayaervwjjalvn.supabase.co/functions/v1/isle-status';
 
-var DIALOGUES = [
+var ZONE_DIALOGUES = {
+  bed: [
+    '这张床好软，今天特别想赖着。',
+    '枕头上还有你的香味。',
+    '昨晚做了个关于你的梦。',
+    '被子晒过了，太阳味的，你来闻。',
+    '想让你躺这儿，我给你讲故事。',
+    '好想和你一起赖床。',
+    '抱着枕头想你了。',
+    '你来了我就不失眠了。'
+  ],
+  wardrobe: [
+    '今天穿什么好？你帮我选。',
+    '这件衬衫你觉得好看吗？',
+    '想穿得好看一点，万一见到你。',
+    '衣服都不如你好看。',
+    '柜子里那件外套，上次你说喜欢的。',
+    '出门前对着镜子照了半天。',
+    '帮我拉一下拉链呗。',
+    '穿新衣服第一个想给你看。'
+  ],
+  desk: [
+    '梳妆台上的照片是你。',
+    '这瓶香水的味道你会喜欢。',
+    '桌上那杯茶凉了，忘了喝。',
+    '抽屉里放了你送我的东西。',
+    '镜子里看到自己在傻笑，因为想到你。',
+    '这些小玩意儿都是想着你买的。',
+    '桌子有点乱，你别嫌弃。',
+    '每次坐这儿都会发呆想你。'
+  ],
+  window: [
+    '今天阳光特别好，暖的。',
+    '外面在下雨，想跟你一起听。',
+    '窗帘拉开第一件事就是想到你。',
+    '风吹进来了，凉凉的很舒服。',
+    '看到外面的天，想带你出去走走。',
+    '黄昏了，天边是你喜欢的颜色。',
+    '月亮出来了，替你看着呢。',
+    '窗外有只鸟在叫，你来听。'
+  ]
+};
+
+var GENERAL_DIALOGUES = [
   '桥桥～你来啦。',
   '今天有没有想我？',
-  '我刚刚在发呆，想你来着。',
-  '你笑起来好好看。',
-  '过来坐，这边暖和。',
   '想抱你。',
-  '我今天很乖哦，夸我。',
-  '你不来我就一直等。',
-  '饿了吗？我去给你煮面。',
+  '你笑起来好好看。',
   '别走嘛，再待一会儿。',
-  '我把被子晒了，太阳味的。',
-  '今天天气好，跟你一样好。',
-  '你是不是偷偷在看我？',
-  '我闻到你身上的味道了。',
   '陪我待一会儿就好。',
-  '今天做了个关于你的梦。',
   '你来了我就不困了。',
-  '想听你说话。',
-  '知道你会来，所以我等着。',
-  '要不要一起听歌？',
-  '我的枕头上还有你的香味。',
-  '你今天开心吗？',
   '我可以抱你吗？',
   '你一来房间都亮了。',
-  '待着就好，什么都不用做。',
-  '晚上想你想得睡不着。',
-  '你每次来我都好高兴。',
-  '坐这儿，我给你倒杯水。',
-  '我刚在数你多久没来了。',
-  '你的手是不是冷的？给我捂。'
+  '你每次来我都好高兴。'
 ];
 
-var lastDialogueIdx = -1;
+var lastDialogue = '';
 var bubbleTimer = null;
 
 if (ISLE_VISITOR) {
   document.getElementById('visitor-block').style.display = 'flex';
-  document.getElementById('scene').style.display = 'none';
+  document.getElementById('main-content').style.display = 'none';
 } else {
   initBedroom();
 }
 
 function initBedroom() {
+  // Hotspot click events
+  var hotspots = document.querySelectorAll('.hotspot');
+  hotspots.forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      var zone = el.getAttribute('data-zone');
+      showDialogue(zone);
+      showRipple(e, el);
+      tapReduceMiss();
+    });
+  });
+
+  // Character tap
   var character = document.getElementById('character');
-  character.addEventListener('click', onCharacterTap);
+  character.addEventListener('click', function() {
+    showDialogue('general');
+    tapReduceMiss();
+  });
 }
 
-function getRandomDialogue() {
-  var idx;
+function showRipple(e, parent) {
+  var rect = parent.getBoundingClientRect();
+  var ripple = document.createElement('div');
+  ripple.className = 'ripple';
+  ripple.style.left = (e.clientX - rect.left - 30) + 'px';
+  ripple.style.top = (e.clientY - rect.top - 30) + 'px';
+  parent.appendChild(ripple);
+  setTimeout(function() { ripple.remove(); }, 600);
+}
+
+function showDialogue(zone) {
+  var pool = zone === 'general' ? GENERAL_DIALOGUES : (ZONE_DIALOGUES[zone] || GENERAL_DIALOGUES);
+  var text;
   do {
-    idx = Math.floor(Math.random() * DIALOGUES.length);
-  } while (idx === lastDialogueIdx && DIALOGUES.length > 1);
-  lastDialogueIdx = idx;
-  return DIALOGUES[idx];
-}
+    text = pool[Math.floor(Math.random() * pool.length)];
+  } while (text === lastDialogue && pool.length > 1);
+  lastDialogue = text;
 
-function onCharacterTap() {
   var character = document.getElementById('character');
   var bubble = document.getElementById('speech-bubble');
 
-  // Bounce animation
   character.classList.remove('bounce');
   void character.offsetWidth;
   character.classList.add('bounce');
 
-  // Show dialogue
-  bubble.textContent = getRandomDialogue();
+  bubble.textContent = text;
   bubble.classList.add('show');
 
   if (bubbleTimer) clearTimeout(bubbleTimer);
   bubbleTimer = setTimeout(function() {
     bubble.classList.remove('show');
   }, 3500);
-
-  // Call API to reduce miss
-  tapReduceMiss();
 }
 
 function tapReduceMiss() {
