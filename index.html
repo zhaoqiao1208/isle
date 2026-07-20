@@ -31,7 +31,7 @@
 <body>
 
 <!-- Splash Screen -->
-<div class="splash-screen" id="splash">
+<div class="splash-screen hidden" id="splash">
   <div class="splash-title">屿</div>
   <div class="splash-subtitle">Isle</div>
   <img class="splash-tree" src="assets/greenhouse/tree.png" alt="蓝花楹">
@@ -79,14 +79,19 @@ function escapeHtml(s){var d=document.createElement('div');d.textContent=s;retur
 function pad2(n){return n<10?'0'+n:''+n}
 localStorage.removeItem('isle_music_state');
 
-/* Splash screen dismiss */
+/* Splash screen: only show once per session (closing app resets it) */
 (function(){
   try {
     var splash = document.getElementById('splash');
-    if (splash) {
-      setTimeout(function(){ splash.classList.add('hidden'); }, 2200);
-      setTimeout(function(){ splash.style.display = 'none'; }, 3200);
+    if (!splash) return;
+    if (sessionStorage.getItem('isle_splash_shown')) {
+      splash.style.display = 'none';
+      return;
     }
+    splash.classList.remove('hidden');
+    sessionStorage.setItem('isle_splash_shown', '1');
+    setTimeout(function(){ splash.classList.add('hidden'); }, 2200);
+    setTimeout(function(){ splash.style.display = 'none'; }, 3200);
   } catch(e) { console.error('Splash error:', e); }
 })();
 
