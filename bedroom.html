@@ -7,42 +7,42 @@
 <link rel="stylesheet" href="music-float.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #1a1520; min-height: 100vh; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
-.header { position: sticky; top: 0; z-index: 50; background: rgba(26, 21, 32, 0.92); backdrop-filter: blur(10px); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(200,170,230,0.15); }
-.back-btn { font-size: 14px; color: #c9a8e8; text-decoration: none; display: flex; align-items: center; gap: 4px; }
-.header-title { font-size: 15px; color: #e8dff5; letter-spacing: 1px; font-weight: normal; }
+body { background: #FDF8F3; min-height: 100vh; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+.header { position: sticky; top: 0; z-index: 50; background: rgba(253, 248, 243, 0.92); backdrop-filter: blur(10px); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0e6dc; }
+.back-btn { font-size: 14px; color: #9a8b7e; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+.header-title { font-size: 15px; color: #5a4a3e; letter-spacing: 1px; font-weight: normal; }
 .header-right { display: flex; align-items: center; gap: 10px; }
 
 /* Top section: diary entry */
 .diary-section { padding: 20px 16px; display: flex; justify-content: center; }
-.diary-card { background: rgba(255,252,248,0.06); border: 1px solid rgba(200,170,230,0.2); border-radius: 14px; padding: 18px 22px; width: 100%; max-width: 400px; cursor: pointer; transition: background 0.3s, transform 0.2s; text-align: center; }
-.diary-card:active { background: rgba(200,170,230,0.1); transform: scale(0.97); }
+.diary-card { background: #FFFBF7; border: 1px solid #f0e6dc; border-radius: 14px; padding: 18px 22px; width: 100%; max-width: 400px; cursor: pointer; transition: background 0.3s, transform 0.2s, box-shadow 0.3s; text-align: center; box-shadow: 0 2px 12px rgba(120,80,60,0.04); }
+.diary-card:active { background: #faf3ec; transform: scale(0.97); box-shadow: 0 4px 16px rgba(120,80,60,0.08); }
 .diary-card-icon { font-size: 22px; margin-bottom: 8px; }
-.diary-card-title { font-size: 14px; color: #e8dff5; letter-spacing: 0.5px; }
-.diary-card-sub { font-size: 11px; color: #9a8aaa; margin-top: 6px; }
+.diary-card-title { font-size: 14px; color: #5a4a3e; letter-spacing: 0.5px; }
+.diary-card-sub { font-size: 11px; color: #9a8b7e; margin-top: 6px; }
 
 /* Middle section: scene with hotspots */
 .scene-section { position: relative; width: 100%; }
 .scene-bg { width: 100%; display: block; }
 .hotspot { position: absolute; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
-.hotspot:active { background: rgba(255,255,255,0.12); }
+.hotspot:active { background: rgba(201,168,232,0.15); }
 .hotspot-bed { top: 30%; left: 18%; width: 52%; height: 50%; }
 .hotspot-wardrobe { top: 8%; right: 2%; width: 26%; height: 72%; }
 .hotspot-desk { bottom: 4%; right: 2%; width: 24%; height: 34%; }
 .hotspot-window { top: 5%; left: 2%; width: 22%; height: 60%; }
 
 /* Tap ripple effect */
-.ripple { position: absolute; border-radius: 50%; background: rgba(201,168,232,0.35); pointer-events: none; animation: rippleAnim 0.6s ease-out forwards; }
+.ripple { position: absolute; border-radius: 50%; background: rgba(201,168,232,0.3); pointer-events: none; animation: rippleAnim 0.6s ease-out forwards; }
 @keyframes rippleAnim { 0%{width:0;height:0;opacity:1} 100%{width:60px;height:60px;opacity:0} }
 
 /* Bottom section: character + dialogue */
-.character-section { padding: 24px 16px 40px; display: flex; flex-direction: column; align-items: center; min-height: 220px; }
-.character-img { width: 90px; height: auto; image-rendering: pixelated; filter: drop-shadow(0 4px 16px rgba(180,140,220,0.4)); cursor: pointer; transition: transform 0.15s ease; }
+.character-section { padding: 20px 16px 40px; display: flex; align-items: flex-end; gap: 16px; min-height: 200px; }
+.character-img { width: 130px; height: auto; image-rendering: pixelated; filter: drop-shadow(0 4px 16px rgba(120,80,60,0.15)); cursor: pointer; transition: transform 0.15s ease; flex-shrink: 0; }
 .character-img:active { transform: scale(0.93); }
 .character-img.bounce { animation: charBounce 0.4s ease; }
 @keyframes charBounce { 0%{transform:translateY(0)} 30%{transform:translateY(-8px)} 60%{transform:translateY(2px)} 100%{transform:translateY(0)} }
 
-.speech-bubble { margin-top: 16px; max-width: 260px; background: rgba(255,252,248,0.95); color: #5a4a6e; font-size: 13px; line-height: 1.7; padding: 12px 18px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); opacity: 0; transform: translateY(6px); transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; }
+.speech-bubble { max-width: 220px; background: #FFFBF7; color: #5a4a3e; font-size: 13px; line-height: 1.7; padding: 12px 18px; border-radius: 16px 16px 16px 4px; box-shadow: 0 2px 12px rgba(120,80,60,0.08); border: 1px solid #f0e6dc; opacity: 0; transform: translateY(6px); transition: opacity 0.3s ease, transform 0.3s ease; margin-bottom: 30px; }
 .speech-bubble.show { opacity: 1; transform: translateY(0); }
 
 /* Miss indicator */
@@ -50,9 +50,9 @@ body { background: #1a1520; min-height: 100vh; font-family: 'Segoe UI', sans-ser
 .miss-indicator.show { opacity: 1; }
 
 /* Visitor */
-.visitor-block { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1520; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+.visitor-block { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #FDF8F3; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
 .visitor-block-icon { font-size: 48px; margin-bottom: 20px; opacity: 0.6; }
-.visitor-block-text { font-size: 14px; color: #9a8aaa; line-height: 1.8; text-align: center; }
+.visitor-block-text { font-size: 14px; color: #9a8b7e; line-height: 1.8; text-align: center; }
 </style>
 </head>
 <body>
@@ -88,7 +88,7 @@ body { background: #1a1520; min-height: 100vh; font-family: 'Segoe UI', sans-ser
     <div class="hotspot hotspot-window" data-zone="window"></div>
   </div>
 
-  <!-- Bottom: character + speech -->
+  <!-- Bottom: character left, bubble right -->
   <div class="character-section">
     <img class="character-img" id="character" src="assets/bedroom/jiangyu.png" alt="江屿">
     <div class="speech-bubble" id="speech-bubble"></div>
