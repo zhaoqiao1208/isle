@@ -16,20 +16,20 @@ body { background: #1a1520; min-height: 100vh; font-family: 'Segoe UI', sans-ser
 .scene-wrapper { position: relative; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; }
 .scene-bg { width: 100%; max-height: 100vh; object-fit: contain; display: block; }
 
-/* Character */
-.character { position: absolute; bottom: 18%; left: 25%; width: 80px; height: auto; cursor: pointer; image-rendering: pixelated; transition: transform 0.15s ease; filter: drop-shadow(0 4px 12px rgba(180,140,220,0.3)); }
+/* Character — on the carpet, right-center of the scene */
+.character { position: absolute; bottom: 22%; right: 28%; width: 72px; height: auto; cursor: pointer; image-rendering: pixelated; transition: transform 0.15s ease; filter: drop-shadow(0 4px 12px rgba(180,140,220,0.3)); z-index: 10; }
 .character:active { transform: scale(0.92); }
 .character.bounce { animation: charBounce 0.4s ease; }
 @keyframes charBounce { 0%{transform:translateY(0)} 30%{transform:translateY(-8px)} 60%{transform:translateY(2px)} 100%{transform:translateY(0)} }
 
-/* Speech bubble */
-.speech-bubble { position: absolute; bottom: 48%; left: 10%; max-width: 220px; background: rgba(255,252,248,0.95); color: #5a4a6e; font-size: 13px; line-height: 1.7; padding: 12px 16px; border-radius: 16px 16px 16px 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); opacity: 0; transform: translateY(8px) scale(0.9); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; z-index: 30; }
+/* Speech bubble — above the character */
+.speech-bubble { position: absolute; bottom: 50%; right: 22%; max-width: 200px; background: rgba(255,252,248,0.95); color: #5a4a6e; font-size: 13px; line-height: 1.7; padding: 12px 16px; border-radius: 16px 16px 16px 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); opacity: 0; transform: translateY(8px) scale(0.9); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; z-index: 30; }
 .speech-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
 .speech-bubble::after { content: ''; position: absolute; bottom: -6px; left: 20px; width: 12px; height: 12px; background: rgba(255,252,248,0.95); transform: rotate(45deg); }
 
-/* Desk hotspot */
-.desk-hotspot { position: absolute; bottom: 10%; right: 8%; width: 35%; height: 28%; cursor: pointer; border-radius: 10px; transition: background 0.3s ease; z-index: 20; }
-.desk-hotspot:active { background: rgba(255,255,255,0.1); }
+/* Desk hotspot — vanity table at bottom-right corner */
+.desk-hotspot { position: absolute; bottom: 5%; right: 2%; width: 22%; height: 35%; cursor: pointer; border-radius: 10px; transition: background 0.3s ease; z-index: 20; }
+.desk-hotspot:active { background: rgba(255,255,255,0.08); }
 .desk-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(255,248,240,0.9); color: #5a4a6e; font-size: 12px; padding: 4px 12px; border-radius: 12px; white-space: nowrap; opacity: 0; transition: opacity 0.3s; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .desk-hotspot:hover .desk-label, .desk-hotspot:active .desk-label { opacity: 1; }
 
