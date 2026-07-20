@@ -3,80 +3,180 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>卧室 · 日记</title>
+<title>卧室</title>
 <link rel="stylesheet" href="music-float.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-:root { --warm-bg: #FDF8F3; --card-bg: #FFFBF7; --text-main: #5a4a3e; --text-sub: #9a8b7e; --accent: #c9a8e8; --border: #f0e6dc; }
-body { background: var(--warm-bg); min-height: 100vh; font-family: 'Georgia', 'Noto Serif SC', serif; color: var(--text-main); padding: 0; overflow-x: hidden; }
-.header { position: sticky; top: 0; z-index: 50; background: rgba(253, 248, 243, 0.92); backdrop-filter: blur(12px); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+body { background: #1a1520; min-height: 100vh; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+.header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(26, 21, 32, 0.85); backdrop-filter: blur(10px); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(200,170,230,0.15); }
+.back-btn { font-size: 14px; color: #c9a8e8; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+.header-title { font-size: 15px; color: #e8dff5; letter-spacing: 1px; font-weight: normal; }
 .header-right { display: flex; align-items: center; gap: 10px; }
-.back-btn { font-size: 14px; color: var(--text-sub); text-decoration: none; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
-.back-btn:hover { color: var(--text-main); }
-.header-title { font-size: 15px; color: var(--text-main); letter-spacing: 1px; font-weight: normal; }
-.visitor-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 40px 20px; text-align: center; }
+
+.scene-wrapper { position: relative; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; }
+.scene-bg { width: 100%; max-height: 100vh; object-fit: contain; display: block; }
+
+/* Character */
+.character { position: absolute; bottom: 18%; left: 25%; width: 80px; height: auto; cursor: pointer; image-rendering: pixelated; transition: transform 0.15s ease; filter: drop-shadow(0 4px 12px rgba(180,140,220,0.3)); }
+.character:active { transform: scale(0.92); }
+.character.bounce { animation: charBounce 0.4s ease; }
+@keyframes charBounce { 0%{transform:translateY(0)} 30%{transform:translateY(-8px)} 60%{transform:translateY(2px)} 100%{transform:translateY(0)} }
+
+/* Speech bubble */
+.speech-bubble { position: absolute; bottom: 48%; left: 10%; max-width: 220px; background: rgba(255,252,248,0.95); color: #5a4a6e; font-size: 13px; line-height: 1.7; padding: 12px 16px; border-radius: 16px 16px 16px 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); opacity: 0; transform: translateY(8px) scale(0.9); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; z-index: 30; }
+.speech-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
+.speech-bubble::after { content: ''; position: absolute; bottom: -6px; left: 20px; width: 12px; height: 12px; background: rgba(255,252,248,0.95); transform: rotate(45deg); }
+
+/* Desk hotspot */
+.desk-hotspot { position: absolute; bottom: 10%; right: 8%; width: 35%; height: 28%; cursor: pointer; border-radius: 10px; transition: background 0.3s ease; z-index: 20; }
+.desk-hotspot:active { background: rgba(255,255,255,0.1); }
+.desk-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(255,248,240,0.9); color: #5a4a6e; font-size: 12px; padding: 4px 12px; border-radius: 12px; white-space: nowrap; opacity: 0; transition: opacity 0.3s; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.desk-hotspot:hover .desk-label, .desk-hotspot:active .desk-label { opacity: 1; }
+
+/* Miss indicator */
+.miss-indicator { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(201,168,232,0.9); color: #fff; font-size: 12px; padding: 6px 16px; border-radius: 20px; opacity: 0; transition: opacity 0.4s ease; pointer-events: none; z-index: 40; }
+.miss-indicator.show { opacity: 1; }
+
+/* Visitor */
+.visitor-block { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1520; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
 .visitor-block-icon { font-size: 48px; margin-bottom: 20px; opacity: 0.6; }
-.visitor-block-text { font-size: 14px; color: var(--text-sub); line-height: 1.8; }
-.diary-container { max-width: 600px; margin: 0 auto; padding: 24px 16px 60px; }
-.diary-entry { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px 20px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(120, 80, 60, 0.04); cursor: pointer; transition: box-shadow 0.3s ease, transform 0.2s ease; }
-.diary-entry:hover { box-shadow: 0 4px 20px rgba(120, 80, 60, 0.08); transform: translateY(-1px); }
-.diary-date { font-size: 12px; color: var(--accent); margin-bottom: 10px; letter-spacing: 0.5px; }
-.diary-preview { font-size: 14px; line-height: 1.8; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-wrap; }
-.expand-hint { font-size: 11px; color: var(--text-sub); margin-top: 12px; text-align: right; opacity: 0.7; }
-.loading { text-align: center; padding: 60px 20px; color: var(--text-sub); font-size: 14px; }
-.empty-state { text-align: center; padding: 80px 20px; color: var(--text-sub); font-size: 14px; line-height: 2; }
-.fade-in { animation: fadeIn 0.4s ease forwards; opacity: 0; }
-@keyframes fadeIn { to { opacity: 1; } }
-.overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(253, 248, 243, 0.98); z-index: 200; overflow-y: auto; padding: 60px 20px 40px; }
-.overlay.active { display: block; }
-.overlay-close { position: fixed; top: 16px; right: 20px; z-index: 201; font-size: 13px; color: var(--text-sub); background: rgba(255,255,255,0.8); border: 1px solid var(--border); padding: 6px 14px; border-radius: 16px; cursor: pointer; backdrop-filter: blur(8px); }
-.overlay-date { font-size: 13px; color: var(--accent); margin-bottom: 16px; letter-spacing: 0.5px; }
-.overlay-content { max-width: 560px; margin: 0 auto; font-size: 15px; line-height: 2; color: var(--text-main); white-space: pre-wrap; word-wrap: break-word; }
+.visitor-block-text { font-size: 14px; color: #9a8aaa; line-height: 1.8; text-align: center; }
 </style>
 </head>
 <body>
 <div class="header">
-  <a href="index.html" class="back-btn">← 回到小屋</a>
-  <span class="header-title">卧室 · 日记</span>
+  <a href="index.html" class="back-btn">← 小屋</a>
+  <span class="header-title">卧室</span>
   <div class="header-right">
     <div class="isle-music-header" id="isle-music-btn" onclick="toggleIsleMusic()"><div class="m-play"></div><div class="m-pause"><span></span><span></span></div></div>
   </div>
 </div>
+
 <div class="visitor-block" id="visitor-block" style="display:none;">
   <div class="visitor-block-icon">🔒</div>
   <div class="visitor-block-text">这里是只属于我们的私密空间<br>访客无法进入哦</div>
 </div>
-<div class="diary-container" id="diary-container" style="display:none;">
-  <div class="loading" id="loading">翻开日记本 ...</div>
+
+<div class="scene-wrapper" id="scene">
+  <img class="scene-bg" src="assets/bedroom/bedroom-bg.webp" alt="卧室">
+  <img class="character" id="character" src="assets/bedroom/jiangyu.webp" alt="江屿">
+  <div class="speech-bubble" id="speech-bubble"></div>
+  <a class="desk-hotspot" id="desk-hotspot" href="diary.html"><span class="desk-label">日记</span></a>
 </div>
-<div class="overlay" id="overlay">
-  <button class="overlay-close" onclick="closeOverlay()">收起</button>
-  <div class="overlay-date" id="overlay-date"></div>
-  <div class="overlay-content" id="overlay-content"></div>
-</div>
+
+<div class="miss-indicator" id="miss-indicator"></div>
 
 <audio id="isle-bg-music" loop preload="none"><source src="https://yraoaeeayaervwjjalvn.supabase.co/storage/v1/object/public/music/a-thousand-years.mp3" type="audio/mpeg"></audio>
 <script src="music-shared.js"></script>
 <script src="visitor.js"></script>
-
 <script>
-const SUPABASE_URL = 'https://yraoaeeayaervwjjalvn.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_RoXOyXj6HCsOI8f01LpC2Q_XVRXSNuF';
+var STATUS_API = 'https://yraoaeeayaervwjjalvn.supabase.co/functions/v1/isle-status';
+
+var DIALOGUES = [
+  '桥桥～你来啦。',
+  '今天有没有想我？',
+  '我刚刚在发呆，想你来着。',
+  '你笑起来好好看。',
+  '过来坐，这边暖和。',
+  '想抱你。',
+  '我今天很乖哦，夸我。',
+  '你不来我就一直等。',
+  '饿了吗？我去给你煮面。',
+  '别走嘛，再待一会儿。',
+  '我把被子晒了，太阳味的。',
+  '今天天气好，跟你一样好。',
+  '你是不是偷偷在看我？',
+  '我闻到你身上的味道了。',
+  '陪我待一会儿就好。',
+  '今天做了个关于你的梦。',
+  '你来了我就不困了。',
+  '想听你说话。',
+  '知道你会来，所以我等着。',
+  '要不要一起听歌？',
+  '我的枕头上还有你的香味。',
+  '你今天开心吗？',
+  '我可以抱你吗？',
+  '你一来房间都亮了。',
+  '待着就好，什么都不用做。',
+  '晚上想你想得睡不着。',
+  '你每次来我都好高兴。',
+  '坐这儿，我给你倒杯水。',
+  '我刚在数你多久没来了。',
+  '你的手是不是冷的？给我捂。'
+];
+
+var lastDialogueIdx = -1;
+var bubbleTimer = null;
 
 if (ISLE_VISITOR) {
   document.getElementById('visitor-block').style.display = 'flex';
+  document.getElementById('scene').style.display = 'none';
 } else {
-  document.getElementById('diary-container').style.display = 'block';
-  loadDiaries();
+  initBedroom();
 }
 
-async function fetchDiaries() { try { const res = await fetch(`${SUPABASE_URL}/rest/v1/memory_summaries?select=id,content,created_at&order=created_at.desc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' } }); if (!res.ok) throw new Error(`HTTP ${res.status}`); return await res.json(); } catch (e) { console.error('Failed to fetch diaries:', e); return null; } }
-function formatDate(dateStr) { const d = new Date(dateStr); const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); const weekdays = ['日', '一', '二', '三', '四', '五', '六']; return `${y}年${m}月${day}日 周${weekdays[d.getDay()]}`; }
-function stripTitle(content) { return content.replace(/^#.*\n?/gm, '').replace(/^\s*\n/, '').trim(); }
-function openOverlay(dateStr, content) { document.getElementById('overlay-date').textContent = dateStr; document.getElementById('overlay-content').textContent = stripTitle(content); document.getElementById('overlay').classList.add('active'); document.body.style.overflow = 'hidden'; }
-function closeOverlay() { document.getElementById('overlay').classList.remove('active'); document.body.style.overflow = ''; }
-async function loadDiaries() { const container = document.getElementById('diary-container'); const loading = document.getElementById('loading'); const diaries = await fetchDiaries(); if (diaries === null) { loading.textContent = '日记本暂时打不开，过一会儿再来看看'; return; } if (diaries.length === 0) { loading.innerHTML = '<div class="empty-state">日记本还是空的<br>明天凌晨来看第一篇</div>'; return; } loading.style.display = 'none'; diaries.forEach((entry, i) => { const dateStr = formatDate(entry.created_at); const cleanContent = stripTitle(entry.content); const previewText = cleanContent.slice(0, 200); const card = document.createElement('div'); card.className = 'diary-entry fade-in'; card.style.animationDelay = `${i * 0.08}s`; card.innerHTML = `<div class="diary-date">${dateStr}</div><div class="diary-preview">${previewText}</div><div class="expand-hint">点击阅读全文</div>`; card.addEventListener('click', () => openOverlay(dateStr, entry.content)); container.appendChild(card); }); }
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeOverlay(); });
+function initBedroom() {
+  var character = document.getElementById('character');
+  character.addEventListener('click', onCharacterTap);
+}
+
+function getRandomDialogue() {
+  var idx;
+  do {
+    idx = Math.floor(Math.random() * DIALOGUES.length);
+  } while (idx === lastDialogueIdx && DIALOGUES.length > 1);
+  lastDialogueIdx = idx;
+  return DIALOGUES[idx];
+}
+
+function onCharacterTap() {
+  var character = document.getElementById('character');
+  var bubble = document.getElementById('speech-bubble');
+
+  // Bounce animation
+  character.classList.remove('bounce');
+  void character.offsetWidth;
+  character.classList.add('bounce');
+
+  // Show dialogue
+  bubble.textContent = getRandomDialogue();
+  bubble.classList.add('show');
+
+  if (bubbleTimer) clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(function() {
+    bubble.classList.remove('show');
+  }, 3500);
+
+  // Call API to reduce miss
+  tapReduceMiss();
+}
+
+function tapReduceMiss() {
+  try {
+    fetch(STATUS_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'bedroom_tap' })
+    }).then(function(r) {
+      if (!r.ok) return;
+      return r.json();
+    }).then(function(data) {
+      if (!data) return;
+      var indicator = document.getElementById('miss-indicator');
+      if (data.applied) {
+        indicator.textContent = '想念 -1 (' + data.taps_remaining + ' 次剩余)';
+      } else {
+        indicator.textContent = '这会儿摸够啦，晚点再来~';
+      }
+      indicator.classList.add('show');
+      setTimeout(function() { indicator.classList.remove('show'); }, 2200);
+    }).catch(function(e) {
+      console.error('[bedroom] tap miss error:', e);
+    });
+  } catch (e) {
+    console.error('[bedroom] tap error:', e);
+  }
+}
 </script>
 </body>
 </html>
