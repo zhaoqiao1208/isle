@@ -56,7 +56,7 @@ body { background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 10
 .bouquet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .bouquet-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 14px 10px; text-align: center; min-height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s, box-shadow 0.3s; position: relative; overflow: hidden; cursor: pointer; }
 .bouquet-card.crafted { border-color: rgba(122,184,94,0.5); box-shadow: 0 4px 20px rgba(122,184,94,0.18); }
-.bouquet-card.locked .bouquet-img { filter: grayscale(1) brightness(0.45); transition: filter 0.4s; }
+.bouquet-card.locked .bouquet-img { filter: grayscale(0.55) brightness(0.75) opacity(0.8); transition: filter 0.4s; }
 .bouquet-card.crafted .bouquet-img { filter: none; animation: bouquetGlow 3s ease-in-out infinite; }
 @keyframes bouquetGlow { 0%,100%{ filter: drop-shadow(0 0 0px transparent); } 50%{ filter: drop-shadow(0 0 8px rgba(122,184,94,0.35)); } }
 .bouquet-img { width: 64px; height: 64px; object-fit: contain; margin-bottom: 6px; }
@@ -203,7 +203,6 @@ function renderBouquets(recipes, bouquets, inventory) {
       return `<div class="bouquet-card crafted" onclick="showCard(${r.bouquet_index})"><img class="bouquet-img" src="${imgSrc}"><div class="bouquet-name">${r.name}</div><div class="bouquet-status">已完成 ✓</div></div>`;
     }
 
-    // Not crafted: show image but dark
     const recipe = r.recipe;
     let canCraft = true;
     let statusParts = [];
