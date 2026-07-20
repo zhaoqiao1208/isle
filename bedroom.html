@@ -90,7 +90,7 @@ body { background: #1a1520; min-height: 100vh; font-family: 'Segoe UI', sans-ser
 
   <!-- Bottom: character + speech -->
   <div class="character-section">
-    <img class="character-img" id="character" src="assets/bedroom/jiangyu.webp" alt="江屿">
+    <img class="character-img" id="character" src="assets/bedroom/jiangyu.png" alt="江屿">
     <div class="speech-bubble" id="speech-bubble"></div>
   </div>
 </div>
@@ -170,7 +170,6 @@ if (ISLE_VISITOR) {
 }
 
 function initBedroom() {
-  // Hotspot click events
   var hotspots = document.querySelectorAll('.hotspot');
   hotspots.forEach(function(el) {
     el.addEventListener('click', function(e) {
@@ -181,7 +180,6 @@ function initBedroom() {
     });
   });
 
-  // Character tap
   var character = document.getElementById('character');
   character.addEventListener('click', function() {
     showDialogue('general');
